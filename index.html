@@ -480,6 +480,18 @@
               <span id="age-gate-toggle-label" style="font-size:13px; color:var(--text-dim); letter-spacing:1px;">OFF</span>
             </label>
           </div>
+          <div>
+            <label style="font-size:11px; color:var(--text-dim); letter-spacing:2px; display:block; margin-bottom:6px;">
+              EXPIRES AFTER
+            </label>
+            <select id="expiry-days" class="terminal-input" style="cursor:pointer;">
+              <option value="7">7 DAYS</option>
+              <option value="14">14 DAYS</option>
+              <option value="30" selected>30 DAYS</option>
+              <option value="90">90 DAYS</option>
+              <option value="0">NEVER</option>
+            </select>
+          </div>
         </div>
 
         <!-- Generate Button -->
@@ -563,6 +575,18 @@
           <div style="color:var(--neon); margin-bottom:4px;">03 // DELIVER</div>
           <div style="color:var(--text-dim);">Destination loads in the native OS browser. No tracking. No middleman. Full sovereignty.</div>
         </div>
+      </div>
+    </div>
+
+    <!-- Active Links Dashboard -->
+    <div class="glass-panel" style="overflow:hidden;">
+      <div class="p-3 flex items-center gap-2 border-b" style="border-color: var(--border-dim); background: rgba(0,0,0,0.3);">
+        <span style="color:var(--neon);">●</span>
+        <span style="font-size:11px; color:var(--text-dim); margin-left:8px;">terminal://dissoverse/active-links</span>
+        <button onclick="loadActiveLinks()" style="margin-left:auto; background:transparent; border:1px solid var(--border-dim); color:var(--text-dim); font-family:'Share Tech Mono',monospace; font-size:10px; padding:3px 10px; cursor:pointer; letter-spacing:1px; transition:all 0.3s;" onmouseover="this.style.borderColor='var(--neon)';this.style.color='var(--neon)'" onmouseout="this.style.borderColor='var(--border-dim)';this.style.color='var(--text-dim)'">↻ REFRESH</button>
+      </div>
+      <div id="active-links-panel" class="p-4" style="min-height:72px; background: rgba(0,0,0,0.4); font-size:12px;">
+        <div style="color:var(--text-dim);">Connect GitHub token to view active links.</div>
       </div>
     </div>
 
@@ -656,6 +680,7 @@ function updateTokenStatus() {
     el.style.textShadow = 'none';
   }
   updateDeployButtonVisibility();
+  loadActiveLinks();
 }
 
 function updateDeployButtonVisibility() {
@@ -670,6 +695,103 @@ function updateDeployButtonVisibility() {
   if (deployInstructions) deployInstructions.style.display = (!hasToken && outputVisible) ? 'block' : 'none';
   // Show download only when no token (fallback workflow)
   if (downloadBtn) downloadBtn.style.display = (!hasToken && outputVisible) ? 'flex' : 'none';
+}
+
+// ==================== ACTIVE LINKS DASHBOARD ====================
+async function loadActiveLinks() {
+  const token = sessionStorage.getItem('gh_pat');
+  const panel = document.getElementById('active-links-panel');
+  if (!panel) return;
+
+  if (!token) {
+    panel.innerHTML = '<div style="color:var(--text-dim);">Connect GitHub token to view active links.</div>';
+    return;
+  }
+
+  panel.innerHTML = '<div style="color:var(--text-dim);">SCANNING REPO...</div>';
+
+  try {
+    const resp = await fetch('https://api.github.com/repos/analogflowers-coder/dissolinks/contents/', {
+      headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json' }
+    });
+
+    if (resp.status === 401) {
+      panel.innerHTML = '<div style="color:var(--red-warn);">[ERROR] Authentication failed. Check your PAT in ⚙ settings.</div>';
+      return;
+    }
+    if (!resp.ok) {
+      panel.innerHTML = '<div style="color:var(--red-warn);">[ERROR] Failed to fetch repo contents (' + resp.status + ').</div>';
+      return;
+    }
+
+    const items = await resp.json();
+    const dirs = items.filter(item => item.type === 'dir');
+
+    if (dirs.length === 0) {
+      panel.innerHTML = '<div style="color:var(--text-dim);">No active links yet. Generate your first link above.</div>';
+      return;
+    }
+
+    let html = '<div style="display:flex;flex-direction:column;gap:0;">';
+    dirs.forEach(dir => {
+      const cleanUrl = 'https://links.dissoverse.com/' + dir.name;
+      html += `<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:7px 0;border-bottom:1px solid rgba(0,255,65,0.07);">
+        <span style="flex:1;min-width:0;color:var(--neon);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;">links.dissoverse.com/${dir.name}</span>
+        <button onclick="copyToClipboard('${cleanUrl}')" class="btn-neon" style="font-size:10px;padding:3px 10px;letter-spacing:1px;flex-shrink:0;">COPY</button>
+        <button onclick="deleteLink('${dir.name}')" class="btn-neon btn-red" style="font-size:10px;padding:3px 10px;letter-spacing:1px;flex-shrink:0;">DELETE</button>
+      </div>`;
+    });
+    html += '</div>';
+    panel.innerHTML = html;
+  } catch (e) {
+    panel.innerHTML = '<div style="color:var(--red-warn);">[ERROR] Network error loading links.</div>';
+  }
+}
+
+async function deleteLink(name) {
+  const token = sessionStorage.getItem('gh_pat');
+  if (!token) return;
+
+  addLog('DELETE', 'Removing ' + name + '...', 'dim');
+  const fileUrl = 'https://api.github.com/repos/analogflowers-coder/dissolinks/contents/' + name + '/index.html';
+
+  try {
+    const fileResp = await fetch(fileUrl, {
+      headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json' }
+    });
+    if (!fileResp.ok) {
+      addLog('ERROR', 'Could not locate ' + name + '/index.html.', 'red');
+      return;
+    }
+    const fileData = await fileResp.json();
+
+    const delResp = await fetch(fileUrl, {
+      method: 'DELETE',
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github+json' },
+      body: JSON.stringify({ message: 'delete: ' + name, sha: fileData.sha })
+    });
+
+    if (delResp.ok) {
+      addLog('DELETE', name + ' removed successfully.', 'neon');
+      loadActiveLinks();
+    } else {
+      addLog('ERROR', 'Delete failed (' + delResp.status + ').', 'red');
+    }
+  } catch (e) {
+    addLog('ERROR', 'Delete failed. Network error.', 'red');
+  }
+}
+
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+  });
+  addLog('COPY', 'Copied: ' + text, 'dim');
 }
 
 // ==================== GITHUB DEPLOY ====================
@@ -752,6 +874,7 @@ function showDeployStatus(shortName) {
   document.getElementById('deploy-status-badge').style.display = 'block';
   document.getElementById('open-link-btn').style.display = 'flex';
   document.getElementById('deploy-live-btn').style.display = 'none';
+  loadActiveLinks();
 }
 
 function openDeployedLink() {
@@ -761,6 +884,7 @@ function openDeployedLink() {
 // ==================== STARTUP ====================
 window.addEventListener('DOMContentLoaded', function() {
   updateTokenStatus();
+  loadActiveLinks();
   addLog('SYSTEM', 'DissOLinK\'s Force-Op Generator v1.0 loaded.', 'neon');
   addLog('SYSTEM', 'All operations execute client-side. Zero data transmitted.', 'dim');
 });
@@ -827,9 +951,11 @@ function detectOS(ua) {
  * Generates the escape page HTML that will be hosted at the DISSOVERSE link.
  * When opened in an IAB, it forces the native browser open.
  */
-function buildEscapePage(targetUrl, label, mode, ageGate) {
+function buildEscapePage(targetUrl, label, mode, ageGate, expiryDays) {
   const safeUrl = targetUrl.replace(/"/g, '&quot;').replace(/</g, '&lt;');
   const safeLabel = (label || 'OPEN LINK').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+  const createdTs = Date.now();
+  const expDays = (expiryDays === undefined || expiryDays === null) ? 30 : expiryDays;
 
   const ageGateOverlay = ageGate ? `
 <div id="ep-gate" style="position:fixed;top:0;left:0;right:0;bottom:0;background:#0a0a0a;z-index:1000;display:flex;align-items:center;justify-content:center;flex-direction:column;padding:24px;text-align:center;">
@@ -909,6 +1035,13 @@ function epVerify() {
 </head>
 <body>
 ${ageGateOverlay}
+<div id="ep-expired" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:#0a0a0a;z-index:2000;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;">
+  <div style="color:#ff0033;font-size:11px;letter-spacing:4px;margin-bottom:16px;">&#9888; LINK EXPIRED &#9888;</div>
+  <div style="font-size:clamp(20px,5vw,32px);font-family:monospace;letter-spacing:2px;text-shadow:0 0 15px rgba(0,255,65,0.5);margin-bottom:16px;">THIS LINK HAS EXPIRED</div>
+  <div style="font-size:12px;color:rgba(0,255,65,0.5);letter-spacing:2px;margin-bottom:6px;" id="ep-expired-date"></div>
+  <div style="font-size:12px;color:rgba(0,255,65,0.5);letter-spacing:2px;" id="ep-expired-duration"></div>
+  <div style="position:fixed;bottom:16px;font-size:10px;color:rgba(0,255,65,0.3);">DISSOVERSE NEURAL NETWORK // SOVEREIGN LINK</div>
+</div>
 <div class="title">DissOLinK's</div>
 <div class="label">${safeLabel}</div>
 <div class="status" id="status">ANALYZING ENVIRONMENT...</div>
@@ -983,7 +1116,23 @@ ${ageGateJS}function runRedirect() {
     }, 500);
   }
 }
-${ageGate ? '' : 'runRedirect();'}
+(function() {
+  var CREATED_TS = ${createdTs};
+  var EXPIRY_DAYS = ${expDays};
+  if (EXPIRY_DAYS > 0) {
+    var elapsed = (Date.now() - CREATED_TS) / 86400000;
+    if (elapsed >= EXPIRY_DAYS) {
+      var d = new Date(CREATED_TS).toISOString().split('T')[0];
+      document.getElementById('ep-expired-date').textContent = 'GENERATED ' + d;
+      document.getElementById('ep-expired-duration').textContent = 'ACTIVE FOR ' + EXPIRY_DAYS + ' DAYS';
+      document.getElementById('ep-expired').style.display = 'flex';
+      var gate = document.getElementById('ep-gate');
+      if (gate) gate.style.display = 'none';
+      return;
+    }
+  }
+  ${ageGate ? '' : 'runRedirect();'}
+})();
 <\\/script>
 </body>
 </html>`;
@@ -1005,6 +1154,7 @@ function generateLink() {
   const label = labelInput.value.trim();
   const mode = modeSelect.value;
   const ageGate = document.getElementById('age-gate-toggle').checked;
+  const expiryDays = parseInt(document.getElementById('expiry-days').value, 10);
 
   // Validate short name
   if (!shortName) {
@@ -1056,16 +1206,16 @@ function generateLink() {
 
       // On last message, show output
       if (i === bootMessages.length - 1) {
-        finishGeneration(targetUrl, label, mode, ageGate, shortName);
+        finishGeneration(targetUrl, label, mode, ageGate, shortName, expiryDays);
       }
     }, delay);
     delay += 150 + Math.random() * 200;
   });
 }
 
-function finishGeneration(targetUrl, label, mode, ageGate, shortName) {
+function finishGeneration(targetUrl, label, mode, ageGate, shortName, expiryDays) {
   // Build the escape page HTML
-  generatedHTML = buildEscapePage(targetUrl, label, mode, ageGate);
+  generatedHTML = buildEscapePage(targetUrl, label, mode, ageGate, expiryDays);
 
   // Clean vanity URL
   generatedLink = 'https://links.dissoverse.com/' + shortName;
