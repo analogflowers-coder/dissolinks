@@ -1004,11 +1004,11 @@ function buildEscapeHTML(targetUrl, label, mode, ageGate, expiryDays) {
   parts.push('if(!isIAB){window.location.replace(TARGET);return;}');
   parts.push('if(isAndroid){window.location.href="intent://"+TARGET.replace(/^https?:\\/\\//,"")+"#Intent;scheme=https;end";');
   parts.push('setTimeout(function(){document.getElementById("fallback").style.display="block";},1500);return;}');
-  parts.push('if(isIOS){var safariUrl=TARGET.replace(/^https:\\/\\//,"x-safari-https://");');
-  parts.push('window.location.href=safariUrl;');
+  parts.push('if(isIOS){var bridgeUrl=window.location.href.replace(/^https:\\/\\//,"x-safari-https://");');
+  parts.push('window.location.href=bridgeUrl;');
   parts.push('setTimeout(function(){document.getElementById("fallback").style.display="block";');
   parts.push('document.getElementById("ios-tip").style.display="block";');
-  parts.push('document.getElementById("copy-btn").style.display="inline-block";},800);return;}');
+  parts.push('document.getElementById("copy-btn").style.display="inline-block";},2000);return;}');
   parts.push('window.location.href=TARGET;');
   parts.push('setTimeout(function(){document.getElementById("fallback").style.display="block";},1500);');
   parts.push('}');
