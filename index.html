@@ -81,11 +81,6 @@
     100% { transform: translate(0); }
   }
 
-  @keyframes scanDown {
-    0% { top: -5%; }
-    100% { top: 105%; }
-  }
-
   @keyframes typeIn {
     from { width: 0; }
     to { width: 100%; }
@@ -232,57 +227,14 @@
     white-space: nowrap;
   }
 
-  /* Age Gate */
-  #age-gate {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: var(--bg-deep);
-    z-index: 10000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-  }
-
-  #age-gate.verified {
-    animation: gateDissolve 0.8s ease-out forwards;
-  }
-
-  @keyframes gateDissolve {
-    0% { opacity: 1; }
-    50% { opacity: 1; filter: blur(0px); }
-    100% { opacity: 0; filter: blur(10px); pointer-events: none; }
-  }
-
-  .gate-text {
-    font-family: 'VT323', monospace;
-    font-size: clamp(24px, 5vw, 48px);
-    text-align: center;
-    text-shadow: 0 0 20px var(--neon-glow);
-  }
-
-  .verify-btn {
-    margin-top: 32px;
-    padding: 16px 48px;
-    font-size: 18px;
-    animation: pulseGlow 2s ease-in-out infinite;
-  }
-
-  .gate-warning {
-    color: var(--red-warn);
-    font-size: 11px;
-    margin-top: 16px;
-    text-shadow: 0 0 5px var(--red-glow);
-  }
-
-  .scan-line {
-    position: absolute;
-    width: 100%;
-    height: 4px;
-    background: linear-gradient(180deg, transparent, var(--neon-glow), transparent);
-    animation: scanDown 3s linear infinite;
-    opacity: 0.3;
-  }
+  /* Age Gate Toggle */
+  .toggle-wrap { display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; }
+  .toggle-switch { position: relative; width: 44px; height: 22px; flex-shrink: 0; }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+  .toggle-track { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); border: 1px solid var(--border-mid); transition: all 0.3s; }
+  .toggle-switch input:checked + .toggle-track { border-color: var(--neon); box-shadow: 0 0 8px var(--neon-glow); background: rgba(0,255,65,0.08); }
+  .toggle-thumb { position: absolute; top: 3px; left: 3px; width: 14px; height: 14px; background: var(--text-dim); transition: all 0.3s; }
+  .toggle-switch input:checked ~ .toggle-thumb { left: 25px; background: var(--neon); box-shadow: 0 0 6px var(--neon-glow); }
 
   /* Generated Link Display */
   .output-box {
@@ -332,41 +284,8 @@
 <!-- Matrix Rain Background -->
 <div class="matrix-bg" id="matrix-bg"></div>
 
-<!-- ==================== AGE GATE ==================== -->
-<div id="age-gate">
-  <div class="scan-line"></div>
-  <div style="position:relative; z-index:2; padding: 24px;">
-    <div class="gate-text" style="color: var(--red-warn); margin-bottom: 8px; font-size: clamp(12px, 2.5vw, 16px); letter-spacing: 4px;">
-      ⚠ RESTRICTED ACCESS ⚠
-    </div>
-    <div class="gate-text" style="margin-bottom: 4px;">
-      DISSOVERSE<br>NEURAL NETWORK
-    </div>
-    <div style="color: var(--text-dim); font-size: 12px; text-align: center; margin: 16px 0 32px;">
-      IDENTITY VERIFICATION REQUIRED
-    </div>
-
-    <div style="text-align:center;">
-      <label style="display:flex; align-items:center; justify-content:center; gap:12px; cursor:pointer; font-size:14px; color: var(--neon-dim);">
-        <input type="checkbox" id="age-check" style="accent-color: var(--neon); width:18px; height:18px; cursor:pointer;">
-        <span>I CONFIRM I AM 19 YEARS OF AGE OR OLDER</span>
-      </label>
-    </div>
-
-    <div style="text-align:center;">
-      <button class="btn-neon verify-btn" id="verify-btn" disabled onclick="verifyAge()">
-        ▶ VERIFY IDENTITY
-      </button>
-    </div>
-
-    <div class="gate-warning" style="text-align:center; max-width:400px; margin: 16px auto 0;">
-      UNAUTHORIZED ACCESS WILL BE LOGGED // SESSION ENCRYPTED
-    </div>
-  </div>
-</div>
-
 <!-- ==================== MAIN APP ==================== -->
-<div id="main-app" style="display:none; opacity:0; transition: opacity 0.5s;">
+<div id="main-app">
 
   <!-- Header -->
   <header class="p-4 sm:p-6 border-b" style="border-color: var(--border-dim);">
@@ -423,7 +342,7 @@
             type="url"
             id="target-url"
             class="terminal-input"
-            placeholder="https://your-destination-url.com"
+            placeholder="example.com or https://example.com"
             autocomplete="off"
             spellcheck="false"
           >
@@ -455,6 +374,19 @@
               <option value="safari">SAFARI FORCE</option>
               <option value="universal">UNIVERSAL</option>
             </select>
+          </div>
+          <div>
+            <label style="font-size:11px; color:var(--text-dim); letter-spacing:2px; display:block; margin-bottom:6px;">
+              AGE GATE
+            </label>
+            <label class="toggle-wrap" style="margin-top:10px;">
+              <div class="toggle-switch">
+                <input type="checkbox" id="age-gate-toggle">
+                <div class="toggle-track"></div>
+                <div class="toggle-thumb"></div>
+              </div>
+              <span id="age-gate-toggle-label" style="font-size:13px; color:var(--text-dim); letter-spacing:1px;">OFF</span>
+            </label>
           </div>
         </div>
 
@@ -570,42 +502,11 @@ function updateClock() {
 setInterval(updateClock, 1000);
 updateClock();
 
-// ==================== AGE GATE ====================
-const ageCheck = document.getElementById('age-check');
-const verifyBtn = document.getElementById('verify-btn');
-
-ageCheck.addEventListener('change', function() {
-  verifyBtn.disabled = !this.checked;
-  if (this.checked) {
-    verifyBtn.style.opacity = '1';
-  } else {
-    verifyBtn.style.opacity = '0.5';
-  }
+// ==================== STARTUP ====================
+window.addEventListener('DOMContentLoaded', function() {
+  addLog('SYSTEM', 'DissOLinK\'s Force-Op Generator v1.0 loaded.', 'neon');
+  addLog('SYSTEM', 'All operations execute client-side. Zero data transmitted.', 'dim');
 });
-
-function verifyAge() {
-  if (!ageCheck.checked) return;
-
-  const gate = document.getElementById('age-gate');
-  const app = document.getElementById('main-app');
-
-  // Glitch effect on verify
-  const gateText = gate.querySelector('.gate-text');
-  gateText.textContent = '■ IDENTITY VERIFIED ■';
-  gateText.style.color = 'var(--neon)';
-
-  setTimeout(() => {
-    gate.classList.add('verified');
-    app.style.display = 'block';
-    setTimeout(() => {
-      app.style.opacity = '1';
-      gate.style.display = 'none';
-      addLog('GATE', 'Identity verified. Session initialized.', 'neon');
-      addLog('SYSTEM', 'DissOLinK\'s Force-Op Generator v1.0 loaded.', 'dim');
-      addLog('SYSTEM', 'All operations execute client-side. Zero data transmitted.', 'dim');
-    }, 100);
-  }, 600);
-}
 
 // ==================== LIVE LOG ====================
 let logCount = 0;
@@ -669,9 +570,35 @@ function detectOS(ua) {
  * Generates the escape page HTML that will be hosted at the DISSOVERSE link.
  * When opened in an IAB, it forces the native browser open.
  */
-function buildEscapePage(targetUrl, label, mode) {
+function buildEscapePage(targetUrl, label, mode, ageGate) {
   const safeUrl = targetUrl.replace(/"/g, '&quot;').replace(/</g, '&lt;');
   const safeLabel = (label || 'OPEN LINK').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+
+  const ageGateOverlay = ageGate ? `
+<div id="ep-gate" style="position:fixed;top:0;left:0;right:0;bottom:0;background:#0a0a0a;z-index:1000;display:flex;align-items:center;justify-content:center;flex-direction:column;padding:24px;text-align:center;">
+  <div style="position:absolute;width:100%;height:4px;background:linear-gradient(180deg,transparent,rgba(0,255,65,0.3),transparent);animation:epScan 3s linear infinite;top:0;"></div>
+  <style>body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.12) 2px,rgba(0,0,0,0.12) 4px);pointer-events:none;z-index:999;}@keyframes epScan{0%{top:-5%}100%{top:105%}}</style>
+  <div style="font-size:11px;color:#ff0033;letter-spacing:4px;margin-bottom:12px;">&#9888; RESTRICTED ACCESS &#9888;</div>
+  <div style="font-size:clamp(28px,6vw,42px);font-family:monospace;text-shadow:0 0 15px rgba(0,255,65,0.5);margin-bottom:8px;line-height:1.1;">DISSOVERSE<br>NEURAL NETWORK</div>
+  <div style="font-size:12px;color:rgba(0,255,65,0.5);margin:16px 0 32px;letter-spacing:2px;">IDENTITY VERIFICATION REQUIRED</div>
+  <label style="display:flex;align-items:center;gap:12px;cursor:pointer;font-size:14px;color:rgba(0,255,65,0.7);margin-bottom:24px;">
+    <input type="checkbox" id="ep-age-chk" style="accent-color:#00ff41;width:18px;height:18px;cursor:pointer;" onchange="document.getElementById('ep-vbtn').disabled=!this.checked;document.getElementById('ep-vbtn').style.opacity=this.checked?'1':'0.5';">
+    <span>I CONFIRM I AM 19 YEARS OF AGE OR OLDER</span>
+  </label>
+  <button id="ep-vbtn" disabled onclick="epVerify()" style="background:transparent;border:1px solid #00ff41;color:#00ff41;font-family:'Courier New',monospace;font-size:16px;padding:14px 40px;cursor:pointer;text-transform:uppercase;letter-spacing:2px;opacity:0.5;transition:all 0.3s;">&#9654; VERIFY IDENTITY</button>
+  <div style="color:#ff0033;font-size:11px;margin-top:16px;">UNAUTHORIZED ACCESS WILL BE LOGGED // SESSION ENCRYPTED</div>
+</div>` : '';
+
+  const ageGateJS = ageGate ? `
+function epVerify() {
+  if (!document.getElementById('ep-age-chk').checked) return;
+  var g = document.getElementById('ep-gate');
+  g.style.transition = 'opacity 0.6s, filter 0.6s';
+  g.style.opacity = '0';
+  g.style.filter = 'blur(8px)';
+  setTimeout(function() { g.style.display = 'none'; runRedirect(); }, 650);
+}
+` : '';
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -724,6 +651,7 @@ function buildEscapePage(targetUrl, label, mode) {
 </style>
 </head>
 <body>
+${ageGateOverlay}
 <div class="title">DissOLinK's</div>
 <div class="label">${safeLabel}</div>
 <div class="status" id="status">ANALYZING ENVIRONMENT...</div>
@@ -732,7 +660,7 @@ function buildEscapePage(targetUrl, label, mode) {
 <div class="footer">DISSOVERSE NEURAL NETWORK // SOVEREIGN LINK</div>
 
 <script>
-(function() {
+${ageGateJS}function runRedirect() {
   var TARGET = "${safeUrl}";
   var MODE = "${mode}";
   var status = document.getElementById('status');
@@ -797,7 +725,8 @@ function buildEscapePage(targetUrl, label, mode) {
       window.location.href = TARGET;
     }, 500);
   }
-})();
+}
+${ageGate ? '' : 'runRedirect();'}
 <\\/script>
 </body>
 </html>`;
@@ -813,9 +742,16 @@ function generateLink() {
   const labelInput = document.getElementById('link-label');
   const modeSelect = document.getElementById('bypass-mode');
 
-  const targetUrl = urlInput.value.trim();
+  let targetUrl = urlInput.value.trim();
   const label = labelInput.value.trim();
   const mode = modeSelect.value;
+  const ageGate = document.getElementById('age-gate-toggle').checked;
+
+  // Auto-prepend https:// if no protocol present
+  if (targetUrl && !targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
+    targetUrl = 'https://' + targetUrl;
+    urlInput.value = targetUrl;
+  }
 
   // Validate
   if (!targetUrl) {
@@ -854,16 +790,16 @@ function generateLink() {
 
       // On last message, show output
       if (i === bootMessages.length - 1) {
-        finishGeneration(targetUrl, label, mode);
+        finishGeneration(targetUrl, label, mode, ageGate);
       }
     }, delay);
     delay += 150 + Math.random() * 200;
   });
 }
 
-function finishGeneration(targetUrl, label, mode) {
+function finishGeneration(targetUrl, label, mode, ageGate) {
   // Build the escape page HTML
-  generatedHTML = buildEscapePage(targetUrl, label, mode);
+  generatedHTML = buildEscapePage(targetUrl, label, mode, ageGate);
 
   // Create Base64 data URI version
   const b64 = btoa(unescape(encodeURIComponent(generatedHTML)));
@@ -946,6 +882,20 @@ function clearAll() {
 // Enter key triggers generate
 document.getElementById('target-url').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') generateLink();
+});
+
+// Age gate toggle label update
+document.getElementById('age-gate-toggle').addEventListener('change', function() {
+  const lbl = document.getElementById('age-gate-toggle-label');
+  if (this.checked) {
+    lbl.textContent = 'ON';
+    lbl.style.color = 'var(--neon)';
+    lbl.style.textShadow = '0 0 8px var(--neon-glow)';
+  } else {
+    lbl.textContent = 'OFF';
+    lbl.style.color = 'var(--text-dim)';
+    lbl.style.textShadow = 'none';
+  }
 });
 </script>
 
