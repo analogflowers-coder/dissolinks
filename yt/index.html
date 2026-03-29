@@ -7,35 +7,25 @@
 <div id="fallback" style="display:none;text-align:center;padding:24px;">
 <p style="color:#00ff41;font-size:16px;margin-bottom:20px;">Open in your browser:</p>
 <a href="https://youtube.com" target="_blank" rel="noopener" style="display:inline-block;padding:18px 48px;border:2px solid #00ff41;color:#00ff41;text-decoration:none;font-size:18px;font-weight:bold;letter-spacing:2px;">OPEN LINK</a>
-<p id="ios-tip" style="display:none;font-size:13px;color:#ff9900;margin-top:20px;line-height:1.6;">If the button doesn't work:<br>Tap <b>&#x22EF;</b> or <b>Share</b> &#x2192; <b>Open in Safari</b></p>
+<p id="ios-tip" style="display:none;font-size:13px;color:#ff9900;margin-top:20px;line-height:1.6;">If the button doesn't work:<br>Tap &#x22EF; or Share &#x2192; Open in Safari</p>
 <button id="copy-btn" style="display:none;margin-top:16px;padding:12px 32px;background:transparent;border:1px solid #666;color:#666;font-family:monospace;font-size:13px;cursor:pointer;">COPY LINK</button>
 </div>
 <script>
+(function(){
 var TARGET="https://youtube.com";
-var EXPIRY_DAYS=30;
-var CREATED=1774792971000;
-var AGE_GATE=false;
-function doRedirect(){
 var ua=navigator.userAgent||"";
 var isIAB=/Instagram|FBAN|FBAV|FB_IAB|musical_ly|BytedanceWebview|TikTok|Twitter|Snapchat|LinkedInApp/i.test(ua);
 var isAndroid=/Android/i.test(ua);
 var isIOS=/iPhone|iPad|iPod/i.test(ua);
 if(!isIAB){window.location.replace(TARGET);return;}
-if(isAndroid){window.location.href="intent://"+TARGET.replace(/^https?:\/\//,"")+"#Intent;scheme=https;end";
-setTimeout(function(){document.getElementById("fallback").style.display="block";},1500);return;}
-if(isIOS){var bridgeUrl=window.location.href.replace(/^https:\/\//,"x-safari-https://");
-window.location.href=bridgeUrl;
-setTimeout(function(){document.getElementById("fallback").style.display="block";
-document.getElementById("ios-tip").style.display="block";
-document.getElementById("copy-btn").style.display="inline-block";},2000);return;}
-window.location.href=TARGET;
-setTimeout(function(){document.getElementById("fallback").style.display="block";},1500);
+if(isAndroid){window.location.href="intent://"+TARGET.replace(/^https?:\/\//,"")+"#Intent;scheme=https;end";setTimeout(showFallback,1500);return;}
+if(isIOS){window.location.href=window.location.href.replace(/^https:\/\//,"x-safari-https://");setTimeout(showFallback,2000);return;}
+window.location.href=TARGET;setTimeout(showFallback,1500);
+function showFallback(){
+var fb=document.getElementById("fallback");if(fb)fb.style.display="block";
+var tip=document.getElementById("ios-tip");if(tip&&isIOS)tip.style.display="block";
+var cb=document.getElementById("copy-btn");if(cb){cb.style.display="inline-block";cb.onclick=function(){navigator.clipboard.writeText(TARGET);cb.textContent="COPIED!";cb.style.color="#00ff41";cb.style.borderColor="#00ff41";};}
 }
-document.getElementById("copy-btn").onclick=function(){navigator.clipboard.writeText(TARGET);this.textContent="COPIED!";this.style.color="#00ff41";this.style.borderColor="#00ff41";};
-(function(){
-if(EXPIRY_DAYS>0&&CREATED>0){var e=(Date.now()-CREATED)/86400000;if(e>EXPIRY_DAYS){document.body.innerHTML="<div style=\"text-align:center;padding:40px;color:#ff0033;\"><h2>LINK EXPIRED</h2></div>";return;}}
-if(AGE_GATE){return;}
-doRedirect();
 })();
 </script>
 </body></html>
