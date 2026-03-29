@@ -949,7 +949,7 @@ function detectOS(ua) {
 
 /**
  * Generates the escape page HTML via string concatenation.
- * CRITICAL: </script> is built as '<' + '/script>' to avoid breaking the outer script block.
+ * The closing script tag is built via concatenation to avoid parser issues.
  */
 function buildEscapeHTML(targetUrl, label, mode, ageGate, expiryDays) {
   var safeUrl = targetUrl.replace(/"/g, '&quot;');
