@@ -348,11 +348,30 @@
           >
         </div>
 
+        <!-- Short Link Name -->
+        <div>
+          <label style="font-size:11px; color:var(--text-dim); letter-spacing:2px; display:block; margin-bottom:6px;">
+            SHORT LINK NAME <span style="color:var(--red-warn);">*</span>
+          </label>
+          <input
+            type="text"
+            id="short-name"
+            class="terminal-input"
+            placeholder="e.g. mainframe"
+            maxlength="30"
+            autocomplete="off"
+            spellcheck="false"
+          >
+          <div style="font-size:12px; margin-top:6px; min-height:18px; color:var(--text-dim);">
+            links.dissoverse.com/<span id="short-name-preview" style="color:var(--neon);"></span>
+          </div>
+        </div>
+
         <!-- Options Row -->
         <div class="flex flex-wrap gap-4">
           <div class="flex-1" style="min-width:200px;">
             <label style="font-size:11px; color:var(--text-dim); letter-spacing:2px; display:block; margin-bottom:6px;">
-              LINK LABEL (OPTIONAL)
+              DISPLAY LABEL (OPTIONAL)
             </label>
             <input
               type="text"
@@ -418,9 +437,14 @@
             <button class="btn-neon" onclick="previewLink()" style="flex:1;">
               ◉ PREVIEW
             </button>
-            <button class="btn-neon" onclick="downloadHTML()" style="flex:1;">
-              ↓ EXPORT .HTML
+            <button class="btn-neon" onclick="downloadHTML()" style="flex:1;" id="download-btn">
+              ↓ DOWNLOAD .HTML
             </button>
+          </div>
+
+          <!-- Deploy Instructions -->
+          <div id="deploy-instructions" style="font-size:11px; color:var(--text-dim); line-height:1.9; padding-top:2px;">
+            TO ACTIVATE: Upload <span id="deploy-filename" style="color:var(--neon);"></span> to the dissolinks repo root and push. Your link goes live at the URL above.
           </div>
         </div>
       </div>
@@ -739,13 +763,22 @@ let generatedLink = '';
 
 function generateLink() {
   const urlInput = document.getElementById('target-url');
+  const shortNameInput = document.getElementById('short-name');
   const labelInput = document.getElementById('link-label');
   const modeSelect = document.getElementById('bypass-mode');
 
   let targetUrl = urlInput.value.trim();
+  const shortName = shortNameInput.value.trim();
   const label = labelInput.value.trim();
   const mode = modeSelect.value;
   const ageGate = document.getElementById('age-gate-toggle').checked;
+
+  // Validate short name
+  if (!shortName) {
+    addLog('ERROR', 'Short link name required. Operation aborted.', 'red');
+    shortNameInput.focus();
+    return;
+  }
 
   // Auto-prepend https:// if no protocol present
   if (targetUrl && !targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
@@ -753,7 +786,7 @@ function generateLink() {
     urlInput.value = targetUrl;
   }
 
-  // Validate
+  // Validate URL
   if (!targetUrl) {
     addLog('ERROR', 'No target URL provided. Operation aborted.', 'red');
     urlInput.focus();
@@ -773,14 +806,14 @@ function generateLink() {
 
   const bootMessages = [
     ['SCAN', 'Analyzing target: ' + targetUrl.substring(0, 50) + (targetUrl.length > 50 ? '...' : '')],
-    ['CRYPTO', 'Encoding payload via Base64...'],
+    ['LINK', 'Short link: links.dissoverse.com/' + shortName],
     ['BUILD', 'Compiling IAB detection matrix...'],
     ['BUILD', 'Injecting Android Intent URI handler...'],
     ['BUILD', 'Injecting Safari force-open bypass...'],
     ['BUILD', 'Embedding Facebook/TikTok/IG user-agent patterns...'],
     ['SECURE', 'Stripping tracking parameters...'],
     ['DEPLOY', 'Bypass mode: ' + mode.toUpperCase()],
-    ['COMPLETE', 'Force-Op link generated. Ready for deployment.'],
+    ['COMPLETE', 'Force-Op link ready: links.dissoverse.com/' + shortName],
   ];
 
   let delay = 200;
@@ -790,30 +823,32 @@ function generateLink() {
 
       // On last message, show output
       if (i === bootMessages.length - 1) {
-        finishGeneration(targetUrl, label, mode, ageGate);
+        finishGeneration(targetUrl, label, mode, ageGate, shortName);
       }
     }, delay);
     delay += 150 + Math.random() * 200;
   });
 }
 
-function finishGeneration(targetUrl, label, mode, ageGate) {
+function finishGeneration(targetUrl, label, mode, ageGate, shortName) {
   // Build the escape page HTML
   generatedHTML = buildEscapePage(targetUrl, label, mode, ageGate);
 
-  // Create Base64 data URI version
-  const b64 = btoa(unescape(encodeURIComponent(generatedHTML)));
-  generatedLink = 'data:text/html;base64,' + b64;
+  // Clean vanity URL
+  generatedLink = 'https://links.dissoverse.com/' + shortName;
 
-  // For GitHub Pages hosting, the real approach is to save the HTML file
-  // and link to it. We provide the data URI for instant testing.
   const outputSection = document.getElementById('output-section');
   const outputLink = document.getElementById('output-link');
 
   outputSection.style.display = 'block';
-  outputLink.textContent = generatedLink.substring(0, 120) + '...';
+  outputLink.textContent = generatedLink;
 
-  addLog('READY', 'Link armed. Click output box to copy. Use EXPORT to download standalone HTML.', 'neon');
+  // Update download button and deploy instructions
+  const filename = shortName + '.html';
+  document.getElementById('download-btn').textContent = '↓ DOWNLOAD ' + filename;
+  document.getElementById('deploy-filename').textContent = filename;
+
+  addLog('READY', 'Link armed: ' + generatedLink + ' // Click to copy.', 'neon');
 }
 
 function copyLink() {
@@ -856,31 +891,46 @@ function downloadHTML() {
     addLog('ERROR', 'No link generated. Generate first.', 'red');
     return;
   }
+  const shortName = document.getElementById('short-name').value.trim() || 'dissolink';
+  const filename = shortName + '.html';
   const blob = new Blob([generatedHTML], { type: 'text/html' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'dissolink-escape.html';
+  a.download = filename;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
-  addLog('EXPORT', 'Standalone HTML file downloaded: dissolink-escape.html', 'neon');
-  addLog('DEPLOY', 'Upload this file to GitHub Pages or any static host to activate.', 'dim');
+  addLog('EXPORT', 'Downloaded: ' + filename, 'neon');
+  addLog('DEPLOY', 'Upload ' + filename + ' to the dissolinks repo root and push to activate.', 'dim');
 }
 
 function clearAll() {
   document.getElementById('target-url').value = '';
+  document.getElementById('short-name').value = '';
+  document.getElementById('short-name-preview').textContent = '';
   document.getElementById('link-label').value = '';
   document.getElementById('output-section').style.display = 'none';
   document.getElementById('copy-confirm').style.display = 'none';
+  document.getElementById('download-btn').textContent = '↓ DOWNLOAD .HTML';
+  document.getElementById('deploy-filename').textContent = '';
   generatedHTML = '';
   generatedLink = '';
   addLog('CLEAR', 'All fields reset. Generator standing by.', 'dim');
 }
 
+// Short name: sanitize on input + live preview
+document.getElementById('short-name').addEventListener('input', function() {
+  this.value = this.value.toLowerCase().replace(/[^a-z0-9-]/g, '');
+  document.getElementById('short-name-preview').textContent = this.value;
+});
+
 // Enter key triggers generate
 document.getElementById('target-url').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') generateLink();
+});
+document.getElementById('short-name').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') generateLink();
 });
 
