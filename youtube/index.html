@@ -67,7 +67,7 @@
 <script>
 function runRedirect() {
   var TARGET = "https://youtube.com";
-  var MODE = "safari";
+  var MODE = "auto";
   var status = document.getElementById('status');
   var btn = document.getElementById('fallback-btn');
   var warn = document.getElementById('warn');
@@ -132,7 +132,7 @@ function runRedirect() {
   }
 }
 (function() {
-  var CREATED_TS = 1774788057442;
+  var CREATED_TS = 1774788602425;
   var EXPIRY_DAYS = 30;
   if (EXPIRY_DAYS > 0) {
     var elapsed = (Date.now() - CREATED_TS) / 86400000;
