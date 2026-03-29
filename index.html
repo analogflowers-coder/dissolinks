@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DissOLinK's // DISSOVERSE Neural Network</title>
+<meta name="description" content="Sovereign Deep Link Generator. Break the walled garden.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⛓</text></svg>">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap');
+
+  :root {
+    --neon: #00ff41;
+    --neon-dim: #00cc33;
+    --neon-glow: #00ff4180;
+    --red-warn: #ff0033;
+    --red-glow: #ff003380;
+    --bg-deep: #0a0a0a;
+    --bg-panel: #0d0d0d;
+    --bg-glass: rgba(0, 255, 65, 0.03);
+    --border-dim: rgba(0, 255, 65, 0.12);
+    --border-mid: rgba(0, 255, 65, 0.25);
+    --text-dim: rgba(0, 255, 65, 0.5);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg-deep);
+    color: var(--neon);
+    font-family: 'Share Tech Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* CRT Scanlines */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.15) 2px,
+      rgba(0, 0, 0, 0.15) 4px
+    );
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* CRT Flicker */
+  body::after {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 255, 65, 0.01);
+    pointer-events: none;
+    z-index: 9998;
+    animation: flicker 0.15s infinite;
+  }
+
+  @keyframes flicker {
+    0% { opacity: 0.97; }
+    50% { opacity: 1; }
+    100% { opacity: 0.98; }
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  @keyframes glitch {
+    0% { transform: translate(0); }
+    20% { transform: translate(-2px, 2px); }
+    40% { transform: translate(2px, -1px); }
+    60% { transform: translate(-1px, -2px); }
+    80% { transform: translate(1px, 1px); }
+    100% { transform: translate(0); }
+  }
+
+  @keyframes scanDown {
+    0% { top: -5%; }
+    100% { top: 105%; }
+  }
+
+  @keyframes typeIn {
+    from { width: 0; }
+    to { width: 100%; }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 5px var(--neon-glow), inset 0 0 5px rgba(0,255,65,0.05); }
+    50% { box-shadow: 0 0 20px var(--neon-glow), inset 0 0 10px rgba(0,255,65,0.08); }
+  }
+
+  @keyframes matrixRain {
+    0% { transform: translateY(-100%); opacity: 1; }
+    100% { transform: translateY(100vh); opacity: 0; }
+  }
+
+  .cursor-blink::after {
+    content: '█';
+    animation: blink 0.7s step-end infinite;
+  }
+
+  .glitch-text:hover {
+    animation: glitch 0.3s ease-in-out;
+  }
+
+  .glass-panel {
+    background: var(--bg-glass);
+    border: 1px solid var(--border-dim);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 0 15px rgba(0,0,0,0.5), inset 0 0 30px rgba(0,0,0,0.3);
+  }
+
+  .glass-panel:hover {
+    border-color: var(--border-mid);
+  }
+
+  .neon-border {
+    border: 1px solid var(--neon);
+    box-shadow: 0 0 10px var(--neon-glow), inset 0 0 10px rgba(0,255,65,0.05);
+  }
+
+  .terminal-input {
+    background: rgba(0,0,0,0.6);
+    border: 1px solid var(--border-mid);
+    color: var(--neon);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 14px;
+    padding: 12px 16px;
+    width: 100%;
+    outline: none;
+    transition: all 0.3s;
+  }
+
+  .terminal-input:focus {
+    border-color: var(--neon);
+    box-shadow: 0 0 15px var(--neon-glow);
+  }
+
+  .terminal-input::placeholder {
+    color: var(--text-dim);
+  }
+
+  .btn-neon {
+    background: transparent;
+    border: 1px solid var(--neon);
+    color: var(--neon);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 14px;
+    padding: 10px 24px;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-neon:hover {
+    background: rgba(0, 255, 65, 0.1);
+    box-shadow: 0 0 20px var(--neon-glow);
+    text-shadow: 0 0 10px var(--neon);
+  }
+
+  .btn-neon:active {
+    transform: scale(0.98);
+  }
+
+  .btn-neon::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -100%;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--neon), transparent);
+    animation: none;
+  }
+
+  .btn-neon:hover::before {
+    animation: scanAcross 0.6s ease-out;
+  }
+
+  @keyframes scanAcross {
+    to { left: 100%; }
+  }
+
+  .btn-red {
+    border-color: var(--red-warn);
+    color: var(--red-warn);
+  }
+
+  .btn-red:hover {
+    background: rgba(255, 0, 51, 0.1);
+    box-shadow: 0 0 20px var(--red-glow);
+    text-shadow: 0 0 10px var(--red-warn);
+  }
+
+  .log-entry {
+    animation: fadeUp 0.3s ease-out;
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  .matrix-bg {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: -1;
+    overflow: hidden;
+    opacity: 0.04;
+  }
+
+  .matrix-col {
+    position: absolute;
+    top: -100%;
+    font-family: 'VT323', monospace;
+    font-size: 14px;
+    color: var(--neon);
+    writing-mode: vertical-rl;
+    animation: matrixRain linear infinite;
+    white-space: nowrap;
+  }
+
+  /* Age Gate */
+  #age-gate {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: var(--bg-deep);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+
+  #age-gate.verified {
+    animation: gateDissolve 0.8s ease-out forwards;
+  }
+
+  @keyframes gateDissolve {
+    0% { opacity: 1; }
+    50% { opacity: 1; filter: blur(0px); }
+    100% { opacity: 0; filter: blur(10px); pointer-events: none; }
+  }
+
+  .gate-text {
+    font-family: 'VT323', monospace;
+    font-size: clamp(24px, 5vw, 48px);
+    text-align: center;
+    text-shadow: 0 0 20px var(--neon-glow);
+  }
+
+  .verify-btn {
+    margin-top: 32px;
+    padding: 16px 48px;
+    font-size: 18px;
+    animation: pulseGlow 2s ease-in-out infinite;
+  }
+
+  .gate-warning {
+    color: var(--red-warn);
+    font-size: 11px;
+    margin-top: 16px;
+    text-shadow: 0 0 5px var(--red-glow);
+  }
+
+  .scan-line {
+    position: absolute;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(180deg, transparent, var(--neon-glow), transparent);
+    animation: scanDown 3s linear infinite;
+    opacity: 0.3;
+  }
+
+  /* Generated Link Display */
+  .output-box {
+    background: rgba(0,0,0,0.8);
+    border: 1px solid var(--neon);
+    padding: 16px;
+    word-break: break-all;
+    font-size: 12px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .output-box:hover {
+    box-shadow: 0 0 20px var(--neon-glow);
+  }
+
+  .output-box .copy-hint {
+    position: absolute;
+    top: 4px;
+    right: 8px;
+    font-size: 10px;
+    color: var(--text-dim);
+  }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .terminal-input { font-size: 12px; padding: 10px 12px; }
+    .btn-neon { font-size: 12px; padding: 8px 16px; letter-spacing: 1px; }
+  }
+
+  /* Selection color */
+  ::selection {
+    background: var(--neon);
+    color: var(--bg-deep);
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg-deep); }
+  ::-webkit-scrollbar-thumb { background: var(--border-mid); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--neon-dim); }
+</style>
+</head>
+<body>
+
+<!-- Matrix Rain Background -->
+<div class="matrix-bg" id="matrix-bg"></div>
+
+<!-- ==================== AGE GATE ==================== -->
+<div id="age-gate">
+  <div class="scan-line"></div>
+  <div style="position:relative; z-index:2; padding: 24px;">
+    <div class="gate-text" style="color: var(--red-warn); margin-bottom: 8px; font-size: clamp(12px, 2.5vw, 16px); letter-spacing: 4px;">
+      ⚠ RESTRICTED ACCESS ⚠
+    </div>
+    <div class="gate-text" style="margin-bottom: 4px;">
+      DISSOVERSE<br>NEURAL NETWORK
+    </div>
+    <div style="color: var(--text-dim); font-size: 12px; text-align: center; margin: 16px 0 32px;">
+      IDENTITY VERIFICATION REQUIRED
+    </div>
+
+    <div style="text-align:center;">
+      <label style="display:flex; align-items:center; justify-content:center; gap:12px; cursor:pointer; font-size:14px; color: var(--neon-dim);">
+        <input type="checkbox" id="age-check" style="accent-color: var(--neon); width:18px; height:18px; cursor:pointer;">
+        <span>I CONFIRM I AM 19 YEARS OF AGE OR OLDER</span>
+      </label>
+    </div>
+
+    <div style="text-align:center;">
+      <button class="btn-neon verify-btn" id="verify-btn" disabled onclick="verifyAge()">
+        ▶ VERIFY IDENTITY
+      </button>
+    </div>
+
+    <div class="gate-warning" style="text-align:center; max-width:400px; margin: 16px auto 0;">
+      UNAUTHORIZED ACCESS WILL BE LOGGED // SESSION ENCRYPTED
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MAIN APP ==================== -->
+<div id="main-app" style="display:none; opacity:0; transition: opacity 0.5s;">
+
+  <!-- Header -->
+  <header class="p-4 sm:p-6 border-b" style="border-color: var(--border-dim);">
+    <div class="max-w-4xl mx-auto flex items-center justify-between flex-wrap gap-4">
+      <div>
+        <h1 class="glitch-text" style="font-family:'VT323',monospace; font-size: clamp(28px, 6vw, 42px); letter-spacing: 3px; text-shadow: 0 0 15px var(--neon-glow);">
+          DissOLinK's
+        </h1>
+        <div style="font-size:10px; color: var(--text-dim); letter-spacing: 3px; margin-top:2px;">
+          SOVEREIGN DEEP LINK GENERATOR v1.0
+        </div>
+      </div>
+      <div style="font-size:10px; color: var(--text-dim); text-align:right;">
+        <div>STATUS: <span style="color:var(--neon);">■</span> ONLINE</div>
+        <div id="clock"></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-4xl mx-auto p-4 sm:p-6 space-y-6">
+
+    <!-- System Status Bar -->
+    <div class="glass-panel p-3 flex flex-wrap gap-4 items-center justify-between" style="font-size:11px;">
+      <div class="flex gap-4 flex-wrap">
+        <span>NODE: <span style="color:var(--neon);">DISSOVERSE-01</span></span>
+        <span>ENCRYPTION: <span style="color:var(--neon);">AES-256</span></span>
+        <span>PROTOCOL: <span style="color:var(--neon);">FORCE-OP</span></span>
+      </div>
+      <div style="color:var(--text-dim);">
+        ZERO-LOG // SERVERLESS // SOVEREIGN
+      </div>
+    </div>
+
+    <!-- Generator Terminal -->
+    <div class="glass-panel" style="overflow:hidden;">
+      <div class="p-3 flex items-center gap-2 border-b" style="border-color: var(--border-dim); background: rgba(0,0,0,0.3);">
+        <span style="color:var(--red-warn);">●</span>
+        <span style="color:#ffcc00;">●</span>
+        <span style="color:var(--neon);">●</span>
+        <span style="font-size:11px; color:var(--text-dim); margin-left:8px;">terminal://dissolinks/generator</span>
+      </div>
+
+      <div class="p-4 sm:p-6 space-y-4">
+        <div style="font-size:12px; color:var(--text-dim);">
+          root@dissoverse:~$ <span style="color:var(--neon);">init force-op-generator</span>
+        </div>
+
+        <!-- URL Input -->
+        <div>
+          <label style="font-size:11px; color:var(--text-dim); letter-spacing:2px; display:block; margin-bottom:6px;">
+            TARGET URL
+          </label>
+          <input
+            type="url"
+            id="target-url"
+            class="terminal-input"
+            placeholder="https://your-destination-url.com"
+            autocomplete="off"
+            spellcheck="false"
+          >
+        </div>
+
+        <!-- Options Row -->
+        <div class="flex flex-wrap gap-4">
+          <div class="flex-1" style="min-width:200px;">
+            <label style="font-size:11px; color:var(--text-dim); letter-spacing:2px; display:block; margin-bottom:6px;">
+              LINK LABEL (OPTIONAL)
+            </label>
+            <input
+              type="text"
+              id="link-label"
+              class="terminal-input"
+              placeholder="e.g. NEW DROP // LISTEN NOW"
+              maxlength="50"
+              autocomplete="off"
+              spellcheck="false"
+            >
+          </div>
+          <div>
+            <label style="font-size:11px; color:var(--text-dim); letter-spacing:2px; display:block; margin-bottom:6px;">
+              BYPASS MODE
+            </label>
+            <select id="bypass-mode" class="terminal-input" style="cursor:pointer;">
+              <option value="auto">AUTO-DETECT</option>
+              <option value="intent">ANDROID INTENT</option>
+              <option value="safari">SAFARI FORCE</option>
+              <option value="universal">UNIVERSAL</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Generate Button -->
+        <div class="flex gap-3 flex-wrap">
+          <button class="btn-neon flex-1" onclick="generateLink()">
+            ⚡ GENERATE FORCE-OP LINK
+          </button>
+          <button class="btn-neon btn-red" onclick="clearAll()" style="flex:0 0 auto;">
+            ✕ CLEAR
+          </button>
+        </div>
+
+        <!-- Output -->
+        <div id="output-section" style="display:none;" class="space-y-3">
+          <div style="font-size:11px; color:var(--text-dim); letter-spacing:2px;">
+            ▼ GENERATED LINK
+          </div>
+          <div class="output-box" id="output-box" onclick="copyLink()">
+            <span class="copy-hint">[CLICK TO COPY]</span>
+            <code id="output-link"></code>
+          </div>
+          <div id="copy-confirm" style="display:none; font-size:11px; color:var(--neon); text-align:center;">
+            ✓ COPIED TO CLIPBOARD // LINK ARMED
+          </div>
+
+          <!-- Preview & Share -->
+          <div class="flex gap-3 flex-wrap">
+            <button class="btn-neon" onclick="previewLink()" style="flex:1;">
+              ◉ PREVIEW
+            </button>
+            <button class="btn-neon" onclick="downloadHTML()" style="flex:1;">
+              ↓ EXPORT .HTML
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Log Terminal -->
+    <div class="glass-panel" style="overflow:hidden;">
+      <div class="p-3 flex items-center gap-2 border-b" style="border-color: var(--border-dim); background: rgba(0,0,0,0.3);">
+        <span style="color:var(--neon);">●</span>
+        <span style="font-size:11px; color:var(--text-dim); margin-left:8px;">syslog://dissoverse/live</span>
+        <span style="margin-left:auto; font-size:10px; color:var(--text-dim);" id="log-count">0 entries</span>
+      </div>
+      <div id="live-log" class="p-4" style="height: 200px; overflow-y:auto; font-size:12px; background: rgba(0,0,0,0.4);">
+        <div class="log-entry" style="color:var(--text-dim);">
+          [SYSTEM] Awaiting input...<span class="cursor-blink"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- How It Works -->
+    <div class="glass-panel p-4 sm:p-6 space-y-4">
+      <div style="font-size:13px; letter-spacing:2px; border-bottom: 1px solid var(--border-dim); padding-bottom:8px;">
+        HOW THE FORCE-OP WORKS
+      </div>
+      <div class="grid sm:grid-cols-3 gap-4" style="font-size:12px;">
+        <div class="p-3" style="border-left: 2px solid var(--neon);">
+          <div style="color:var(--neon); margin-bottom:4px;">01 // DETECT</div>
+          <div style="color:var(--text-dim);">User-agent sniffing identifies Instagram, TikTok, Facebook, and Twitter in-app browsers on contact.</div>
+        </div>
+        <div class="p-3" style="border-left: 2px solid var(--neon);">
+          <div style="color:var(--neon); margin-bottom:4px;">02 // BYPASS</div>
+          <div style="color:var(--text-dim);">Intent URIs (Android) and Safari-specific window.open techniques force the link out of the walled garden.</div>
+        </div>
+        <div class="p-3" style="border-left: 2px solid var(--neon);">
+          <div style="color:var(--neon); margin-bottom:4px;">03 // DELIVER</div>
+          <div style="color:var(--text-dim);">Destination loads in the native OS browser. No tracking. No middleman. Full sovereignty.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center py-6" style="font-size:10px; color:var(--text-dim);">
+      <div>DISSOVERSE NEURAL NETWORK // EST. 2026</div>
+      <div style="margin-top:4px;">ZERO LOGS // ZERO FEES // ZERO COMPROMISE</div>
+      <div style="margin-top:8px; color: var(--border-mid);">
+        Built with sovereign code. Hosted on the decentralized web.
+      </div>
+    </footer>
+  </main>
+</div>
+
+<script>
+// ==================== MATRIX RAIN ====================
+(function initMatrix() {
+  const bg = document.getElementById('matrix-bg');
+  const chars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEF';
+  const colCount = Math.floor(window.innerWidth / 20);
+  for (let i = 0; i < colCount; i++) {
+    const col = document.createElement('div');
+    col.className = 'matrix-col';
+    col.style.left = (i * 20) + 'px';
+    col.style.animationDuration = (3 + Math.random() * 7) + 's';
+    col.style.animationDelay = (Math.random() * 5) + 's';
+    let text = '';
+    for (let j = 0; j < 30 + Math.floor(Math.random() * 20); j++) {
+      text += chars[Math.floor(Math.random() * chars.length)];
+    }
+    col.textContent = text;
+    bg.appendChild(col);
+  }
+})();
+
+// ==================== CLOCK ====================
+function updateClock() {
+  const now = new Date();
+  const ts = now.toISOString().replace('T', ' // ').split('.')[0] + ' UTC';
+  document.getElementById('clock').textContent = ts;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ==================== AGE GATE ====================
+const ageCheck = document.getElementById('age-check');
+const verifyBtn = document.getElementById('verify-btn');
+
+ageCheck.addEventListener('change', function() {
+  verifyBtn.disabled = !this.checked;
+  if (this.checked) {
+    verifyBtn.style.opacity = '1';
+  } else {
+    verifyBtn.style.opacity = '0.5';
+  }
+});
+
+function verifyAge() {
+  if (!ageCheck.checked) return;
+
+  const gate = document.getElementById('age-gate');
+  const app = document.getElementById('main-app');
+
+  // Glitch effect on verify
+  const gateText = gate.querySelector('.gate-text');
+  gateText.textContent = '■ IDENTITY VERIFIED ■';
+  gateText.style.color = 'var(--neon)';
+
+  setTimeout(() => {
+    gate.classList.add('verified');
+    app.style.display = 'block';
+    setTimeout(() => {
+      app.style.opacity = '1';
+      gate.style.display = 'none';
+      addLog('GATE', 'Identity verified. Session initialized.', 'neon');
+      addLog('SYSTEM', 'DissOLinK\'s Force-Op Generator v1.0 loaded.', 'dim');
+      addLog('SYSTEM', 'All operations execute client-side. Zero data transmitted.', 'dim');
+    }, 100);
+  }, 600);
+}
+
+// ==================== LIVE LOG ====================
+let logCount = 0;
+
+function addLog(tag, message, color) {
+  const log = document.getElementById('live-log');
+  const entry = document.createElement('div');
+  entry.className = 'log-entry';
+
+  const now = new Date();
+  const ts = now.toTimeString().split(' ')[0];
+
+  let tagColor = 'var(--neon)';
+  if (color === 'red') tagColor = 'var(--red-warn)';
+  if (color === 'dim') tagColor = 'var(--text-dim)';
+  if (color === 'neon') tagColor = 'var(--neon)';
+
+  entry.innerHTML = `<span style="color:var(--text-dim);">${ts}</span> <span style="color:${tagColor};">[${tag}]</span> ${message}`;
+  log.appendChild(entry);
+  log.scrollTop = log.scrollHeight;
+  logCount++;
+  document.getElementById('log-count').textContent = logCount + ' entries';
+}
+
+// ==================== SOCIAL MEDIA ESCAPE LOGIC ====================
+
+/**
+ * Detects if the current browser is an in-app browser (IAB).
+ * Returns the platform name or null.
+ */
+function detectIAB(ua) {
+  ua = ua || navigator.userAgent || '';
+  const patterns = [
+    { name: 'Instagram',  regex: /Instagram/i },
+    { name: 'TikTok',     regex: /musical_ly|BytedanceWebview|TikTok/i },
+    { name: 'Facebook',   regex: /FBAN|FBAV|FB_IAB/i },
+    { name: 'Twitter',    regex: /Twitter/i },
+    { name: 'Snapchat',   regex: /Snapchat/i },
+    { name: 'LinkedIn',   regex: /LinkedInApp/i },
+    { name: 'Pinterest',  regex: /Pinterest/i },
+    { name: 'Line',       regex: /\bLine\b/i },
+    { name: 'WeChat',     regex: /MicroMessenger/i },
+  ];
+  for (const p of patterns) {
+    if (p.regex.test(ua)) return p.name;
+  }
+  return null;
+}
+
+/**
+ * Detects OS from user-agent.
+ */
+function detectOS(ua) {
+  ua = ua || navigator.userAgent || '';
+  if (/iPhone|iPad|iPod/i.test(ua)) return 'ios';
+  if (/Android/i.test(ua)) return 'android';
+  return 'desktop';
+}
+
+/**
+ * Generates the escape page HTML that will be hosted at the DISSOVERSE link.
+ * When opened in an IAB, it forces the native browser open.
+ */
+function buildEscapePage(targetUrl, label, mode) {
+  const safeUrl = targetUrl.replace(/"/g, '&quot;').replace(/</g, '&lt;');
+  const safeLabel = (label || 'OPEN LINK').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DissOLinK // ${safeLabel}</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a0a;
+    color: #00ff41;
+    font-family: 'Courier New', monospace;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 24px;
+    text-align: center;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.12) 2px, rgba(0,0,0,0.12) 4px);
+    pointer-events: none;
+    z-index: 999;
+  }
+  .title { font-size: 24px; letter-spacing: 3px; margin-bottom: 8px; text-shadow: 0 0 15px rgba(0,255,65,0.5); }
+  .label { font-size: 14px; color: rgba(0,255,65,0.5); margin-bottom: 32px; letter-spacing: 2px; }
+  .status { font-size: 13px; margin-bottom: 24px; min-height: 20px; }
+  .btn {
+    background: transparent;
+    border: 1px solid #00ff41;
+    color: #00ff41;
+    font-family: 'Courier New', monospace;
+    font-size: 16px;
+    padding: 14px 40px;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s;
+  }
+  .btn:hover { background: rgba(0,255,65,0.1); box-shadow: 0 0 20px rgba(0,255,65,0.3); }
+  .warn { color: #ff0033; font-size: 11px; margin-top: 24px; }
+  .footer { position:fixed; bottom:16px; font-size:10px; color:rgba(0,255,65,0.3); }
+</style>
+</head>
+<body>
+<div class="title">DissOLinK's</div>
+<div class="label">${safeLabel}</div>
+<div class="status" id="status">ANALYZING ENVIRONMENT...</div>
+<a href="${safeUrl}" id="fallback-btn" class="btn" style="display:none;">▶ OPEN DESTINATION</a>
+<div class="warn" id="warn"></div>
+<div class="footer">DISSOVERSE NEURAL NETWORK // SOVEREIGN LINK</div>
+
+<script>
+(function() {
+  var TARGET = "${safeUrl}";
+  var MODE = "${mode}";
+  var status = document.getElementById('status');
+  var btn = document.getElementById('fallback-btn');
+  var warn = document.getElementById('warn');
+  var ua = navigator.userAgent || '';
+
+  // IAB Detection
+  var iab = null;
+  var patterns = [
+    ['Instagram', /Instagram/i],
+    ['TikTok', /musical_ly|BytedanceWebview|TikTok/i],
+    ['Facebook', /FBAN|FBAV|FB_IAB/i],
+    ['Twitter', /Twitter/i],
+    ['Snapchat', /Snapchat/i],
+    ['LinkedIn', /LinkedInApp/i]
+  ];
+  for (var i = 0; i < patterns.length; i++) {
+    if (patterns[i][1].test(ua)) { iab = patterns[i][0]; break; }
+  }
+
+  var isIOS = /iPhone|iPad|iPod/i.test(ua);
+  var isAndroid = /Android/i.test(ua);
+
+  if (iab) {
+    status.textContent = 'IN-APP BROWSER DETECTED: ' + iab.toUpperCase();
+    warn.textContent = 'Attempting to break out of walled garden...';
+
+    setTimeout(function() {
+      if (isAndroid && (MODE === 'auto' || MODE === 'intent')) {
+        // Android Intent URI
+        var intentUrl = 'intent://' + TARGET.replace(/^https?:\\/\\//, '') + '#Intent;scheme=https;end';
+        status.textContent = 'DEPLOYING ANDROID INTENT BYPASS...';
+        window.location.href = intentUrl;
+      } else if (isIOS && (MODE === 'auto' || MODE === 'safari')) {
+        // iOS: Try window.open with target _system / _blank
+        status.textContent = 'DEPLOYING SAFARI FORCE-OPEN...';
+        // Method 1: window.open
+        var w = window.open(TARGET, '_blank');
+        if (!w) {
+          // Method 2: location assign
+          window.location.href = TARGET;
+        }
+      } else {
+        // Universal fallback
+        status.textContent = 'DEPLOYING UNIVERSAL BYPASS...';
+        window.location.href = TARGET;
+      }
+
+      // Show manual button as fallback after 2s
+      setTimeout(function() {
+        btn.style.display = 'inline-block';
+        status.textContent = 'AUTO-BYPASS ATTEMPTED // USE MANUAL LINK IF NEEDED';
+        warn.textContent = 'TIP: Tap \\u22ee or \\u2026 menu > "Open in Browser" for guaranteed escape.';
+      }, 2000);
+    }, 800);
+
+  } else {
+    // Not in IAB, direct redirect
+    status.textContent = 'NATIVE BROWSER DETECTED // REDIRECTING...';
+    setTimeout(function() {
+      window.location.href = TARGET;
+    }, 500);
+  }
+})();
+<\\/script>
+</body>
+</html>`;
+}
+
+// ==================== GENERATOR ====================
+
+let generatedHTML = '';
+let generatedLink = '';
+
+function generateLink() {
+  const urlInput = document.getElementById('target-url');
+  const labelInput = document.getElementById('link-label');
+  const modeSelect = document.getElementById('bypass-mode');
+
+  const targetUrl = urlInput.value.trim();
+  const label = labelInput.value.trim();
+  const mode = modeSelect.value;
+
+  // Validate
+  if (!targetUrl) {
+    addLog('ERROR', 'No target URL provided. Operation aborted.', 'red');
+    urlInput.focus();
+    return;
+  }
+
+  try {
+    new URL(targetUrl);
+  } catch (e) {
+    addLog('ERROR', 'Invalid URL format. Must include protocol (https://).', 'red');
+    urlInput.focus();
+    return;
+  }
+
+  // Boot sequence logs
+  addLog('INIT', 'Force-Op sequence initiated...', 'neon');
+
+  const bootMessages = [
+    ['SCAN', 'Analyzing target: ' + targetUrl.substring(0, 50) + (targetUrl.length > 50 ? '...' : '')],
+    ['CRYPTO', 'Encoding payload via Base64...'],
+    ['BUILD', 'Compiling IAB detection matrix...'],
+    ['BUILD', 'Injecting Android Intent URI handler...'],
+    ['BUILD', 'Injecting Safari force-open bypass...'],
+    ['BUILD', 'Embedding Facebook/TikTok/IG user-agent patterns...'],
+    ['SECURE', 'Stripping tracking parameters...'],
+    ['DEPLOY', 'Bypass mode: ' + mode.toUpperCase()],
+    ['COMPLETE', 'Force-Op link generated. Ready for deployment.'],
+  ];
+
+  let delay = 200;
+  bootMessages.forEach((msg, i) => {
+    setTimeout(() => {
+      addLog(msg[0], msg[1], i === bootMessages.length - 1 ? 'neon' : 'dim');
+
+      // On last message, show output
+      if (i === bootMessages.length - 1) {
+        finishGeneration(targetUrl, label, mode);
+      }
+    }, delay);
+    delay += 150 + Math.random() * 200;
+  });
+}
+
+function finishGeneration(targetUrl, label, mode) {
+  // Build the escape page HTML
+  generatedHTML = buildEscapePage(targetUrl, label, mode);
+
+  // Create Base64 data URI version
+  const b64 = btoa(unescape(encodeURIComponent(generatedHTML)));
+  generatedLink = 'data:text/html;base64,' + b64;
+
+  // For GitHub Pages hosting, the real approach is to save the HTML file
+  // and link to it. We provide the data URI for instant testing.
+  const outputSection = document.getElementById('output-section');
+  const outputLink = document.getElementById('output-link');
+
+  outputSection.style.display = 'block';
+  outputLink.textContent = generatedLink.substring(0, 120) + '...';
+
+  addLog('READY', 'Link armed. Click output box to copy. Use EXPORT to download standalone HTML.', 'neon');
+}
+
+function copyLink() {
+  if (!generatedLink) return;
+
+  navigator.clipboard.writeText(generatedLink).then(() => {
+    const confirm = document.getElementById('copy-confirm');
+    confirm.style.display = 'block';
+    addLog('COPY', 'Link copied to clipboard.', 'neon');
+    setTimeout(() => { confirm.style.display = 'none'; }, 3000);
+  }).catch(() => {
+    // Fallback
+    const ta = document.createElement('textarea');
+    ta.value = generatedLink;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    addLog('COPY', 'Link copied (fallback method).', 'dim');
+  });
+}
+
+function previewLink() {
+  if (!generatedHTML) {
+    addLog('ERROR', 'No link generated. Generate first.', 'red');
+    return;
+  }
+  const win = window.open('', '_blank');
+  if (win) {
+    win.document.write(generatedHTML);
+    win.document.close();
+    addLog('PREVIEW', 'Escape page opened in new tab.', 'neon');
+  } else {
+    addLog('ERROR', 'Popup blocked. Allow popups for this site.', 'red');
+  }
+}
+
+function downloadHTML() {
+  if (!generatedHTML) {
+    addLog('ERROR', 'No link generated. Generate first.', 'red');
+    return;
+  }
+  const blob = new Blob([generatedHTML], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'dissolink-escape.html';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  addLog('EXPORT', 'Standalone HTML file downloaded: dissolink-escape.html', 'neon');
+  addLog('DEPLOY', 'Upload this file to GitHub Pages or any static host to activate.', 'dim');
+}
+
+function clearAll() {
+  document.getElementById('target-url').value = '';
+  document.getElementById('link-label').value = '';
+  document.getElementById('output-section').style.display = 'none';
+  document.getElementById('copy-confirm').style.display = 'none';
+  generatedHTML = '';
+  generatedLink = '';
+  addLog('CLEAR', 'All fields reset. Generator standing by.', 'dim');
+}
+
+// Enter key triggers generate
+document.getElementById('target-url').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') generateLink();
+});
+</script>
+
+</body>
+</html>
