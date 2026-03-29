@@ -968,11 +968,12 @@ function buildEscapeHTML(targetUrl, label, mode, ageGate, expiryDays) {
   parts.push('</head>');
   parts.push('<body style="background:#000;color:#fff;font-family:monospace;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;">');
 
-  // Fallback button (hidden initially, shown after 1.5s in IABs)
-  parts.push('<div id="fallback" style="display:none;text-align:center;">');
-  parts.push('<p style="color:#00ff41;">Tap below to open in your browser:</p>');
-  parts.push('<a href="' + safeUrl + '" style="display:inline-block;padding:16px 32px;border:1px solid #00ff41;color:#00ff41;text-decoration:none;font-size:16px;margin-top:16px;">' + safeLabel + '</a>');
-  parts.push('<p style="font-size:11px;color:#666;margin-top:16px;">Or tap the menu and select Open in Browser</p>');
+  // Fallback UI (hidden initially, shown in IABs)
+  parts.push('<div id="fallback" style="display:none;text-align:center;padding:24px;">');
+  parts.push('<p style="color:#00ff41;font-size:16px;margin-bottom:20px;">Open in your browser:</p>');
+  parts.push('<a id="open-btn" href="' + safeUrl + '" target="_blank" rel="noopener" style="display:inline-block;padding:18px 48px;border:2px solid #00ff41;color:#00ff41;text-decoration:none;font-size:18px;font-weight:bold;letter-spacing:2px;">OPEN LINK</a>');
+  parts.push('<p id="ios-tip" style="display:none;font-size:13px;color:#ff9900;margin-top:20px;line-height:1.6;">If the button doesn\\\'t work:<br>Tap <b>\\u22ef</b> or <b>Share</b> \\u2192 <b>Open in Safari</b></p>');
+  parts.push('<button id="copy-btn" style="display:none;margin-top:16px;padding:12px 32px;background:transparent;border:1px solid #666;color:#666;font-family:monospace;font-size:13px;cursor:pointer;" onclick="navigator.clipboard.writeText(\\\''+safeUrl+'\\\');this.textContent=\\\'COPIED!\\\';this.style.color=\\\'#00ff41\\\';this.style.borderColor=\\\'#00ff41\\\';">COPY LINK</button>');
   parts.push('</div>');
 
   // Age gate overlay
@@ -1000,9 +1001,13 @@ function buildEscapeHTML(targetUrl, label, mode, ageGate, expiryDays) {
   parts.push('var isIAB=/Instagram|FBAN|FBAV|FB_IAB|musical_ly|BytedanceWebview|TikTok|Twitter|Snapchat|LinkedInApp/i.test(ua);');
   parts.push('var isAndroid=/Android/i.test(ua);');
   parts.push('if(!isIAB){window.location.replace(TARGET);return;}');
+  parts.push('var fb=document.getElementById("fallback");');
+  parts.push('fb.style.display="block";');
   parts.push('if(isAndroid){window.location.href="intent://"+TARGET.replace(/^https?:\\/\\//,"")+"#Intent;scheme=https;end";}');
-  parts.push('else{var w=window.open(TARGET,"_blank");if(!w){window.location.href="x-safari-"+TARGET;}}');
-  parts.push('setTimeout(function(){document.getElementById("fallback").style.display="block";},1500);');
+  parts.push('else{var isIOS=/iPhone|iPad|iPod/i.test(ua);');
+  parts.push('if(isIOS){document.getElementById("ios-tip").style.display="block";document.getElementById("copy-btn").style.display="inline-block";}');
+  parts.push('var a=document.createElement("a");a.href=TARGET;a.target="_blank";a.rel="noopener";document.body.appendChild(a);a.click();');
+  parts.push('}');
   parts.push('}');
   parts.push('(function(){');
   parts.push('if(EXPIRY_DAYS>0&&CREATED>0){var e=(Date.now()-CREATED)/86400000;if(e>EXPIRY_DAYS){document.body.innerHTML="<div style=\\"text-align:center;padding:40px;color:#ff0033;\\"><h2>LINK EXPIRED</h2></div>";return;}}');
