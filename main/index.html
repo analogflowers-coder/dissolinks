@@ -5,26 +5,25 @@
 </head>
 <body style="background:#000;color:#fff;font-family:monospace;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;">
 <div id="fallback" style="display:none;text-align:center;padding:24px;">
-<p style="color:#00ff41;font-size:16px;margin-bottom:20px;">Open in your browser:</p>
+<p style="color:#00ff41;font-size:16px;margin-bottom:20px;">Open in your browser for the best experience:</p>
 <a href="https://dissoverse.com/collections" target="_blank" rel="noopener" style="display:inline-block;padding:18px 48px;border:2px solid #00ff41;color:#00ff41;text-decoration:none;font-size:18px;font-weight:bold;letter-spacing:2px;">OPEN LINK</a>
-<p id="ios-tip" style="display:none;font-size:13px;color:#ff9900;margin-top:20px;line-height:1.6;">If the button doesn't work:<br>Tap &#x22EF; or Share &#x2192; Open in Safari</p>
-<button id="copy-btn" style="display:none;margin-top:16px;padding:12px 32px;background:transparent;border:1px solid #666;color:#666;font-family:monospace;font-size:13px;cursor:pointer;">COPY LINK</button>
+<p style="font-size:13px;color:#ff9900;margin-top:20px;line-height:1.6;">Tap &#x22EF; (3 dots) &#x2192; Open in Safari</p>
 </div>
 <script>
 (function(){
 var TARGET="https://dissoverse.com/collections";
-var ua=navigator.userAgent||"";
-var isIAB=/Instagram|FBAN|FBAV|FB_IAB|musical_ly|BytedanceWebview|TikTok|Twitter|Snapchat|LinkedInApp/i.test(ua);
-var isAndroid=/Android/i.test(ua);
-var isIOS=/iPhone|iPad|iPod/i.test(ua);
-if(!isIAB){window.location.replace(TARGET);return;}
-if(isAndroid){window.location.href="intent://"+TARGET.replace(/^https?:\/\//,"")+"#Intent;scheme=https;end";setTimeout(showFallback,1500);return;}
-if(isIOS){window.location.href=window.location.href.replace(/^https:\/\//,"x-safari-https://");setTimeout(showFallback,2000);return;}
-window.location.href=TARGET;setTimeout(showFallback,1500);
-function showFallback(){
-var fb=document.getElementById("fallback");if(fb)fb.style.display="block";
-var tip=document.getElementById("ios-tip");if(tip&&isIOS)tip.style.display="block";
-var cb=document.getElementById("copy-btn");if(cb){cb.style.display="inline-block";cb.onclick=function(){navigator.clipboard.writeText(TARGET);cb.textContent="COPIED!";cb.style.color="#00ff41";cb.style.borderColor="#00ff41";};}
+var ua=navigator.userAgent||navigator.vendor||window.opera;
+if(ua.indexOf("Instagram")>-1||/FBAN|FBAV|FB_IAB/.test(ua)||/musical_ly|BytedanceWebview|TikTok/.test(ua)||/Twitter|Snapchat|LinkedInApp/.test(ua)){
+if(/iPhone|iPad|iPod/.test(ua)){
+window.location.href="x-safari-"+TARGET;
+}else if(/Android/.test(ua)){
+window.location.href="intent://"+TARGET.replace(/^https?:\/\//,"")+"#Intent;scheme=https;package=com.android.chrome;end;";
+}else{
+window.location.href=TARGET;
+}
+setTimeout(function(){document.getElementById("fallback").style.display="block";},2000);
+}else{
+window.location.replace(TARGET);
 }
 })();
 </script>

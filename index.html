@@ -990,28 +990,30 @@ function buildEscapeHTML(targetUrl, label, mode, ageGate, expiryDays) {
     parts.push('</div>');
   }
 
-  // Script block — single IIFE, no top-level code that can crash
+  // Script block — single IIFE with IAB escape
   parts.push('<script>');
   parts.push('(function(){');
   parts.push('var TARGET="' + safeUrl + '";');
   parts.push('var EXPIRY_DAYS=' + expDays + ';');
   parts.push('var CREATED=' + created + ';');
   parts.push('var AGE_GATE=' + (ageGate ? 'true' : 'false') + ';');
-  parts.push('var ua=navigator.userAgent||"";');
-  parts.push('var isIAB=/Instagram|FBAN|FBAV|FB_IAB|musical_ly|BytedanceWebview|TikTok|Twitter|Snapchat|LinkedInApp/i.test(ua);');
-  parts.push('var isAndroid=/Android/i.test(ua);');
-  parts.push('var isIOS=/iPhone|iPad|iPod/i.test(ua);');
   parts.push('if(EXPIRY_DAYS>0&&CREATED>0){var e=(Date.now()-CREATED)/86400000;if(e>EXPIRY_DAYS){document.body.innerHTML="<div style=\\"text-align:center;padding:40px;color:#ff0033;\\"><h2>LINK EXPIRED</h2></div>";return;}}');
   parts.push('if(AGE_GATE){return;}');
+  parts.push('var ua=navigator.userAgent||navigator.vendor||window.opera;');
+  parts.push('var isInstagram=ua.indexOf("Instagram")>-1;');
+  parts.push('var isFacebook=(/FBAN|FBAV|FB_IAB/).test(ua);');
+  parts.push('var isTikTok=(/musical_ly|BytedanceWebview|TikTok/).test(ua);');
+  parts.push('var isTwitter=ua.indexOf("Twitter")>-1;');
+  parts.push('var isSnapchat=ua.indexOf("Snapchat")>-1;');
+  parts.push('var isLinkedIn=ua.indexOf("LinkedInApp")>-1;');
+  parts.push('var isIAB=isInstagram||isFacebook||isTikTok||isTwitter||isSnapchat||isLinkedIn;');
+  parts.push('var isIOS=(/iPhone|iPad|iPod/).test(ua);');
+  parts.push('var isAndroid=(/Android/).test(ua);');
   parts.push('if(!isIAB){window.location.replace(TARGET);return;}');
-  parts.push('if(isAndroid){window.location.href="intent://"+TARGET.replace(/^https?:\\/\\//,"")+"#Intent;scheme=https;end";setTimeout(showFallback,1500);return;}');
-  parts.push('if(isIOS){window.location.href=window.location.href.replace(/^https:\\/\\//,"x-safari-https://");setTimeout(showFallback,2000);return;}');
-  parts.push('window.location.href=TARGET;setTimeout(showFallback,1500);');
-  parts.push('function showFallback(){');
-  parts.push('var fb=document.getElementById("fallback");if(fb)fb.style.display="block";');
-  parts.push('var tip=document.getElementById("ios-tip");if(tip&&isIOS)tip.style.display="block";');
-  parts.push('var cb=document.getElementById("copy-btn");if(cb){cb.style.display="inline-block";cb.onclick=function(){navigator.clipboard.writeText(TARGET);cb.textContent="COPIED!";cb.style.color="#00ff41";cb.style.borderColor="#00ff41";};}');
-  parts.push('}');
+  parts.push('if(isIOS){window.location.href="x-safari-"+TARGET;}');
+  parts.push('else if(isAndroid){window.location.href="intent://"+TARGET.replace(/^https?:\\/\\//,"")+"#Intent;scheme=https;package=com.android.chrome;end;";}');
+  parts.push('else{window.location.href=TARGET;}');
+  parts.push('setTimeout(function(){document.getElementById("fallback").style.display="block";},2000);');
   parts.push('})();');
   // CRITICAL: close script tag by concatenation — never as a string literal
   parts.push('<' + '/script>');
