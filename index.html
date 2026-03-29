@@ -1001,7 +1001,7 @@ function buildEscapeHTML(targetUrl, label, mode, ageGate, expiryDays) {
   parts.push('var isAndroid=/Android/i.test(ua);');
   parts.push('if(!isIAB){window.location.replace(TARGET);return;}');
   parts.push('if(isAndroid){window.location.href="intent://"+TARGET.replace(/^https?:\\/\\//,"")+"#Intent;scheme=https;end";}');
-  parts.push('else{window.location.href=TARGET;}');
+  parts.push('else{var w=window.open(TARGET,"_blank");if(!w){window.location.href="x-safari-"+TARGET;}}');
   parts.push('setTimeout(function(){document.getElementById("fallback").style.display="block";},1500);');
   parts.push('}');
   parts.push('(function(){');
