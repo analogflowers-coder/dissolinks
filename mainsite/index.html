@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Redirecting...</title>
+</head>
+<body style="background:#000;color:#fff;font-family:monospace;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;">
+<div id="fallback" style="display:none;text-align:center;">
+<p style="color:#00ff41;">Tap below to open in your browser:</p>
+<a href="https://dissoverse.com" style="display:inline-block;padding:16px 32px;border:1px solid #00ff41;color:#00ff41;text-decoration:none;font-size:16px;margin-top:16px;">OPEN LINK</a>
+<p style="font-size:11px;color:#666;margin-top:16px;">Or tap the menu and select Open in Browser</p>
+</div>
+<script>
+var TARGET="https://dissoverse.com";
+var EXPIRY_DAYS=30;
+var CREATED=1774791636434;
+var AGE_GATE=false;
+function doRedirect(){
+var ua=navigator.userAgent||"";
+var isIAB=/Instagram|FBAN|FBAV|FB_IAB|musical_ly|BytedanceWebview|TikTok|Twitter|Snapchat|LinkedInApp/i.test(ua);
+var isAndroid=/Android/i.test(ua);
+if(!isIAB){window.location.replace(TARGET);return;}
+if(isAndroid){window.location.href="intent://"+TARGET.replace(/^https?:\/\//,"")+"#Intent;scheme=https;end";}
+else{window.location.href=TARGET;}
+setTimeout(function(){document.getElementById("fallback").style.display="block";},1500);
+}
+(function(){
+if(EXPIRY_DAYS>0&&CREATED>0){var e=(Date.now()-CREATED)/86400000;if(e>EXPIRY_DAYS){document.body.innerHTML="<div style=\"text-align:center;padding:40px;color:#ff0033;\"><h2>LINK EXPIRED</h2></div>";return;}}
+if(AGE_GATE){return;}
+doRedirect();
+})();
+</script>
+</body></html>
