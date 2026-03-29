@@ -236,6 +236,40 @@
   .toggle-thumb { position: absolute; top: 3px; left: 3px; width: 14px; height: 14px; background: var(--text-dim); transition: all 0.3s; }
   .toggle-switch input:checked ~ .toggle-thumb { left: 25px; background: var(--neon); box-shadow: 0 0 6px var(--neon-glow); }
 
+  /* Settings Modal */
+  .modal-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.88);
+    z-index: 9000;
+    display: flex; align-items: center; justify-content: center;
+    padding: 16px;
+  }
+  .modal-panel {
+    background: var(--bg-deep);
+    border: 1px solid var(--neon);
+    box-shadow: 0 0 40px var(--neon-glow), inset 0 0 30px rgba(0,0,0,0.5);
+    width: 100%; max-width: 480px;
+  }
+  .btn-deploy {
+    background: rgba(0,255,65,0.1);
+    box-shadow: 0 0 12px var(--neon-glow);
+    text-shadow: 0 0 8px var(--neon);
+  }
+  .btn-deploy:hover {
+    background: rgba(0,255,65,0.22);
+    box-shadow: 0 0 28px var(--neon-glow);
+  }
+  .deploy-status-live {
+    display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap;
+    font-size: 12px; color: var(--neon);
+    text-shadow: 0 0 8px var(--neon-glow);
+    padding: 8px 12px;
+    border: 1px solid var(--border-mid);
+    letter-spacing: 2px;
+    background: rgba(0,255,65,0.04);
+  }
+  #gear-btn:hover { border-color: var(--neon); color: var(--neon); box-shadow: 0 0 10px var(--neon-glow); }
+
   /* Generated Link Display */
   .output-box {
     background: rgba(0,0,0,0.8);
@@ -281,6 +315,41 @@
 </head>
 <body>
 
+<!-- ==================== SETTINGS MODAL ==================== -->
+<div id="settings-modal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeSettings()">
+  <div class="modal-panel">
+    <div class="p-3 flex items-center gap-2 border-b" style="border-color: var(--border-dim); background: rgba(0,0,0,0.4);">
+      <span style="color:var(--red-warn);">●</span>
+      <span style="color:#ffcc00;">●</span>
+      <span style="color:var(--neon);">●</span>
+      <span style="font-size:11px; color:var(--text-dim); margin-left:8px;">terminal://dissoverse/config</span>
+      <button onclick="closeSettings()" style="margin-left:auto; background:transparent; border:none; color:var(--text-dim); cursor:pointer; font-size:20px; line-height:1; padding:0 4px;">✕</button>
+    </div>
+    <div class="p-6 space-y-4">
+      <div style="font-size:12px; color:var(--text-dim);">root@dissoverse:~$ <span style="color:var(--neon);">config auth --github</span></div>
+      <div>
+        <label style="font-size:11px; color:var(--text-dim); letter-spacing:2px; display:block; margin-bottom:6px;">GITHUB PAT</label>
+        <input
+          type="password"
+          id="pat-input"
+          class="terminal-input"
+          placeholder="github_pat_xxxxxxxxxxxxxxxxxxxx"
+          autocomplete="off"
+          spellcheck="false"
+        >
+      </div>
+      <div style="font-size:10px; color:var(--text-dim); line-height:1.8; border-left:2px solid var(--border-dim); padding-left:10px;">
+        Generate a fine-grained PAT at github.com/settings/tokens with Contents read/write permission for the dissolinks repo. Stored in sessionStorage only — cleared on tab close.
+      </div>
+      <div class="flex gap-3">
+        <button class="btn-neon flex-1" onclick="saveToken()">▶ SAVE TOKEN</button>
+        <button class="btn-neon btn-red" onclick="clearToken()" style="flex:0 0 auto;">✕ CLEAR</button>
+      </div>
+      <div id="token-feedback" style="font-size:11px; min-height:16px; text-align:center; letter-spacing:1px;"></div>
+    </div>
+  </div>
+</div>
+
 <!-- Matrix Rain Background -->
 <div class="matrix-bg" id="matrix-bg"></div>
 
@@ -298,9 +367,13 @@
           SOVEREIGN DEEP LINK GENERATOR v1.0
         </div>
       </div>
-      <div style="font-size:10px; color: var(--text-dim); text-align:right;">
-        <div>STATUS: <span style="color:var(--neon);">■</span> ONLINE</div>
-        <div id="clock"></div>
+      <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap; justify-content:flex-end;">
+        <div style="font-size:10px; color: var(--text-dim); text-align:right;">
+          <div>STATUS: <span style="color:var(--neon);">■</span> ONLINE</div>
+          <div id="clock"></div>
+          <div style="margin-top:2px;">GITHUB: <span id="token-status" style="color:var(--text-dim);">NO TOKEN</span></div>
+        </div>
+        <button id="gear-btn" onclick="openSettings()" title="Config" style="background:transparent; border:1px solid var(--border-mid); color:var(--text-dim); font-family:'Share Tech Mono',monospace; font-size:18px; width:36px; height:36px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.3s; flex-shrink:0;">⚙</button>
       </div>
     </div>
   </header>
@@ -432,18 +505,32 @@
             ✓ COPIED TO CLIPBOARD // LINK ARMED
           </div>
 
-          <!-- Preview & Share -->
+          <!-- Action Buttons -->
           <div class="flex gap-3 flex-wrap">
             <button class="btn-neon" onclick="previewLink()" style="flex:1;">
               ◉ PREVIEW
+            </button>
+            <button class="btn-neon btn-deploy" onclick="deployLive()" style="flex:2; display:none;" id="deploy-live-btn">
+              ⚡ DEPLOY LIVE
             </button>
             <button class="btn-neon" onclick="downloadHTML()" style="flex:1;" id="download-btn">
               ↓ DOWNLOAD .HTML
             </button>
           </div>
 
-          <!-- Deploy Instructions -->
-          <div id="deploy-instructions" style="font-size:11px; color:var(--text-dim); line-height:1.9; padding-top:2px;">
+          <!-- No token note -->
+          <div id="no-token-note" style="font-size:11px; color:var(--text-dim); text-align:center; display:none;">
+            Connect GitHub token for one-click deploy — click ⚙ in the header
+          </div>
+
+          <!-- Live deploy status -->
+          <div id="deploy-status-line" class="deploy-status-live" style="display:none;">
+            ■ LIVE // <span id="deploy-status-url"></span>
+            <button class="btn-neon" onclick="openDeployedLink()" style="font-size:10px; padding:4px 10px; letter-spacing:1px;">OPEN LINK ↗</button>
+          </div>
+
+          <!-- Deploy Instructions (no-token fallback) -->
+          <div id="deploy-instructions" style="font-size:11px; color:var(--text-dim); line-height:1.9; padding-top:2px; display:none;">
             TO ACTIVATE: Upload <span id="deploy-filename" style="color:var(--neon);"></span> to the dissolinks repo root and push. Your link goes live at the URL above.
           </div>
         </div>
@@ -526,8 +613,157 @@ function updateClock() {
 setInterval(updateClock, 1000);
 updateClock();
 
+// ==================== SETTINGS / TOKEN ====================
+function openSettings() {
+  document.getElementById('settings-modal').style.display = 'flex';
+  const existing = sessionStorage.getItem('gh_pat');
+  if (existing) document.getElementById('pat-input').value = existing;
+  document.getElementById('token-feedback').textContent = '';
+}
+
+function closeSettings() {
+  document.getElementById('settings-modal').style.display = 'none';
+}
+
+function saveToken() {
+  const val = document.getElementById('pat-input').value.trim();
+  const fb = document.getElementById('token-feedback');
+  if (!val) {
+    fb.style.color = 'var(--red-warn)';
+    fb.textContent = 'NO TOKEN ENTERED';
+    return;
+  }
+  sessionStorage.setItem('gh_pat', val);
+  updateTokenStatus();
+  fb.style.color = 'var(--neon)';
+  fb.textContent = '✓ TOKEN SAVED TO SESSION';
+  setTimeout(closeSettings, 900);
+}
+
+function clearToken() {
+  sessionStorage.removeItem('gh_pat');
+  document.getElementById('pat-input').value = '';
+  const fb = document.getElementById('token-feedback');
+  fb.style.color = 'var(--text-dim)';
+  fb.textContent = 'TOKEN CLEARED';
+  updateTokenStatus();
+}
+
+function updateTokenStatus() {
+  const hasToken = !!sessionStorage.getItem('gh_pat');
+  const el = document.getElementById('token-status');
+  if (hasToken) {
+    el.textContent = 'CONNECTED';
+    el.style.color = 'var(--neon)';
+    el.style.textShadow = '0 0 6px var(--neon-glow)';
+  } else {
+    el.textContent = 'NO TOKEN';
+    el.style.color = 'var(--text-dim)';
+    el.style.textShadow = 'none';
+  }
+  updateDeployButtonVisibility();
+}
+
+function updateDeployButtonVisibility() {
+  const hasToken = !!sessionStorage.getItem('gh_pat');
+  const deployBtn = document.getElementById('deploy-live-btn');
+  const noTokenNote = document.getElementById('no-token-note');
+  const deployInstructions = document.getElementById('deploy-instructions');
+  const outputVisible = document.getElementById('output-section').style.display !== 'none';
+  if (deployBtn) deployBtn.style.display = (hasToken && outputVisible) ? 'flex' : 'none';
+  if (noTokenNote) noTokenNote.style.display = (!hasToken && outputVisible) ? 'block' : 'none';
+  if (deployInstructions) deployInstructions.style.display = (!hasToken && outputVisible) ? 'block' : 'none';
+}
+
+// ==================== GITHUB DEPLOY ====================
+async function deployToGitHub(shortName, htmlContent) {
+  const token = sessionStorage.getItem('gh_pat');
+  if (!token) return false;
+
+  const filename = shortName + '.html';
+  const apiUrl = 'https://api.github.com/repos/analogflowers-coder/dissolinks/contents/' + filename;
+  const b64Content = btoa(unescape(encodeURIComponent(htmlContent)));
+
+  addLog('DEPLOY', 'Pushing ' + filename + ' to GitHub...', 'dim');
+
+  try {
+    // Check if file already exists (need SHA to update)
+    let sha = null;
+    const checkResp = await fetch(apiUrl, {
+      headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json' }
+    });
+    if (checkResp.status === 200) {
+      const existing = await checkResp.json();
+      sha = existing.sha;
+      addLog('DEPLOY', 'Existing file detected. Overwriting...', 'dim');
+    } else if (checkResp.status === 401) {
+      addLog('ERROR', 'GitHub authentication failed. Check your PAT.', 'red');
+      return false;
+    } else if (checkResp.status === 429) {
+      addLog('ERROR', 'GitHub API rate limited. Try again in 60 seconds.', 'red');
+      return false;
+    }
+
+    const body = { message: 'link: ' + shortName, content: b64Content };
+    if (sha) body.sha = sha;
+
+    const putResp = await fetch(apiUrl, {
+      method: 'PUT',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+        'Accept': 'application/vnd.github+json'
+      },
+      body: JSON.stringify(body)
+    });
+
+    if (putResp.status === 201 || putResp.status === 200) {
+      const result = await putResp.json();
+      const sha7 = result.commit.sha.substring(0, 7);
+      addLog('DEPLOY', 'Commit successful. SHA: ' + sha7, 'neon');
+      addLog('LIVE', 'Link active at links.dissoverse.com/' + shortName, 'neon');
+      return true;
+    } else if (putResp.status === 401) {
+      addLog('ERROR', 'GitHub authentication failed. Check your PAT.', 'red');
+      return false;
+    } else if (putResp.status === 429) {
+      addLog('ERROR', 'GitHub API rate limited. Try again in 60 seconds.', 'red');
+      return false;
+    } else {
+      addLog('ERROR', 'Deploy failed (' + putResp.status + '). Download the file and push manually.', 'red');
+      return false;
+    }
+  } catch (e) {
+    addLog('ERROR', 'Network error. Deploy failed. Download the file and push manually.', 'red');
+    return false;
+  }
+}
+
+async function deployLive() {
+  if (!generatedHTML || !generatedLink) return;
+  const shortName = document.getElementById('short-name').value.trim();
+  const btn = document.getElementById('deploy-live-btn');
+  btn.disabled = true;
+  btn.textContent = '⟳ DEPLOYING...';
+  const success = await deployToGitHub(shortName, generatedHTML);
+  btn.disabled = false;
+  btn.textContent = '⚡ DEPLOY LIVE';
+  if (success) showDeployStatus(shortName);
+}
+
+function showDeployStatus(shortName) {
+  const line = document.getElementById('deploy-status-line');
+  document.getElementById('deploy-status-url').textContent = 'links.dissoverse.com/' + shortName;
+  line.style.display = 'flex';
+}
+
+function openDeployedLink() {
+  if (generatedLink) window.open(generatedLink, '_blank');
+}
+
 // ==================== STARTUP ====================
 window.addEventListener('DOMContentLoaded', function() {
+  updateTokenStatus();
   addLog('SYSTEM', 'DissOLinK\'s Force-Op Generator v1.0 loaded.', 'neon');
   addLog('SYSTEM', 'All operations execute client-side. Zero data transmitted.', 'dim');
 });
@@ -847,8 +1083,18 @@ function finishGeneration(targetUrl, label, mode, ageGate, shortName) {
   const filename = shortName + '.html';
   document.getElementById('download-btn').textContent = '↓ DOWNLOAD ' + filename;
   document.getElementById('deploy-filename').textContent = filename;
+  document.getElementById('deploy-status-line').style.display = 'none';
+
+  updateDeployButtonVisibility();
 
   addLog('READY', 'Link armed: ' + generatedLink + ' // Click to copy.', 'neon');
+
+  // Auto-deploy if token is connected
+  if (sessionStorage.getItem('gh_pat')) {
+    deployToGitHub(shortName, generatedHTML).then(success => {
+      if (success) showDeployStatus(shortName);
+    });
+  }
 }
 
 function copyLink() {
@@ -915,6 +1161,9 @@ function clearAll() {
   document.getElementById('copy-confirm').style.display = 'none';
   document.getElementById('download-btn').textContent = '↓ DOWNLOAD .HTML';
   document.getElementById('deploy-filename').textContent = '';
+  document.getElementById('deploy-status-line').style.display = 'none';
+  document.getElementById('deploy-live-btn').style.display = 'none';
+  document.getElementById('no-token-note').style.display = 'none';
   generatedHTML = '';
   generatedLink = '';
   addLog('CLEAR', 'All fields reset. Generator standing by.', 'dim');
