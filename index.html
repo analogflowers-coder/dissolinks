@@ -715,8 +715,9 @@ async function loadActiveLinks() {
       headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json' }
     });
 
-    if (resp.status === 401) {
-      panel.innerHTML = '<div style="color:var(--red-warn);">[ERROR] Authentication failed. Check your PAT in ⚙ settings.</div>';
+    if (resp.status === 401 || resp.status === 403) {
+      const errData = await resp.json().catch(() => ({}));
+      panel.innerHTML = '<div style="color:var(--red-warn);">[ERROR] Auth failed (' + resp.status + '): ' + (errData.message || 'Check your PAT.') + '</div>';
       return;
     }
     if (!resp.ok) {
@@ -815,8 +816,9 @@ async function deployToGitHub(shortName, htmlContent) {
       const existing = await checkResp.json();
       sha = existing.sha;
       addLog('DEPLOY', 'Existing file detected. Overwriting...', 'dim');
-    } else if (checkResp.status === 401) {
-      addLog('ERROR', 'GitHub authentication failed. Check your PAT.', 'red');
+    } else if (checkResp.status === 401 || checkResp.status === 403) {
+      const errBody = await checkResp.json().catch(() => ({}));
+      addLog('ERROR', 'GitHub auth failed (' + checkResp.status + '): ' + (errBody.message || 'Check your PAT.'), 'red');
       return false;
     } else if (checkResp.status === 429) {
       addLog('ERROR', 'GitHub API rate limited. Try again in 60 seconds.', 'red');
@@ -842,8 +844,9 @@ async function deployToGitHub(shortName, htmlContent) {
       addLog('DEPLOY', 'Commit successful. SHA: ' + sha7, 'neon');
       addLog('LIVE', 'Link active at links.dissoverse.com/' + shortName, 'neon');
       return true;
-    } else if (putResp.status === 401) {
-      addLog('ERROR', 'GitHub authentication failed. Check your PAT.', 'red');
+    } else if (putResp.status === 401 || putResp.status === 403) {
+      const putErr = await putResp.json().catch(() => ({}));
+      addLog('ERROR', 'GitHub auth failed (' + putResp.status + '): ' + (putErr.message || 'Check PAT permissions.'), 'red');
       return false;
     } else if (putResp.status === 429) {
       addLog('ERROR', 'GitHub API rate limited. Try again in 60 seconds.', 'red');
