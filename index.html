@@ -965,23 +965,37 @@ function buildEscapeHTML(targetUrl, label, mode, ageGate, expiryDays) {
   parts.push('<html><head><meta charset="UTF-8">');
   parts.push('<meta name="viewport" content="width=device-width,initial-scale=1">');
   parts.push('<title>Redirecting...</title>');
-  // IAB escape script in <head> — runs before body renders
+  // IAB escape script in <head> — Android intent auto-redirects, iOS shows interstitial
   parts.push('<script>');
   parts.push('(function(){');
   parts.push('var ua=navigator.userAgent||"";');
-  parts.push('var url=window.location.href;');
   parts.push('var isIAB=ua.indexOf("Instagram")>-1||/FBAN|FBAV|FB_IAB/.test(ua)||/musical_ly|BytedanceWebview|TikTok/.test(ua)||ua.indexOf("Twitter")>-1||ua.indexOf("Snapchat")>-1||ua.indexOf("LinkedInApp")>-1;');
   parts.push('if(!isIAB){window.location.replace("' + safeUrl + '");return;}');
-  parts.push('if(/iPhone|iPad|iPod/.test(ua)){window.location.href="x-safari-"+url;return;}');
-  parts.push('if(/Android/.test(ua)){window.location.href="intent://"+url.replace(/^https?:\\/\\//,"")+"#Intent;scheme=https;package=com.android.chrome;end;";return;}');
+  parts.push('if(/Android/.test(ua)){window.location.href="intent://"+window.location.href.replace(/^https?:\\/\\//,"")+"#Intent;scheme=https;package=com.android.chrome;end;";return;}');
   parts.push('})();');
   parts.push('<' + '/script>');
+  parts.push('<style>');
+  parts.push('*{margin:0;padding:0;box-sizing:border-box;}');
+  parts.push('body{background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,monospace;min-height:100vh;display:flex;align-items:center;justify-content:center;}');
+  parts.push('.card{text-align:center;padding:32px 24px;max-width:360px;}');
+  parts.push('.step{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,0.1);}');
+  parts.push('.step:last-child{border-bottom:none;}');
+  parts.push('.step-num{width:32px;height:32px;border-radius:50%;background:#00ff41;color:#000;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;}');
+  parts.push('.step-text{font-size:15px;line-height:1.4;color:rgba(255,255,255,0.9);}');
+  parts.push('.step-text b{color:#00ff41;}');
+  parts.push('</style>');
   parts.push('</head>');
-  parts.push('<body style="background:#000;color:#00ff41;font-family:monospace;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;">');
-  parts.push('<div style="text-align:center;padding:24px;">');
-  parts.push('<p style="font-size:16px;margin-bottom:20px;">Open in your browser:</p>');
-  parts.push('<a href="' + safeUrl + '" target="_blank" rel="noopener" style="display:inline-block;padding:18px 48px;border:2px solid #00ff41;color:#00ff41;text-decoration:none;font-size:18px;font-weight:bold;letter-spacing:2px;">OPEN LINK</a>');
-  parts.push('<p style="font-size:13px;color:#ff9900;margin-top:20px;">Tap &#x22EF; (3 dots) &#x2192; Open in Safari</p>');
+  parts.push('<body>');
+  parts.push('<div class="card">');
+  parts.push('<div style="font-size:48px;margin-bottom:24px;">&#x1F310;</div>');
+  parts.push('<div style="font-size:20px;font-weight:700;margin-bottom:12px;color:#00ff41;">OPEN IN YOUR BROWSER</div>');
+  parts.push('<p style="font-size:14px;color:rgba(255,255,255,0.6);margin-bottom:8px;">For the best experience, open this page in Safari</p>');
+  parts.push('<div style="text-align:left;margin:24px 0;padding:0 8px;">');
+  parts.push('<div class="step"><div class="step-num">1</div><div class="step-text">Tap the <b>&#x22EF;</b> (three dots) in the top right</div></div>');
+  parts.push('<div class="step"><div class="step-num">2</div><div class="step-text">Select <b>&ldquo;Open in Safari&rdquo;</b></div></div>');
+  parts.push('</div>');
+  parts.push('<a href="' + safeUrl + '" style="display:inline-block;margin-top:20px;padding:14px 40px;border:2px solid #00ff41;color:#00ff41;text-decoration:none;font-size:16px;font-weight:700;letter-spacing:1px;border-radius:8px;">OPEN LINK</a>');
+  parts.push('<div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:16px;">DISSOVERSE &bull; SOVEREIGN LINK</div>');
   parts.push('</div>');
   parts.push('</body></html>');
 

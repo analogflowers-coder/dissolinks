@@ -3,31 +3,39 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Redirecting...</title>
 <script>
-(function () {
-  var ua = navigator.userAgent || "";
-  var url = window.location.href;
-
-  if (!ua.includes("Instagram") && !/FBAN|FBAV|FB_IAB/.test(ua) && !/musical_ly|BytedanceWebview|TikTok/.test(ua) && !ua.includes("Twitter") && !ua.includes("Snapchat") && !ua.includes("LinkedInApp")) {
-    window.location.replace("https://dissoverse.com/collections");
-    return;
-  }
-
-  if (/iPhone|iPad|iPod/.test(ua)) {
-    window.location.href = "x-safari-" + url;
-    return;
-  }
-
-  if (/Android/.test(ua)) {
-    window.location.href = "intent://" + url.replace(/^https?:\/\//, "") + "#Intent;scheme=https;package=com.android.chrome;end;";
-    return;
-  }
+(function(){
+var ua=navigator.userAgent||"";
+var isIAB=ua.indexOf("Instagram")>-1||/FBAN|FBAV|FB_IAB/.test(ua)||/musical_ly|BytedanceWebview|TikTok/.test(ua)||ua.indexOf("Twitter")>-1||ua.indexOf("Snapchat")>-1||ua.indexOf("LinkedInApp")>-1;
+if(!isIAB){window.location.replace("https://dissoverse.com/collections");return;}
+if(/Android/.test(ua)){window.location.href="intent://"+window.location.href.replace(/^https?:\/\//,"")+"#Intent;scheme=https;package=com.android.chrome;end;";return;}
 })();
 </script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,monospace;min-height:100vh;display:flex;align-items:center;justify-content:center;}
+.card{text-align:center;padding:32px 24px;max-width:360px;}
+.icon{font-size:48px;margin-bottom:24px;}
+.title{font-size:20px;font-weight:700;margin-bottom:12px;color:#00ff41;}
+.steps{text-align:left;margin:24px 0;padding:0 8px;}
+.step{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,0.1);}
+.step:last-child{border-bottom:none;}
+.step-num{width:32px;height:32px;border-radius:50%;background:#00ff41;color:#000;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;}
+.step-text{font-size:15px;line-height:1.4;color:rgba(255,255,255,0.9);}
+.step-text b{color:#00ff41;}
+.link-btn{display:inline-block;margin-top:20px;padding:14px 40px;border:2px solid #00ff41;color:#00ff41;text-decoration:none;font-size:16px;font-weight:700;letter-spacing:1px;border-radius:8px;}
+.sub{font-size:12px;color:rgba(255,255,255,0.4);margin-top:16px;}
+</style>
 </head>
-<body style="background:#000;color:#00ff41;font-family:monospace;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;">
-<div style="text-align:center;padding:24px;">
-<p style="font-size:16px;margin-bottom:20px;">Open in your browser:</p>
-<a href="https://dissoverse.com/collections" target="_blank" rel="noopener" style="display:inline-block;padding:18px 48px;border:2px solid #00ff41;color:#00ff41;text-decoration:none;font-size:18px;font-weight:bold;letter-spacing:2px;">OPEN LINK</a>
-<p style="font-size:13px;color:#ff9900;margin-top:20px;">Tap &#x22EF; (3 dots) &#x2192; Open in Safari</p>
+<body>
+<div class="card">
+<div class="icon">&#x1F310;</div>
+<div class="title">OPEN IN YOUR BROWSER</div>
+<p style="font-size:14px;color:rgba(255,255,255,0.6);margin-bottom:8px;">For the best experience, open this page in Safari</p>
+<div class="steps">
+<div class="step"><div class="step-num">1</div><div class="step-text">Tap the <b>&#x22EF;</b> (three dots) in the top right</div></div>
+<div class="step"><div class="step-num">2</div><div class="step-text">Select <b>&ldquo;Open in Safari&rdquo;</b></div></div>
+</div>
+<a href="https://dissoverse.com/collections" class="link-btn">OPEN LINK</a>
+<div class="sub">DISSOVERSE &bull; SOVEREIGN LINK</div>
 </div>
 </body></html>
