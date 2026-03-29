@@ -2,25 +2,32 @@
 <html><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Redirecting...</title>
-</head>
-<body style="background:#000;color:#fff;font-family:monospace;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;">
-<div id="fallback" style="display:none;text-align:center;padding:24px;">
-<p style="color:#00ff41;font-size:16px;margin-bottom:20px;">Open in your browser for the best experience:</p>
-<a href="https://dissoverse.com/collections" target="_blank" rel="noopener" style="display:inline-block;padding:18px 48px;border:2px solid #00ff41;color:#00ff41;text-decoration:none;font-size:18px;font-weight:bold;letter-spacing:2px;">OPEN LINK</a>
-<p style="font-size:13px;color:#ff9900;margin-top:20px;line-height:1.6;">Tap &#x22EF; (3 dots) &#x2192; Open in Safari</p>
-</div>
 <script>
-(function(){
-var TARGET="https://dissoverse.com/collections";
-var ua=navigator.userAgent||navigator.vendor||window.opera;
-var isIAB=ua.indexOf("Instagram")>-1||(/FBAN|FBAV|FB_IAB/).test(ua)||(/musical_ly|BytedanceWebview|TikTok/).test(ua)||ua.indexOf("Twitter")>-1||ua.indexOf("Snapchat")>-1||ua.indexOf("LinkedInApp")>-1;
-var isIOS=(/iPhone|iPad|iPod/).test(ua);
-var isAndroid=(/Android/).test(ua);
-if(!isIAB){window.location.replace(TARGET);return;}
-if(isAndroid){window.location.href="intent://"+TARGET.replace(/^https?:\/\//,"")+"#Intent;scheme=https;package=com.android.chrome;end;";setTimeout(function(){document.getElementById("fallback").style.display="block";},2000);return;}
-if(isIOS){window.location.href="shortcuts://x-callback-url/run-shortcut?name=open&x-error="+encodeURIComponent(TARGET);setTimeout(function(){document.getElementById("fallback").style.display="block";},3000);return;}
-window.location.href=TARGET;
-setTimeout(function(){document.getElementById("fallback").style.display="block";},2000);
+(function () {
+  var ua = navigator.userAgent || "";
+  var url = window.location.href;
+
+  if (!ua.includes("Instagram") && !/FBAN|FBAV|FB_IAB/.test(ua) && !/musical_ly|BytedanceWebview|TikTok/.test(ua) && !ua.includes("Twitter") && !ua.includes("Snapchat") && !ua.includes("LinkedInApp")) {
+    window.location.replace("https://dissoverse.com/collections");
+    return;
+  }
+
+  if (/iPhone|iPad|iPod/.test(ua)) {
+    window.location.href = "x-safari-" + url;
+    return;
+  }
+
+  if (/Android/.test(ua)) {
+    window.location.href = "intent://" + url.replace(/^https?:\/\//, "") + "#Intent;scheme=https;package=com.android.chrome;end;";
+    return;
+  }
 })();
 </script>
+</head>
+<body style="background:#000;color:#00ff41;font-family:monospace;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;">
+<div style="text-align:center;padding:24px;">
+<p style="font-size:16px;margin-bottom:20px;">Open in your browser:</p>
+<a href="https://dissoverse.com/collections" target="_blank" rel="noopener" style="display:inline-block;padding:18px 48px;border:2px solid #00ff41;color:#00ff41;text-decoration:none;font-size:18px;font-weight:bold;letter-spacing:2px;">OPEN LINK</a>
+<p style="font-size:13px;color:#ff9900;margin-top:20px;">Tap &#x22EF; (3 dots) &#x2192; Open in Safari</p>
+</div>
 </body></html>
