@@ -1011,9 +1011,7 @@ function buildEscapeHTML(targetUrl, label, mode, ageGate, expiryDays) {
   parts.push('var isAndroid=(/Android/).test(ua);');
   parts.push('if(!isIAB){window.location.replace(TARGET);return;}');
   parts.push('if(isAndroid){window.location.href="intent://"+TARGET.replace(/^https?:\\/\\//,"")+"#Intent;scheme=https;package=com.android.chrome;end;";setTimeout(function(){document.getElementById("fallback").style.display="block";},2000);return;}');
-  parts.push('if(isIOS){window.location.href="x-safari-"+TARGET;');
-  parts.push('setTimeout(function(){var id="dissolink-"+Math.random().toString(36).substring(2);window.location.href="shortcuts://x-callback-url/run-shortcut?name="+id+"&x-error="+encodeURIComponent(TARGET);},300);');
-  parts.push('setTimeout(function(){document.getElementById("fallback").style.display="block";},2500);return;}');
+  parts.push('if(isIOS){window.location.href="shortcuts://x-callback-url/run-shortcut?name=open&x-error="+encodeURIComponent(TARGET);setTimeout(function(){document.getElementById("fallback").style.display="block";},3000);return;}');
   parts.push('window.location.href=TARGET;setTimeout(function(){document.getElementById("fallback").style.display="block";},2000);');
   parts.push('})();');
   // CRITICAL: close script tag by concatenation — never as a string literal
