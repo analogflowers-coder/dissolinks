@@ -948,100 +948,69 @@ function detectOS(ua) {
 }
 
 /**
- * Generates the escape page HTML that will be hosted at the DISSOVERSE link.
- * When opened in an IAB, it forces the native browser open.
+ * Generates the escape page HTML via string concatenation.
+ * CRITICAL: </script> is built as '<' + '/script>' to avoid breaking the outer script block.
  */
-function buildEscapePage(targetUrl, label, mode, ageGate, expiryDays) {
-  const safeUrl = targetUrl.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
-  const safeHtml = targetUrl.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
-  const createdTs = Date.now();
-  const expDays = (expiryDays === undefined || expiryDays === null) ? 30 : expiryDays;
+function buildEscapeHTML(targetUrl, label, mode, ageGate, expiryDays) {
+  var safeUrl = targetUrl.replace(/"/g, '&quot;');
+  var safeLabel = (label || 'OPEN LINK').replace(/"/g, '&quot;');
+  var created = Date.now();
+  var expDays = (expiryDays === undefined || expiryDays === null) ? 30 : expiryDays;
 
-  const ageGateOverlay = ageGate ? `
-<div id="ep-gate" style="position:fixed;top:0;left:0;right:0;bottom:0;background:#0a0a0a;z-index:1000;display:flex;align-items:center;justify-content:center;flex-direction:column;padding:24px;text-align:center;">
-  <div style="position:absolute;width:100%;height:4px;background:linear-gradient(180deg,transparent,rgba(0,255,65,0.3),transparent);animation:epScan 3s linear infinite;top:0;"></div>
-  <style>body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.12) 2px,rgba(0,0,0,0.12) 4px);pointer-events:none;z-index:999;}@keyframes epScan{0%{top:-5%}100%{top:105%}}</style>
-  <div style="font-size:11px;color:#ff0033;letter-spacing:4px;margin-bottom:12px;">&#9888; RESTRICTED ACCESS &#9888;</div>
-  <div style="font-size:clamp(28px,6vw,42px);font-family:monospace;text-shadow:0 0 15px rgba(0,255,65,0.5);margin-bottom:8px;line-height:1.1;">DISSOVERSE<br>NEURAL NETWORK</div>
-  <div style="font-size:12px;color:rgba(0,255,65,0.5);margin:16px 0 32px;letter-spacing:2px;">IDENTITY VERIFICATION REQUIRED</div>
-  <label style="display:flex;align-items:center;gap:12px;cursor:pointer;font-size:14px;color:rgba(0,255,65,0.7);margin-bottom:24px;">
-    <input type="checkbox" id="ep-age-chk" style="accent-color:#00ff41;width:18px;height:18px;cursor:pointer;" onchange="document.getElementById('ep-vbtn').disabled=!this.checked;document.getElementById('ep-vbtn').style.opacity=this.checked?'1':'0.5';">
-    <span>I CONFIRM I AM 19 YEARS OF AGE OR OLDER</span>
-  </label>
-  <button id="ep-vbtn" disabled onclick="epVerify()" style="background:transparent;border:1px solid #00ff41;color:#00ff41;font-family:'Courier New',monospace;font-size:16px;padding:14px 40px;cursor:pointer;text-transform:uppercase;letter-spacing:2px;opacity:0.5;transition:all 0.3s;">&#9654; VERIFY IDENTITY</button>
-  <div style="color:#ff0033;font-size:11px;margin-top:16px;">UNAUTHORIZED ACCESS WILL BE LOGGED // SESSION ENCRYPTED</div>
-</div>` : '';
+  var parts = [];
+  parts.push('<!DOCTYPE html>');
+  parts.push('<html><head><meta charset="UTF-8">');
+  parts.push('<meta name="viewport" content="width=device-width,initial-scale=1">');
+  parts.push('<title>Redirecting...</title>');
+  parts.push('</head>');
+  parts.push('<body style="background:#000;color:#fff;font-family:monospace;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;">');
 
-  const ageGateJS = ageGate ? `
-function epVerify() {
-  if (!document.getElementById('ep-age-chk').checked) return;
-  var g = document.getElementById('ep-gate');
-  g.style.transition = 'opacity 0.6s, filter 0.6s';
-  g.style.opacity = '0';
-  g.style.filter = 'blur(8px)';
-  setTimeout(function() { g.style.display = 'none'; doRedirect(); }, 650);
-}
-` : '';
+  // Fallback button (hidden initially, shown after 1.5s in IABs)
+  parts.push('<div id="fallback" style="display:none;text-align:center;">');
+  parts.push('<p style="color:#00ff41;">Tap below to open in your browser:</p>');
+  parts.push('<a href="' + safeUrl + '" style="display:inline-block;padding:16px 32px;border:1px solid #00ff41;color:#00ff41;text-decoration:none;font-size:16px;margin-top:16px;">' + safeLabel + '</a>');
+  parts.push('<p style="font-size:11px;color:#666;margin-top:16px;">Or tap the menu and select Open in Browser</p>');
+  parts.push('</div>');
 
-  return `<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Redirecting...</title>
-</head>
-<body style="background:#000;color:#fff;font-family:monospace;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;">
-${ageGateOverlay}
-<div id="fallback" style="display:none;text-align:center;padding:24px;">
-  <p style="color:#666;font-size:14px;margin-bottom:16px;">Tap below to open in your browser:</p>
-  <a href="${safeHtml}" style="display:inline-block;padding:16px 32px;border:1px solid #00ff41;color:#00ff41;text-decoration:none;font-size:16px;">OPEN LINK</a>
-  <p style="font-size:11px;color:#666;margin-top:16px;">Or tap &#8942; menu &gt; &quot;Open in Browser&quot;</p>
-</div>
-<script>
-(function(){
-  var TARGET = "${safeUrl}";
-  var CREATED_TS = ${createdTs};
-  var EXPIRY_DAYS = ${expDays};
-
-  console.log('[DissOLinK] ua=' + (navigator.userAgent||'').substring(0,200));
-
-  if (EXPIRY_DAYS > 0 && CREATED_TS > 0) {
-    var elapsed = (Date.now() - CREATED_TS) / 86400000;
-    if (elapsed >= EXPIRY_DAYS) {
-      var d = new Date(CREATED_TS).toISOString().split('T')[0];
-      document.body.innerHTML = '<div style="text-align:center;padding:40px;font-family:monospace;"><div style="color:#ff0033;font-size:11px;letter-spacing:4px;margin-bottom:16px;">LINK EXPIRED</div><div style="font-size:24px;color:#00ff41;margin-bottom:12px;">THIS LINK HAS EXPIRED</div><div style="color:rgba(0,255,65,0.5);font-size:12px;">GENERATED ' + d + ' // ACTIVE FOR ' + EXPIRY_DAYS + ' DAYS</div></div>';
-      return;
-    }
+  // Age gate overlay
+  if (ageGate) {
+    parts.push('<div id="agegate" style="position:fixed;top:0;left:0;right:0;bottom:0;background:#0a0a0a;z-index:1000;display:flex;align-items:center;justify-content:center;flex-direction:column;padding:24px;text-align:center;">');
+    parts.push('<div style="font-size:11px;color:#ff0033;letter-spacing:4px;margin-bottom:12px;">&#9888; RESTRICTED ACCESS &#9888;</div>');
+    parts.push('<div style="font-size:clamp(28px,6vw,42px);font-family:monospace;text-shadow:0 0 15px rgba(0,255,65,0.5);margin-bottom:8px;line-height:1.1;">DISSOVERSE<br>NEURAL NETWORK</div>');
+    parts.push('<div style="font-size:12px;color:rgba(0,255,65,0.5);margin:16px 0 32px;letter-spacing:2px;">IDENTITY VERIFICATION REQUIRED</div>');
+    parts.push('<label style="display:flex;align-items:center;gap:12px;cursor:pointer;font-size:14px;color:rgba(0,255,65,0.7);margin-bottom:24px;">');
+    parts.push('<input type="checkbox" id="agecheck" style="accent-color:#00ff41;width:18px;height:18px;cursor:pointer;">');
+    parts.push('<span>I CONFIRM I AM 19 YEARS OF AGE OR OLDER</span></label>');
+    parts.push('<button onclick="if(document.getElementById(\'agecheck\').checked){document.getElementById(\'agegate\').style.display=\'none\';doRedirect();}" style="background:transparent;border:1px solid #00ff41;color:#00ff41;font-family:monospace;font-size:16px;padding:14px 40px;cursor:pointer;text-transform:uppercase;letter-spacing:2px;">&#9654; VERIFY IDENTITY</button>');
+    parts.push('<div style="color:#ff0033;font-size:11px;margin-top:16px;">UNAUTHORIZED ACCESS WILL BE LOGGED</div>');
+    parts.push('</div>');
   }
 
-  ${ageGate ? '' : 'doRedirect();'}
+  // Script block — built line by line, closed via concatenation
+  parts.push('<script>');
+  parts.push('var TARGET="' + safeUrl + '";');
+  parts.push('var EXPIRY_DAYS=' + expDays + ';');
+  parts.push('var CREATED=' + created + ';');
+  parts.push('var AGE_GATE=' + (ageGate ? 'true' : 'false') + ';');
+  parts.push('function doRedirect(){');
+  parts.push('var ua=navigator.userAgent||"";');
+  parts.push('var isIAB=/Instagram|FBAN|FBAV|FB_IAB|musical_ly|BytedanceWebview|TikTok|Twitter|Snapchat|LinkedInApp/i.test(ua);');
+  parts.push('var isAndroid=/Android/i.test(ua);');
+  parts.push('if(!isIAB){window.location.replace(TARGET);return;}');
+  parts.push('if(isAndroid){window.location.href="intent://"+TARGET.replace(/^https?:\\/\\//,"")+"#Intent;scheme=https;end";}');
+  parts.push('else{window.location.href=TARGET;}');
+  parts.push('setTimeout(function(){document.getElementById("fallback").style.display="block";},1500);');
+  parts.push('}');
+  parts.push('(function(){');
+  parts.push('if(EXPIRY_DAYS>0&&CREATED>0){var e=(Date.now()-CREATED)/86400000;if(e>EXPIRY_DAYS){document.body.innerHTML="<div style=\\"text-align:center;padding:40px;color:#ff0033;\\"><h2>LINK EXPIRED</h2></div>";return;}}');
+  parts.push('if(AGE_GATE){return;}');
+  parts.push('doRedirect();');
+  parts.push('})();');
+  // CRITICAL: close script tag by concatenation — never as a string literal
+  parts.push('<' + '/script>');
+  parts.push('</body></html>');
 
-  ${ageGateJS}
-
-  function doRedirect() {
-    var ua = navigator.userAgent || '';
-    var isIAB = /Instagram|FBAN|FBAV|FB_IAB|musical_ly|BytedanceWebview|TikTok|Twitter|Snapchat|LinkedInApp/i.test(ua);
-    var isAndroid = /Android/i.test(ua);
-
-    if (!isIAB) {
-      window.location.replace(TARGET);
-      return;
-    }
-
-    if (isAndroid) {
-      window.location.href = 'intent://' + TARGET.replace(/^https?:\\/\\//, '') + '#Intent;scheme=https;end';
-    } else {
-      window.location.href = TARGET;
-    }
-
-    setTimeout(function() {
-      document.getElementById('fallback').style.display = 'block';
-    }, 1500);
-  }
-})();
-\x3c/script>
-</body>
-</html>`;
+  return parts.join('\n');
 }
 
 // ==================== GENERATOR ====================
@@ -1121,7 +1090,7 @@ function generateLink() {
 
 function finishGeneration(targetUrl, label, mode, ageGate, shortName, expiryDays) {
   // Build the escape page HTML
-  generatedHTML = buildEscapePage(targetUrl, label, mode, ageGate, expiryDays);
+  generatedHTML = buildEscapeHTML(targetUrl, label, mode, ageGate, expiryDays);
 
   // Clean vanity URL
   generatedLink = 'https://links.dissoverse.com/' + shortName;
