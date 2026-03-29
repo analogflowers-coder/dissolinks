@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DissOLinK // OPEN LINK</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a0a;
+    color: #00ff41;
+    font-family: 'Courier New', monospace;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 24px;
+    text-align: center;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.12) 2px, rgba(0,0,0,0.12) 4px);
+    pointer-events: none;
+    z-index: 999;
+  }
+  .title { font-size: 24px; letter-spacing: 3px; margin-bottom: 8px; text-shadow: 0 0 15px rgba(0,255,65,0.5); }
+  .label { font-size: 14px; color: rgba(0,255,65,0.5); margin-bottom: 32px; letter-spacing: 2px; }
+  .status { font-size: 13px; margin-bottom: 24px; min-height: 20px; }
+  .btn {
+    background: transparent;
+    border: 1px solid #00ff41;
+    color: #00ff41;
+    font-family: 'Courier New', monospace;
+    font-size: 16px;
+    padding: 14px 40px;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s;
+  }
+  .btn:hover { background: rgba(0,255,65,0.1); box-shadow: 0 0 20px rgba(0,255,65,0.3); }
+  .warn { color: #ff0033; font-size: 11px; margin-top: 24px; }
+  .footer { position:fixed; bottom:16px; font-size:10px; color:rgba(0,255,65,0.3); }
+</style>
+</head>
+<body>
+
+<div id="ep-expired" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:#0a0a0a;z-index:2000;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;">
+  <div style="color:#ff0033;font-size:11px;letter-spacing:4px;margin-bottom:16px;">&#9888; LINK EXPIRED &#9888;</div>
+  <div style="font-size:clamp(20px,5vw,32px);font-family:monospace;letter-spacing:2px;text-shadow:0 0 15px rgba(0,255,65,0.5);margin-bottom:16px;">THIS LINK HAS EXPIRED</div>
+  <div style="font-size:12px;color:rgba(0,255,65,0.5);letter-spacing:2px;margin-bottom:6px;" id="ep-expired-date"></div>
+  <div style="font-size:12px;color:rgba(0,255,65,0.5);letter-spacing:2px;" id="ep-expired-duration"></div>
+  <div style="position:fixed;bottom:16px;font-size:10px;color:rgba(0,255,65,0.3);">DISSOVERSE NEURAL NETWORK // SOVEREIGN LINK</div>
+</div>
+<div class="title">DissOLinK's</div>
+<div class="label">OPEN LINK</div>
+<div class="status" id="status">ANALYZING ENVIRONMENT...</div>
+<a href="https://youtube.com" id="fallback-btn" class="btn" style="display:none;">▶ OPEN DESTINATION</a>
+<div class="warn" id="warn"></div>
+<div class="footer">DISSOVERSE NEURAL NETWORK // SOVEREIGN LINK</div>
+
+<script>
+function runRedirect() {
+  var TARGET = "https://youtube.com";
+  var MODE = "safari";
+  var status = document.getElementById('status');
+  var btn = document.getElementById('fallback-btn');
+  var warn = document.getElementById('warn');
+  var ua = navigator.userAgent || '';
+
+  // IAB Detection
+  var iab = null;
+  var patterns = [
+    ['Instagram', /Instagram/i],
+    ['TikTok', /musical_ly|BytedanceWebview|TikTok/i],
+    ['Facebook', /FBAN|FBAV|FB_IAB/i],
+    ['Twitter', /Twitter/i],
+    ['Snapchat', /Snapchat/i],
+    ['LinkedIn', /LinkedInApp/i]
+  ];
+  for (var i = 0; i < patterns.length; i++) {
+    if (patterns[i][1].test(ua)) { iab = patterns[i][0]; break; }
+  }
+
+  var isIOS = /iPhone|iPad|iPod/i.test(ua);
+  var isAndroid = /Android/i.test(ua);
+
+  if (iab) {
+    status.textContent = 'IN-APP BROWSER DETECTED: ' + iab.toUpperCase();
+    warn.textContent = 'Attempting to break out of walled garden...';
+
+    setTimeout(function() {
+      if (isAndroid && (MODE === 'auto' || MODE === 'intent')) {
+        // Android Intent URI
+        var intentUrl = 'intent://' + TARGET.replace(/^https?:\/\//, '') + '#Intent;scheme=https;end';
+        status.textContent = 'DEPLOYING ANDROID INTENT BYPASS...';
+        window.location.href = intentUrl;
+      } else if (isIOS && (MODE === 'auto' || MODE === 'safari')) {
+        // iOS: Try window.open with target _system / _blank
+        status.textContent = 'DEPLOYING SAFARI FORCE-OPEN...';
+        // Method 1: window.open
+        var w = window.open(TARGET, '_blank');
+        if (!w) {
+          // Method 2: location assign
+          window.location.href = TARGET;
+        }
+      } else {
+        // Universal fallback
+        status.textContent = 'DEPLOYING UNIVERSAL BYPASS...';
+        window.location.href = TARGET;
+      }
+
+      // Show manual button as fallback after 2s
+      setTimeout(function() {
+        btn.style.display = 'inline-block';
+        status.textContent = 'AUTO-BYPASS ATTEMPTED // USE MANUAL LINK IF NEEDED';
+        warn.textContent = 'TIP: Tap \u22ee or \u2026 menu > "Open in Browser" for guaranteed escape.';
+      }, 2000);
+    }, 800);
+
+  } else {
+    // Not in IAB, direct redirect
+    status.textContent = 'NATIVE BROWSER DETECTED // REDIRECTING...';
+    setTimeout(function() {
+      window.location.href = TARGET;
+    }, 500);
+  }
+}
+(function() {
+  var CREATED_TS = 1774788057442;
+  var EXPIRY_DAYS = 30;
+  if (EXPIRY_DAYS > 0) {
+    var elapsed = (Date.now() - CREATED_TS) / 86400000;
+    if (elapsed >= EXPIRY_DAYS) {
+      var d = new Date(CREATED_TS).toISOString().split('T')[0];
+      document.getElementById('ep-expired-date').textContent = 'GENERATED ' + d;
+      document.getElementById('ep-expired-duration').textContent = 'ACTIVE FOR ' + EXPIRY_DAYS + ' DAYS';
+      document.getElementById('ep-expired').style.display = 'flex';
+      var gate = document.getElementById('ep-gate');
+      if (gate) gate.style.display = 'none';
+      return;
+    }
+  }
+  runRedirect();
+})();
+<\/script>
+</body>
+</html>
