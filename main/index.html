@@ -4,24 +4,29 @@
 <title>Redirecting...</title>
 </head>
 <body style="background:#000;color:#fff;font-family:monospace;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;">
-<div id="fallback" style="display:none;text-align:center;">
-<p style="color:#00ff41;">Tap below to open in your browser:</p>
-<a href="https://dissoverse.com" style="display:inline-block;padding:16px 32px;border:1px solid #00ff41;color:#00ff41;text-decoration:none;font-size:16px;margin-top:16px;">OPEN LINK</a>
-<p style="font-size:11px;color:#666;margin-top:16px;">Or tap the menu and select Open in Browser</p>
+<div id="fallback" style="display:none;text-align:center;padding:24px;">
+<p style="color:#00ff41;font-size:16px;margin-bottom:20px;">Open in your browser:</p>
+<a id="open-btn" href="https://dissoverse.com/collections" target="_blank" rel="noopener" style="display:inline-block;padding:18px 48px;border:2px solid #00ff41;color:#00ff41;text-decoration:none;font-size:18px;font-weight:bold;letter-spacing:2px;">OPEN LINK</a>
+<p id="ios-tip" style="display:none;font-size:13px;color:#ff9900;margin-top:20px;line-height:1.6;">If the button doesn\'t work:<br>Tap <b>\u22ef</b> or <b>Share</b> \u2192 <b>Open in Safari</b></p>
+<button id="copy-btn" style="display:none;margin-top:16px;padding:12px 32px;background:transparent;border:1px solid #666;color:#666;font-family:monospace;font-size:13px;cursor:pointer;" onclick="navigator.clipboard.writeText(\'https://dissoverse.com/collections\');this.textContent=\'COPIED!\';this.style.color=\'#00ff41\';this.style.borderColor=\'#00ff41\';">COPY LINK</button>
 </div>
 <script>
-var TARGET="https://dissoverse.com";
+var TARGET="https://dissoverse.com/collections";
 var EXPIRY_DAYS=30;
-var CREATED=1774791775444;
+var CREATED=1774792152439;
 var AGE_GATE=false;
 function doRedirect(){
 var ua=navigator.userAgent||"";
 var isIAB=/Instagram|FBAN|FBAV|FB_IAB|musical_ly|BytedanceWebview|TikTok|Twitter|Snapchat|LinkedInApp/i.test(ua);
 var isAndroid=/Android/i.test(ua);
 if(!isIAB){window.location.replace(TARGET);return;}
+var fb=document.getElementById("fallback");
+fb.style.display="block";
 if(isAndroid){window.location.href="intent://"+TARGET.replace(/^https?:\/\//,"")+"#Intent;scheme=https;end";}
-else{window.location.href=TARGET;}
-setTimeout(function(){document.getElementById("fallback").style.display="block";},1500);
+else{var isIOS=/iPhone|iPad|iPod/i.test(ua);
+if(isIOS){document.getElementById("ios-tip").style.display="block";document.getElementById("copy-btn").style.display="inline-block";}
+var a=document.createElement("a");a.href=TARGET;a.target="_blank";a.rel="noopener";document.body.appendChild(a);a.click();
+}
 }
 (function(){
 if(EXPIRY_DAYS>0&&CREATED>0){var e=(Date.now()-CREATED)/86400000;if(e>EXPIRY_DAYS){document.body.innerHTML="<div style=\"text-align:center;padding:40px;color:#ff0033;\"><h2>LINK EXPIRED</h2></div>";return;}}
