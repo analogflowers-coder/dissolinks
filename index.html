@@ -493,29 +493,29 @@
         </div>
 
         <!-- Output -->
-        <div id="output-section" style="display:none;" class="space-y-3">
-          <div style="font-size:11px; color:var(--text-dim); letter-spacing:2px;">
-            ▼ GENERATED LINK
-          </div>
-          <div class="output-box" id="output-box" onclick="copyLink()">
-            <span class="copy-hint">[CLICK TO COPY]</span>
-            <code id="output-link"></code>
-          </div>
-          <div id="copy-confirm" style="display:none; font-size:11px; color:var(--neon); text-align:center;">
-            ✓ COPIED TO CLIPBOARD // LINK ARMED
+        <div id="output-section" style="display:none;" class="space-y-4">
+
+          <!-- Link display -->
+          <div style="text-align:center; padding: 8px 0 4px;">
+            <div style="font-size:10px; color:var(--text-dim); letter-spacing:3px; margin-bottom:10px;">▼ YOUR FORCE-OP LINK</div>
+            <div style="font-family:'VT323',monospace; font-size:clamp(22px,4.5vw,32px); color:var(--neon); text-shadow:0 0 15px var(--neon-glow); letter-spacing:1px; word-break:break-all; padding:0 4px;">links.dissoverse.com/<span id="output-shortname"></span></div>
+            <div id="deploy-status-badge" style="display:none; margin-top:8px; font-size:11px; letter-spacing:4px; color:var(--neon); text-shadow:0 0 10px var(--neon-glow);">■ LIVE</div>
           </div>
 
-          <!-- Action Buttons -->
+          <!-- Primary: COPY LINK -->
+          <button class="btn-neon btn-deploy" onclick="copyLink()" style="width:100%; font-size:15px; padding:14px; letter-spacing:4px;">
+            ⎘ COPY LINK
+          </button>
+          <div id="copy-confirm" style="display:none; font-size:11px; color:var(--neon); text-align:center; letter-spacing:2px;">
+            ✓ COPIED // LINK ARMED
+          </div>
+
+          <!-- Secondary buttons -->
           <div class="flex gap-3 flex-wrap">
-            <button class="btn-neon" onclick="previewLink()" style="flex:1;">
-              ◉ PREVIEW
-            </button>
-            <button class="btn-neon btn-deploy" onclick="deployLive()" style="flex:2; display:none;" id="deploy-live-btn">
-              ⚡ DEPLOY LIVE
-            </button>
-            <button class="btn-neon" onclick="downloadHTML()" style="flex:1;" id="download-btn">
-              ↓ DOWNLOAD .HTML
-            </button>
+            <button class="btn-neon" onclick="previewLink()" style="flex:1;">◉ PREVIEW</button>
+            <button class="btn-neon btn-deploy" onclick="deployLive()" style="flex:2; display:none;" id="deploy-live-btn">⚡ DEPLOY LIVE</button>
+            <button class="btn-neon" onclick="openDeployedLink()" style="flex:1; display:none;" id="open-link-btn">OPEN ↗</button>
+            <button class="btn-neon" onclick="downloadHTML()" style="flex:1; display:none;" id="download-btn">↓ DOWNLOAD</button>
           </div>
 
           <!-- No token note -->
@@ -523,15 +523,9 @@
             Connect GitHub token for one-click deploy — click ⚙ in the header
           </div>
 
-          <!-- Live deploy status -->
-          <div id="deploy-status-line" class="deploy-status-live" style="display:none;">
-            ■ LIVE // <span id="deploy-status-url"></span>
-            <button class="btn-neon" onclick="openDeployedLink()" style="font-size:10px; padding:4px 10px; letter-spacing:1px;">OPEN LINK ↗</button>
-          </div>
-
-          <!-- Deploy Instructions (no-token fallback) -->
-          <div id="deploy-instructions" style="font-size:11px; color:var(--text-dim); line-height:1.9; padding-top:2px; display:none;">
-            TO ACTIVATE: Upload <span id="deploy-filename" style="color:var(--neon);"></span> to the dissolinks repo root and push. Your link goes live at the URL above.
+          <!-- Deploy instructions (no-token fallback) -->
+          <div id="deploy-instructions" style="font-size:11px; color:var(--text-dim); line-height:1.9; display:none;">
+            TO ACTIVATE: Push as <span id="deploy-filename" style="color:var(--neon);"></span> in the dissolinks repo. Your link goes live at the URL above.
           </div>
         </div>
       </div>
@@ -666,13 +660,16 @@ function updateTokenStatus() {
 
 function updateDeployButtonVisibility() {
   const hasToken = !!sessionStorage.getItem('gh_pat');
+  const outputVisible = document.getElementById('output-section').style.display !== 'none';
   const deployBtn = document.getElementById('deploy-live-btn');
   const noTokenNote = document.getElementById('no-token-note');
   const deployInstructions = document.getElementById('deploy-instructions');
-  const outputVisible = document.getElementById('output-section').style.display !== 'none';
+  const downloadBtn = document.getElementById('download-btn');
   if (deployBtn) deployBtn.style.display = (hasToken && outputVisible) ? 'flex' : 'none';
   if (noTokenNote) noTokenNote.style.display = (!hasToken && outputVisible) ? 'block' : 'none';
   if (deployInstructions) deployInstructions.style.display = (!hasToken && outputVisible) ? 'block' : 'none';
+  // Show download only when no token (fallback workflow)
+  if (downloadBtn) downloadBtn.style.display = (!hasToken && outputVisible) ? 'flex' : 'none';
 }
 
 // ==================== GITHUB DEPLOY ====================
@@ -680,7 +677,7 @@ async function deployToGitHub(shortName, htmlContent) {
   const token = sessionStorage.getItem('gh_pat');
   if (!token) return false;
 
-  const filename = shortName + '.html';
+  const filename = shortName + '/index.html';
   const apiUrl = 'https://api.github.com/repos/analogflowers-coder/dissolinks/contents/' + filename;
   const b64Content = btoa(unescape(encodeURIComponent(htmlContent)));
 
@@ -752,9 +749,9 @@ async function deployLive() {
 }
 
 function showDeployStatus(shortName) {
-  const line = document.getElementById('deploy-status-line');
-  document.getElementById('deploy-status-url').textContent = 'links.dissoverse.com/' + shortName;
-  line.style.display = 'flex';
+  document.getElementById('deploy-status-badge').style.display = 'block';
+  document.getElementById('open-link-btn').style.display = 'flex';
+  document.getElementById('deploy-live-btn').style.display = 'none';
 }
 
 function openDeployedLink() {
@@ -1074,16 +1071,16 @@ function finishGeneration(targetUrl, label, mode, ageGate, shortName) {
   generatedLink = 'https://links.dissoverse.com/' + shortName;
 
   const outputSection = document.getElementById('output-section');
-  const outputLink = document.getElementById('output-link');
 
   outputSection.style.display = 'block';
-  outputLink.textContent = generatedLink;
+  document.getElementById('output-shortname').textContent = shortName;
 
   // Update download button and deploy instructions
-  const filename = shortName + '.html';
-  document.getElementById('download-btn').textContent = '↓ DOWNLOAD ' + filename;
+  const filename = shortName + '/index.html';
+  document.getElementById('download-btn').textContent = '↓ DOWNLOAD';
   document.getElementById('deploy-filename').textContent = filename;
-  document.getElementById('deploy-status-line').style.display = 'none';
+  document.getElementById('deploy-status-badge').style.display = 'none';
+  document.getElementById('open-link-btn').style.display = 'none';
 
   updateDeployButtonVisibility();
 
@@ -1138,7 +1135,7 @@ function downloadHTML() {
     return;
   }
   const shortName = document.getElementById('short-name').value.trim() || 'dissolink';
-  const filename = shortName + '.html';
+  const filename = shortName + '.html'; // local download keeps flat filename
   const blob = new Blob([generatedHTML], { type: 'text/html' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -1159,10 +1156,12 @@ function clearAll() {
   document.getElementById('link-label').value = '';
   document.getElementById('output-section').style.display = 'none';
   document.getElementById('copy-confirm').style.display = 'none';
-  document.getElementById('download-btn').textContent = '↓ DOWNLOAD .HTML';
+  document.getElementById('output-shortname').textContent = '';
   document.getElementById('deploy-filename').textContent = '';
-  document.getElementById('deploy-status-line').style.display = 'none';
+  document.getElementById('deploy-status-badge').style.display = 'none';
   document.getElementById('deploy-live-btn').style.display = 'none';
+  document.getElementById('open-link-btn').style.display = 'none';
+  document.getElementById('download-btn').style.display = 'none';
   document.getElementById('no-token-note').style.display = 'none';
   generatedHTML = '';
   generatedLink = '';
