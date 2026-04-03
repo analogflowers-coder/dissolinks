@@ -466,7 +466,7 @@ if(sessionStorage.getItem('dv_access')==='1'){document.getElementById('access-ga
             spellcheck="false"
           >
           <div style="font-size:12px; margin-top:6px; min-height:18px; color:var(--text-dim);">
-            <span id="short-name-preview" style="color:var(--text-dim); font-size:11px;"></span>
+            links.dissoverse.com/<span id="short-name-preview" style="color:var(--neon);"></span>
           </div>
         </div>
 
@@ -530,7 +530,7 @@ if(sessionStorage.getItem('dv_access')==='1'){document.getElementById('access-ga
           <!-- Link display -->
           <div style="text-align:center; padding: 8px 0 4px;">
             <div style="font-size:10px; color:var(--text-dim); letter-spacing:3px; margin-bottom:10px;">▼ YOUR FORCE-OP LINK</div>
-            <div id="output-link-display" style="font-family:'VT323',monospace; font-size:clamp(14px,2.5vw,20px); color:var(--neon); text-shadow:0 0 15px var(--neon-glow); letter-spacing:1px; word-break:break-all; padding:0 4px;"></div>
+            <div style="font-family:'VT323',monospace; font-size:clamp(22px,4.5vw,32px); color:var(--neon); text-shadow:0 0 15px var(--neon-glow); letter-spacing:1px; word-break:break-all; padding:0 4px;">links.dissoverse.com/<span id="output-shortname"></span></div>
             <div id="deploy-status-badge" style="display:none; margin-top:8px; font-size:11px; letter-spacing:4px; color:var(--neon); text-shadow:0 0 10px var(--neon-glow);">■ LIVE</div>
           </div>
 
@@ -980,58 +980,15 @@ function buildEscapeHTML(targetUrl, label, mode, ageGate, expiryDays) {
   var created = Date.now();
   var expDays = (expiryDays === undefined || expiryDays === null) ? 30 : expiryDays;
 
+  // Simple redirect page — forwards to Shopify bridge which handles IAB escape
+  var bridgeUrl = 'https://dissoverse.com/pages/go?url=' + encodeURIComponent(targetUrl);
   var parts = [];
   parts.push('<!DOCTYPE html>');
   parts.push('<html><head><meta charset="UTF-8">');
   parts.push('<meta name="viewport" content="width=device-width,initial-scale=1">');
   parts.push('<title>Redirecting...</title>');
-  parts.push('<script>');
-  parts.push('(function(){');
-  parts.push('var TARGET="' + safeUrl + '";');
-  parts.push('var ua=navigator.userAgent||navigator.vendor||window.opera;');
-  parts.push('var isIAB=(ua.indexOf("Instagram")>-1)||(ua.indexOf("FBAN")>-1)||(ua.indexOf("FBAV")>-1)||(ua.indexOf("Twitter")>-1)||(ua.indexOf("Line")>-1)||(ua.indexOf("TikTok")>-1)||(ua.indexOf("Snapchat")>-1)||(ua.indexOf("LinkedInApp")>-1);');
-  parts.push('var isIOS=/iPad|iPhone|iPod/.test(ua)&&!window.MSStream;');
-  parts.push('var isAndroid=/android/i.test(ua);');
-  // Normal browser = instant redirect
-  parts.push('if(!isIAB){window.location.replace(TARGET);return;}');
-  // iOS: googlechromes:// first, x-safari- fallback at 1.5s
-  parts.push('if(isIOS){');
-  parts.push('var chromeUrl="googlechromes://"+TARGET.replace("https://","");');
-  parts.push('var safariUrl="x-safari-"+TARGET;');
-  parts.push('window.location.href=chromeUrl;');
-  parts.push('setTimeout(function(){window.location.href=safariUrl;},1500);');
-  parts.push('}');
-  // Android: intent:// with Chrome package + browser fallback
-  parts.push('if(isAndroid){');
-  parts.push('var intentUrl="intent://"+TARGET.replace(/^https?:\\/\\//,"")+"#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url="+encodeURIComponent(TARGET)+";end";');
-  parts.push('window.location.href=intentUrl;');
-  parts.push('}');
-  // Show manual fallback UI after 2.5s
-  parts.push('setTimeout(function(){var f=document.getElementById("fallback");if(f)f.style.display="block";},2500);');
-  parts.push('})();');
-  parts.push('<' + '/script>');
-  parts.push('<style>');
-  parts.push('*{margin:0;padding:0;box-sizing:border-box;}');
-  parts.push('body{background:#0a0a0a;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Share Tech Mono",monospace;min-height:100vh;display:flex;align-items:center;justify-content:center;}');
-  parts.push('#fallback{display:none;text-align:center;padding:32px 24px;max-width:380px;}');
-  parts.push('.esc-btn{display:inline-block;padding:16px 40px;border:2px solid #00ff41;color:#00ff41;text-decoration:none;font-size:16px;font-weight:700;letter-spacing:2px;border-radius:6px;margin:8px 0;cursor:pointer;background:transparent;font-family:inherit;width:100%;}');
-  parts.push('.esc-btn:active{background:rgba(0,255,65,0.15);}');
-  parts.push('.copy-btn{display:inline-block;padding:12px 40px;border:1px solid #555;color:#999;text-decoration:none;font-size:13px;letter-spacing:1px;border-radius:6px;margin:4px 0;cursor:pointer;background:transparent;font-family:inherit;width:100%;}');
-  parts.push('</style>');
-  parts.push('</head>');
-  parts.push('<body>');
-  parts.push('<div id="fallback">');
-  parts.push('<div style="font-size:11px;color:#00ff41;letter-spacing:4px;margin-bottom:16px;">DISSOVERSE</div>');
-  parts.push('<div style="font-size:22px;font-weight:700;margin-bottom:8px;color:#fff;">Open in your browser</div>');
-  parts.push('<p style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:24px;">For the best experience, open this link in Safari or Chrome</p>');
-  // Open in Safari button (fires both schemes on tap)
-  parts.push('<button class="esc-btn" onclick="var t=\\\''+safeUrl+'\\\';window.location.href=\\\'googlechromes://\\\'+ t.replace(\\\'https://\\\',\\\'\\\');setTimeout(function(){window.location.href=\\\'x-safari-\\\'+t;},500);">OPEN IN SAFARI</button>');
-  // Copy link button
-  parts.push('<button class="copy-btn" onclick="var t=\\\''+safeUrl+'\\\';navigator.clipboard?navigator.clipboard.writeText(t).then(function(){this.textContent=\\\'COPIED!\\\';this.style.color=\\\'#00ff41\\\';this.style.borderColor=\\\'#00ff41\\\';}.bind(this)):void 0;" >COPY LINK</button>');
-  parts.push('<p style="font-size:12px;color:rgba(255,255,255,0.35);margin-top:20px;line-height:1.6;">Or tap <span style="color:#fff;">&#x2022;&#x2022;&#x2022;</span> menu &rarr; <b style="color:rgba(255,255,255,0.7);">Open in Browser</b></p>');
-  parts.push('<div style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:24px;letter-spacing:2px;">SOVEREIGN LINK // ZERO TRACKING</div>');
-  parts.push('</div>');
-  parts.push('</body></html>');
+  parts.push('<script>window.location.replace("' + bridgeUrl.replace(/"/g, '\\"') + '");<' + '/script>');
+  parts.push('</head><body style="background:#000;"></body></html>');
 
   return parts.join('\n');
 }
@@ -1115,13 +1072,13 @@ function finishGeneration(targetUrl, label, mode, ageGate, shortName, expiryDays
   // Build the escape page HTML
   generatedHTML = buildEscapeHTML(targetUrl, label, mode, ageGate, expiryDays);
 
-  // Route through Shopify bridge page (working IAB escape)
-  generatedLink = 'https://dissoverse.com/pages/go?url=' + encodeURIComponent(targetUrl);
+  // Clean vanity URL — redirects to Shopify bridge via deployed page
+  generatedLink = 'https://links.dissoverse.com/' + shortName;
 
   const outputSection = document.getElementById('output-section');
 
   outputSection.style.display = 'block';
-  document.getElementById('output-link-display').textContent = generatedLink;
+  document.getElementById('output-shortname').textContent = shortName;
 
   // Update download button and deploy instructions
   const filename = shortName + '/index.html';
@@ -1216,16 +1173,10 @@ function clearAll() {
   addLog('CLEAR', 'All fields reset. Generator standing by.', 'dim');
 }
 
-// Short name: sanitize on input
+// Short name: sanitize on input + live preview
 document.getElementById('short-name').addEventListener('input', function() {
   this.value = this.value.toLowerCase().replace(/[^a-z0-9-]/g, '');
-  document.getElementById('short-name-preview').textContent = this.value ? 'links.dissoverse.com/' + this.value : '';
-});
-// Target URL: live preview of bridge link
-document.getElementById('target-url').addEventListener('input', function() {
-  var url = this.value.trim();
-  if (url && !url.startsWith('http')) url = 'https://' + url;
-  document.getElementById('short-name-preview').textContent = url ? 'dissoverse.com/pages/go?url=' + encodeURIComponent(url).substring(0, 40) + '...' : '';
+  document.getElementById('short-name-preview').textContent = this.value;
 });
 
 // Enter key triggers generate
