@@ -436,7 +436,7 @@
             spellcheck="false"
           >
           <div style="font-size:12px; margin-top:6px; min-height:18px; color:var(--text-dim);">
-            links.dissoverse.com/<span id="short-name-preview" style="color:var(--neon);"></span>
+            dissoverse.com/pages/go?url=<span id="short-name-preview" style="color:var(--neon);"></span>
           </div>
         </div>
 
@@ -510,7 +510,7 @@
           <!-- Link display -->
           <div style="text-align:center; padding: 8px 0 4px;">
             <div style="font-size:10px; color:var(--text-dim); letter-spacing:3px; margin-bottom:10px;">▼ YOUR FORCE-OP LINK</div>
-            <div style="font-family:'VT323',monospace; font-size:clamp(22px,4.5vw,32px); color:var(--neon); text-shadow:0 0 15px var(--neon-glow); letter-spacing:1px; word-break:break-all; padding:0 4px;">links.dissoverse.com/<span id="output-shortname"></span></div>
+            <div id="output-link-display" style="font-family:'VT323',monospace; font-size:clamp(16px,3vw,22px); color:var(--neon); text-shadow:0 0 15px var(--neon-glow); letter-spacing:1px; word-break:break-all; padding:0 4px;"></div>
             <div id="deploy-status-badge" style="display:none; margin-top:8px; font-size:11px; letter-spacing:4px; color:var(--neon); text-shadow:0 0 10px var(--neon-glow);">■ LIVE</div>
           </div>
 
@@ -736,9 +736,10 @@ async function loadActiveLinks() {
     let html = '<div style="display:flex;flex-direction:column;gap:0;">';
     dirs.forEach(dir => {
       const cleanUrl = 'https://links.dissoverse.com/' + dir.name;
+      const bridgeUrl = 'https://dissoverse.com/pages/go?url=' + encodeURIComponent('https://links.dissoverse.com/' + dir.name);
       html += `<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:7px 0;border-bottom:1px solid rgba(0,255,65,0.07);">
-        <span style="flex:1;min-width:0;color:var(--neon);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;">links.dissoverse.com/${dir.name}</span>
-        <button onclick="copyToClipboard('${cleanUrl}')" class="btn-neon" style="font-size:10px;padding:3px 10px;letter-spacing:1px;flex-shrink:0;">COPY</button>
+        <span style="flex:1;min-width:0;color:var(--neon);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;">${dir.name}</span>
+        <button onclick="copyToClipboard('${bridgeUrl}')" class="btn-neon" style="font-size:10px;padding:3px 10px;letter-spacing:1px;flex-shrink:0;">COPY</button>
         <button onclick="deleteLink('${dir.name}')" class="btn-neon btn-red" style="font-size:10px;padding:3px 10px;letter-spacing:1px;flex-shrink:0;">DELETE</button>
       </div>`;
     });
@@ -842,7 +843,7 @@ async function deployToGitHub(shortName, htmlContent) {
       const result = await putResp.json();
       const sha7 = result.commit.sha.substring(0, 7);
       addLog('DEPLOY', 'Commit successful. SHA: ' + sha7, 'neon');
-      addLog('LIVE', 'Link active at links.dissoverse.com/' + shortName, 'neon');
+      addLog('LIVE', 'Bridge link active via dissoverse.com/pages/go', 'neon');
       return true;
     } else if (putResp.status === 401 || putResp.status === 403) {
       const putErr = await putResp.json().catch(() => ({}));
@@ -1053,14 +1054,14 @@ function generateLink() {
 
   const bootMessages = [
     ['SCAN', 'Analyzing target: ' + targetUrl.substring(0, 50) + (targetUrl.length > 50 ? '...' : '')],
-    ['LINK', 'Short link: links.dissoverse.com/' + shortName],
+    ['LINK', 'Bridge link: dissoverse.com/pages/go?url=' + encodeURIComponent(targetUrl)],
     ['BUILD', 'Compiling IAB detection matrix...'],
     ['BUILD', 'Injecting Android Intent URI handler...'],
     ['BUILD', 'Injecting Safari force-open bypass...'],
     ['BUILD', 'Embedding Facebook/TikTok/IG user-agent patterns...'],
     ['SECURE', 'Stripping tracking parameters...'],
     ['DEPLOY', 'Bypass mode: ' + mode.toUpperCase()],
-    ['COMPLETE', 'Force-Op link ready: links.dissoverse.com/' + shortName],
+    ['COMPLETE', 'Force-Op link ready: dissoverse.com/pages/go'],
   ];
 
   let delay = 200;
@@ -1081,13 +1082,13 @@ function finishGeneration(targetUrl, label, mode, ageGate, shortName, expiryDays
   // Build the escape page HTML
   generatedHTML = buildEscapeHTML(targetUrl, label, mode, ageGate, expiryDays);
 
-  // Clean vanity URL
-  generatedLink = 'https://links.dissoverse.com/' + shortName;
+  // Route through Shopify bridge page for IAB escape
+  generatedLink = 'https://dissoverse.com/pages/go?url=' + encodeURIComponent(targetUrl);
 
   const outputSection = document.getElementById('output-section');
 
   outputSection.style.display = 'block';
-  document.getElementById('output-shortname').textContent = shortName;
+  document.getElementById('output-link-display').textContent = generatedLink;
 
   // Update download button and deploy instructions
   const filename = shortName + '/index.html';
