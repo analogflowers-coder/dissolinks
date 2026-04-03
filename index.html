@@ -436,7 +436,7 @@
             spellcheck="false"
           >
           <div style="font-size:12px; margin-top:6px; min-height:18px; color:var(--text-dim);">
-            dissoverse.com/pages/go?url=<span id="short-name-preview" style="color:var(--neon);"></span>
+            links.dissoverse.com/<span id="short-name-preview" style="color:var(--neon);"></span>
           </div>
         </div>
 
@@ -510,7 +510,7 @@
           <!-- Link display -->
           <div style="text-align:center; padding: 8px 0 4px;">
             <div style="font-size:10px; color:var(--text-dim); letter-spacing:3px; margin-bottom:10px;">▼ YOUR FORCE-OP LINK</div>
-            <div id="output-link-display" style="font-family:'VT323',monospace; font-size:clamp(16px,3vw,22px); color:var(--neon); text-shadow:0 0 15px var(--neon-glow); letter-spacing:1px; word-break:break-all; padding:0 4px;"></div>
+            <div style="font-family:'VT323',monospace; font-size:clamp(22px,4.5vw,32px); color:var(--neon); text-shadow:0 0 15px var(--neon-glow); letter-spacing:1px; word-break:break-all; padding:0 4px;">links.dissoverse.com/<span id="output-shortname"></span></div>
             <div id="deploy-status-badge" style="display:none; margin-top:8px; font-size:11px; letter-spacing:4px; color:var(--neon); text-shadow:0 0 10px var(--neon-glow);">■ LIVE</div>
           </div>
 
@@ -736,10 +736,9 @@ async function loadActiveLinks() {
     let html = '<div style="display:flex;flex-direction:column;gap:0;">';
     dirs.forEach(dir => {
       const cleanUrl = 'https://links.dissoverse.com/' + dir.name;
-      const bridgeUrl = 'https://dissoverse.com/pages/go?url=' + encodeURIComponent('https://links.dissoverse.com/' + dir.name);
       html += `<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:7px 0;border-bottom:1px solid rgba(0,255,65,0.07);">
-        <span style="flex:1;min-width:0;color:var(--neon);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;">${dir.name}</span>
-        <button onclick="copyToClipboard('${bridgeUrl}')" class="btn-neon" style="font-size:10px;padding:3px 10px;letter-spacing:1px;flex-shrink:0;">COPY</button>
+        <span style="flex:1;min-width:0;color:var(--neon);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;">links.dissoverse.com/${dir.name}</span>
+        <button onclick="copyToClipboard('${cleanUrl}')" class="btn-neon" style="font-size:10px;padding:3px 10px;letter-spacing:1px;flex-shrink:0;">COPY</button>
         <button onclick="deleteLink('${dir.name}')" class="btn-neon btn-red" style="font-size:10px;padding:3px 10px;letter-spacing:1px;flex-shrink:0;">DELETE</button>
       </div>`;
     });
@@ -843,7 +842,7 @@ async function deployToGitHub(shortName, htmlContent) {
       const result = await putResp.json();
       const sha7 = result.commit.sha.substring(0, 7);
       addLog('DEPLOY', 'Commit successful. SHA: ' + sha7, 'neon');
-      addLog('LIVE', 'Bridge link active via dissoverse.com/pages/go', 'neon');
+      addLog('LIVE', 'Link active at links.dissoverse.com/' + shortName, 'neon');
       return true;
     } else if (putResp.status === 401 || putResp.status === 403) {
       const putErr = await putResp.json().catch(() => ({}));
@@ -966,37 +965,51 @@ function buildEscapeHTML(targetUrl, label, mode, ageGate, expiryDays) {
   parts.push('<html><head><meta charset="UTF-8">');
   parts.push('<meta name="viewport" content="width=device-width,initial-scale=1">');
   parts.push('<title>Redirecting...</title>');
-  // IAB escape script in <head> — Android intent auto-redirects, iOS shows interstitial
   parts.push('<script>');
   parts.push('(function(){');
-  parts.push('var ua=navigator.userAgent||"";');
-  parts.push('var isIAB=ua.indexOf("Instagram")>-1||/FBAN|FBAV|FB_IAB/.test(ua)||/musical_ly|BytedanceWebview|TikTok/.test(ua)||ua.indexOf("Twitter")>-1||ua.indexOf("Snapchat")>-1||ua.indexOf("LinkedInApp")>-1;');
-  parts.push('if(!isIAB){window.location.replace("' + safeUrl + '");return;}');
-  parts.push('if(/Android/.test(ua)){window.location.href="intent://"+window.location.href.replace(/^https?:\\/\\//,"")+"#Intent;scheme=https;package=com.android.chrome;end;";return;}');
+  parts.push('var TARGET="' + safeUrl + '";');
+  parts.push('var ua=navigator.userAgent||navigator.vendor||window.opera;');
+  parts.push('var isIAB=(ua.indexOf("Instagram")>-1)||(ua.indexOf("FBAN")>-1)||(ua.indexOf("FBAV")>-1)||(ua.indexOf("Twitter")>-1)||(ua.indexOf("Line")>-1)||(ua.indexOf("TikTok")>-1)||(ua.indexOf("Snapchat")>-1)||(ua.indexOf("LinkedInApp")>-1);');
+  parts.push('var isIOS=/iPad|iPhone|iPod/.test(ua)&&!window.MSStream;');
+  parts.push('var isAndroid=/android/i.test(ua);');
+  // Normal browser = instant redirect
+  parts.push('if(!isIAB){window.location.replace(TARGET);return;}');
+  // iOS: googlechromes:// first, x-safari- fallback at 1.5s
+  parts.push('if(isIOS){');
+  parts.push('var chromeUrl="googlechromes://"+TARGET.replace("https://","");');
+  parts.push('var safariUrl="x-safari-"+TARGET;');
+  parts.push('window.location.href=chromeUrl;');
+  parts.push('setTimeout(function(){window.location.href=safariUrl;},1500);');
+  parts.push('}');
+  // Android: intent:// with Chrome package + browser fallback
+  parts.push('if(isAndroid){');
+  parts.push('var intentUrl="intent://"+TARGET.replace(/^https?:\\/\\//,"")+"#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url="+encodeURIComponent(TARGET)+";end";');
+  parts.push('window.location.href=intentUrl;');
+  parts.push('}');
+  // Show manual fallback UI after 2.5s
+  parts.push('setTimeout(function(){var f=document.getElementById("fallback");if(f)f.style.display="block";},2500);');
   parts.push('})();');
   parts.push('<' + '/script>');
   parts.push('<style>');
   parts.push('*{margin:0;padding:0;box-sizing:border-box;}');
-  parts.push('body{background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,monospace;min-height:100vh;display:flex;align-items:center;justify-content:center;}');
-  parts.push('.card{text-align:center;padding:32px 24px;max-width:360px;}');
-  parts.push('.step{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,0.1);}');
-  parts.push('.step:last-child{border-bottom:none;}');
-  parts.push('.step-num{width:32px;height:32px;border-radius:50%;background:#00ff41;color:#000;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;}');
-  parts.push('.step-text{font-size:15px;line-height:1.4;color:rgba(255,255,255,0.9);}');
-  parts.push('.step-text b{color:#00ff41;}');
+  parts.push('body{background:#0a0a0a;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Share Tech Mono",monospace;min-height:100vh;display:flex;align-items:center;justify-content:center;}');
+  parts.push('#fallback{display:none;text-align:center;padding:32px 24px;max-width:380px;}');
+  parts.push('.esc-btn{display:inline-block;padding:16px 40px;border:2px solid #00ff41;color:#00ff41;text-decoration:none;font-size:16px;font-weight:700;letter-spacing:2px;border-radius:6px;margin:8px 0;cursor:pointer;background:transparent;font-family:inherit;width:100%;}');
+  parts.push('.esc-btn:active{background:rgba(0,255,65,0.15);}');
+  parts.push('.copy-btn{display:inline-block;padding:12px 40px;border:1px solid #555;color:#999;text-decoration:none;font-size:13px;letter-spacing:1px;border-radius:6px;margin:4px 0;cursor:pointer;background:transparent;font-family:inherit;width:100%;}');
   parts.push('</style>');
   parts.push('</head>');
   parts.push('<body>');
-  parts.push('<div class="card">');
-  parts.push('<div style="font-size:48px;margin-bottom:24px;">&#x1F310;</div>');
-  parts.push('<div style="font-size:20px;font-weight:700;margin-bottom:12px;color:#00ff41;">OPEN IN YOUR BROWSER</div>');
-  parts.push('<p style="font-size:14px;color:rgba(255,255,255,0.6);margin-bottom:8px;">For the best experience, open this page in Safari</p>');
-  parts.push('<div style="text-align:left;margin:24px 0;padding:0 8px;">');
-  parts.push('<div class="step"><div class="step-num">1</div><div class="step-text">Tap the <b>&#x22EF;</b> (three dots) in the top right</div></div>');
-  parts.push('<div class="step"><div class="step-num">2</div><div class="step-text">Select <b>&ldquo;Open in Safari&rdquo;</b></div></div>');
-  parts.push('</div>');
-  parts.push('<a href="' + safeUrl + '" style="display:inline-block;margin-top:20px;padding:14px 40px;border:2px solid #00ff41;color:#00ff41;text-decoration:none;font-size:16px;font-weight:700;letter-spacing:1px;border-radius:8px;">OPEN LINK</a>');
-  parts.push('<div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:16px;">DISSOVERSE &bull; SOVEREIGN LINK</div>');
+  parts.push('<div id="fallback">');
+  parts.push('<div style="font-size:11px;color:#00ff41;letter-spacing:4px;margin-bottom:16px;">DISSOVERSE</div>');
+  parts.push('<div style="font-size:22px;font-weight:700;margin-bottom:8px;color:#fff;">Open in your browser</div>');
+  parts.push('<p style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:24px;">For the best experience, open this link in Safari or Chrome</p>');
+  // Open in Safari button (fires both schemes on tap)
+  parts.push('<button class="esc-btn" onclick="var t=\\\''+safeUrl+'\\\';window.location.href=\\\'googlechromes://\\\'+ t.replace(\\\'https://\\\',\\\'\\\');setTimeout(function(){window.location.href=\\\'x-safari-\\\'+t;},500);">OPEN IN SAFARI</button>');
+  // Copy link button
+  parts.push('<button class="copy-btn" onclick="var t=\\\''+safeUrl+'\\\';navigator.clipboard?navigator.clipboard.writeText(t).then(function(){this.textContent=\\\'COPIED!\\\';this.style.color=\\\'#00ff41\\\';this.style.borderColor=\\\'#00ff41\\\';}.bind(this)):void 0;" >COPY LINK</button>');
+  parts.push('<p style="font-size:12px;color:rgba(255,255,255,0.35);margin-top:20px;line-height:1.6;">Or tap <span style="color:#fff;">&#x2022;&#x2022;&#x2022;</span> menu &rarr; <b style="color:rgba(255,255,255,0.7);">Open in Browser</b></p>');
+  parts.push('<div style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:24px;letter-spacing:2px;">SOVEREIGN LINK // ZERO TRACKING</div>');
   parts.push('</div>');
   parts.push('</body></html>');
 
@@ -1054,14 +1067,14 @@ function generateLink() {
 
   const bootMessages = [
     ['SCAN', 'Analyzing target: ' + targetUrl.substring(0, 50) + (targetUrl.length > 50 ? '...' : '')],
-    ['LINK', 'Bridge link: dissoverse.com/pages/go?url=' + encodeURIComponent(targetUrl)],
+    ['LINK', 'Short link: links.dissoverse.com/' + shortName],
     ['BUILD', 'Compiling IAB detection matrix...'],
     ['BUILD', 'Injecting Android Intent URI handler...'],
     ['BUILD', 'Injecting Safari force-open bypass...'],
     ['BUILD', 'Embedding Facebook/TikTok/IG user-agent patterns...'],
     ['SECURE', 'Stripping tracking parameters...'],
     ['DEPLOY', 'Bypass mode: ' + mode.toUpperCase()],
-    ['COMPLETE', 'Force-Op link ready: dissoverse.com/pages/go'],
+    ['COMPLETE', 'Force-Op link ready: links.dissoverse.com/' + shortName],
   ];
 
   let delay = 200;
@@ -1082,13 +1095,13 @@ function finishGeneration(targetUrl, label, mode, ageGate, shortName, expiryDays
   // Build the escape page HTML
   generatedHTML = buildEscapeHTML(targetUrl, label, mode, ageGate, expiryDays);
 
-  // Route through Shopify bridge page for IAB escape
-  generatedLink = 'https://dissoverse.com/pages/go?url=' + encodeURIComponent(targetUrl);
+  // Clean vanity URL — bridge page hosted on GitHub Pages
+  generatedLink = 'https://links.dissoverse.com/' + shortName;
 
   const outputSection = document.getElementById('output-section');
 
   outputSection.style.display = 'block';
-  document.getElementById('output-link-display').textContent = generatedLink;
+  document.getElementById('output-shortname').textContent = shortName;
 
   // Update download button and deploy instructions
   const filename = shortName + '/index.html';
