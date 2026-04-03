@@ -599,7 +599,7 @@ if(sessionStorage.getItem('dv_access')==='1'){document.getElementById('access-ga
         <button onclick="loadActiveLinks()" style="margin-left:auto; background:transparent; border:1px solid var(--border-dim); color:var(--text-dim); font-family:'Share Tech Mono',monospace; font-size:10px; padding:3px 10px; cursor:pointer; letter-spacing:1px; transition:all 0.3s;" onmouseover="this.style.borderColor='var(--neon)';this.style.color='var(--neon)'" onmouseout="this.style.borderColor='var(--border-dim)';this.style.color='var(--text-dim)'">↻ REFRESH</button>
       </div>
       <div id="active-links-panel" class="p-4" style="min-height:72px; background: rgba(0,0,0,0.4); font-size:12px;">
-        <div style="color:var(--text-dim);">Connect GitHub token to view active links.</div>
+        <div style="color:var(--text-dim);">No active links yet.</div>
       </div>
     </div>
 
@@ -717,7 +717,7 @@ async function loadActiveLinks() {
   if (!panel) return;
 
   if (!token) {
-    panel.innerHTML = '<div style="color:var(--text-dim);">Connect GitHub token to view active links.</div>';
+    panel.innerHTML = '<div style="color:var(--text-dim);">No active links yet.</div>';
     return;
   }
 
