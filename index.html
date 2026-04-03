@@ -550,15 +550,8 @@ if(sessionStorage.getItem('dv_access')==='1'){document.getElementById('access-ga
             <button class="btn-neon" onclick="downloadHTML()" style="flex:1; display:none;" id="download-btn">↓ DOWNLOAD</button>
           </div>
 
-          <!-- No token note -->
-          <div id="no-token-note" style="font-size:11px; color:var(--text-dim); text-align:center; display:none;">
-            Connect GitHub token for one-click deploy — click ⚙ in the header
-          </div>
-
-          <!-- Deploy instructions (no-token fallback) -->
-          <div id="deploy-instructions" style="font-size:11px; color:var(--text-dim); line-height:1.9; display:none;">
-            TO ACTIVATE: Push as <span id="deploy-filename" style="color:var(--neon);"></span> in the dissolinks repo. Your link goes live at the URL above.
-          </div>
+          <div id="no-token-note" style="display:none;"></div>
+          <div id="deploy-instructions" style="display:none;"><span id="deploy-filename"></span></div>
         </div>
       </div>
     </div>
