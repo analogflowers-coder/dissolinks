@@ -2,5 +2,42 @@
 <html><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Redirecting...</title>
-<script>window.location.replace("https://link.me/itsrockymontana");</script>
-</head><body style="background:#000;"></body></html>
+<script>
+(function(){
+var TARGET="https://link.me/itsrockymontana";
+var ua=navigator.userAgent||navigator.vendor||window.opera;
+var isIAB=(ua.indexOf("Instagram")>-1)||(ua.indexOf("FBAN")>-1)||(ua.indexOf("FBAV")>-1)||(ua.indexOf("Twitter")>-1)||(ua.indexOf("TikTok")>-1)||(ua.indexOf("Snapchat")>-1)||(ua.indexOf("LinkedInApp")>-1);
+var isIOS=/iPad|iPhone|iPod/.test(ua)&&!window.MSStream;
+var isAndroid=/android/i.test(ua);
+if(!isIAB){window.location.replace(TARGET);return;}
+if(isIOS){
+window.location.href="googlechromes://"+TARGET.replace("https://","");
+setTimeout(function(){window.location.href="brave://open-url?url="+encodeURIComponent(TARGET);},1200);
+setTimeout(function(){window.location.href="firefox://open-url?url="+encodeURIComponent(TARGET);},2400);
+setTimeout(function(){window.location.href="microsoft-edge-https://"+TARGET.replace("https://","");},3600);
+setTimeout(function(){window.location.href="x-safari-"+TARGET;},4800);
+}
+if(isAndroid){
+window.location.href="intent://"+TARGET.replace(/^https?:\/\//,"")+"#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url="+encodeURIComponent(TARGET)+";end";
+}
+setTimeout(function(){var f=document.getElementById("fallback");if(f)f.style.display="block";},2500);
+})();
+</script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#0a0a0a;color:#fff;font-family:-apple-system,BlinkMacSystemFont,monospace;min-height:100vh;display:flex;align-items:center;justify-content:center;}
+#fallback{display:none;text-align:center;padding:32px 24px;max-width:380px;}
+.esc-btn{display:inline-block;padding:16px 40px;border:2px solid #e91885;color:#e91885;text-decoration:none;font-size:16px;font-weight:700;letter-spacing:2px;border-radius:6px;margin:8px 0;cursor:pointer;background:transparent;font-family:inherit;width:100%;}
+.copy-btn{display:inline-block;padding:12px 40px;border:1px solid #555;color:#999;text-decoration:none;font-size:13px;letter-spacing:1px;border-radius:6px;margin:4px 0;cursor:pointer;background:transparent;font-family:inherit;width:100%;}
+</style>
+</head>
+<body>
+<div id="fallback">
+<div style="font-size:11px;color:#e91885;letter-spacing:4px;margin-bottom:16px;">DISSOVERSE</div>
+<div style="font-size:22px;font-weight:700;margin-bottom:8px;color:#fff;">Open in your browser</div>
+<p style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:24px;">For the best experience, open this link in Safari or Chrome</p>
+<button class="esc-btn" onclick="var t='https://link.me/itsrockymontana';window.location.href='googlechromes://'+t.replace('https://','');setTimeout(function(){window.location.href='x-safari-'+t;},500);">OPEN IN BROWSER</button>
+<button class="copy-btn" id="copybtn" onclick="navigator.clipboard.writeText('https://link.me/itsrockymontana').then(function(){document.getElementById('copybtn').textContent='COPIED!';document.getElementById('copybtn').style.color='#e91885';document.getElementById('copybtn').style.borderColor='#e91885';});">COPY LINK</button>
+<p style="font-size:12px;color:rgba(255,255,255,0.35);margin-top:20px;line-height:1.6;">Or tap <span style="color:#fff;">&#x2022;&#x2022;&#x2022;</span> menu &rarr; <b style="color:rgba(255,255,255,0.7);">Open in Browser</b></p>
+</div>
+</body></html>
