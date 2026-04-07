@@ -1,0 +1,59 @@
+================================================================================
+FOREVER_LINKS.txt
+DISSOVERSE LLC — DissOLinK Permanent Link Registry
+Generated: 2026-04-07 | IRONWIRE directive from GRANDMASTER
+================================================================================
+
+GRANDMASTER DIRECTIVE (2026-04-07):
+"flag for any link to be made using either [itsrockymontana/ivydelicate]
+to be forever links"
+
+================================================================================
+PERMANENT LINKS — NEVER DELETE, NEVER REDIRECT, NEVER MODIFY WITHOUT GRANDMASTER
+================================================================================
+
+  SLUG               TYPE    DESTINATION                          STATUS
+  /itsrockymontana   TYPE A  → /pages/go?url=link.me/itsrockymontana  🔒 FOREVER
+  /ivydelicate       TYPE A  → /pages/go?url=link.me/ivydelicate       🔒 FOREVER
+
+THESE LINKS ARE HARDLOCKED:
+  ❌ NEVER delete these folders
+  ❌ NEVER redirect to a different destination without Grandmaster directive
+  ❌ NEVER change TYPE A routing to direct redirect
+  ❌ NEVER remove from CNAME / GitHub Pages config
+  ✅ Governance comment in HTML: BRIDGE ROUTED (INTERNAL). DO NOT CONVERT TO DIRECT REDIRECT.
+
+WHY THEY'RE FOREVER:
+  - Artist links distributed across Instagram, TikTok, Twitter bios
+  - If the link breaks, it breaks ALL existing bio links for the artist
+  - link.me/itsrockymontana and link.me/ivydelicate are the artist link trees
+  - Breaks = artist loses all inbound traffic from social media
+
+================================================================================
+CURRENT LINK MAP (2026-04-07 after /yt deletion)
+================================================================================
+
+  SLUG               TYPE    DESTINATION                          PROTECTION
+  /itsrockymontana   TYPE A  → link.me/itsrockymontana             🔒 FOREVER
+  /ivydelicate       TYPE A  → link.me/ivydelicate                 🔒 FOREVER
+  /main              TYPE B  → /pages/go?url=%2Fcollections        ✅ ACTIVE
+  /mainsite          TYPE B  → /pages/go (homepage)                ✅ ACTIVE
+  /shop              TYPE B  → /pages/go?url=%2Fcollections%2Fall  ✅ ACTIVE
+  /all               TYPE B  → /pages/go?url=%2Fcollections        ✅ ACTIVE
+  /shopstore         TYPE B  → /pages/go?url=%2Fmainframe          ✅ ACTIVE
+  /yt                DELETED → removed per Grandmaster (test link)  ❌ GONE
+
+================================================================================
+FOR ANY NEW ARTIST LINK:
+================================================================================
+
+If a new artist slug is created (e.g., /newartist):
+  1. ALWAYS use TYPE A routing: /pages/go?url=https%3A%2F%2Flink.me%2F[slug]
+  2. ALWAYS mark as FOREVER in this file immediately
+  3. ALWAYS add BRIDGE ROUTED comment in index.html
+  4. NEVER let audit/cleanup agents touch it without explicit Grandmaster directive
+  5. Reference DISSOLINK_MASTER_RULES.txt for full template
+
+================================================================================
+END OF FOREVER_LINKS.txt
+================================================================================
