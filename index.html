@@ -449,6 +449,7 @@ if(sessionStorage.getItem('dv_access')==='1'){document.getElementById('access-ga
             autocomplete="off"
             spellcheck="false"
           >
+          <div id="url-type-indicator" style="margin-top:6px; font-size:11px; letter-spacing:1.5px; color:var(--text-dim); min-height:16px;"></div>
         </div>
 
         <!-- Short Link Name -->
@@ -967,21 +968,51 @@ function detectOS(ua) {
  * Generates the escape page HTML via string concatenation.
  * The closing script tag is built via concatenation to avoid parser issues.
  */
+function isInternalUrl(url) {
+  // Internal: full dissoverse.com URL (any protocol or bare), or a path-only string starting with "/"
+  return url.startsWith('https://dissoverse.com') ||
+         url.startsWith('http://dissoverse.com') ||
+         url.startsWith('dissoverse.com') ||
+         url.startsWith('/');
+}
+
+function extractInternalPath(url) {
+  // Strip protocol + dissoverse.com host to get just the path
+  var stripped = url
+    .replace(/^https?:\/\/dissoverse\.com/, '')
+    .replace(/^dissoverse\.com/, '');
+  // If nothing was stripped (e.g. already a "/path"), return as-is
+  return stripped || '/';
+}
+
 function buildEscapeHTML(targetUrl, label, mode, ageGate, expiryDays) {
   var safeUrl = targetUrl.replace(/"/g, '&quot;');
   var safeLabel = (label || 'OPEN LINK').replace(/"/g, '&quot;');
   var created = Date.now();
   var expDays = (expiryDays === undefined || expiryDays === null) ? 30 : expiryDays;
 
-  // Simple redirect page — forwards to Shopify bridge which handles IAB escape
-  var bridgeUrl = 'https://dissoverse.com/pages/go?url=' + encodeURIComponent(targetUrl);
   var parts = [];
   parts.push('<!DOCTYPE html>');
   parts.push('<html><head><meta charset="UTF-8">');
   parts.push('<meta name="viewport" content="width=device-width,initial-scale=1">');
   parts.push('<title>Redirecting...</title>');
-  parts.push('<script>window.location.replace("' + bridgeUrl.replace(/"/g, '\\"') + '");<' + '/script>');
-  parts.push('</head><body style="background:#000;"></body></html>');
+
+  if (isInternalUrl(targetUrl)) {
+    // INTERNAL — route through Shopify bridge page
+    var internalPath = extractInternalPath(targetUrl);
+    var encodedPath = encodeURIComponent(internalPath);
+    var bridgeUrl = 'https://dissoverse.com/pages/go?url=' + encodedPath;
+    parts.push('<script>window.location.replace("' + bridgeUrl.replace(/"/g, '\\"') + '");<' + '/script>');
+    parts.push('</head><body style="background:#000;">');
+    parts.push('<noscript><a href="' + bridgeUrl.replace(/"/g, '&quot;') + '">Click here</a></noscript>');
+  } else {
+    // EXTERNAL — direct redirect, no bridge
+    parts.push('<script>window.location.replace("' + safeUrl.replace(/"/g, '\\"') + '");<' + '/script>');
+    parts.push('</head><body style="background:#000;">');
+    parts.push('<noscript><a href="' + safeUrl + '">Click here</a></noscript>');
+  }
+
+  parts.push('</body></html>');
 
   return parts.join('\n');
 }
@@ -1175,6 +1206,28 @@ document.getElementById('short-name').addEventListener('input', function() {
 // Enter key triggers generate
 document.getElementById('target-url').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') generateLink();
+});
+
+// Live internal/external type indicator
+document.getElementById('target-url').addEventListener('input', function() {
+  var val = this.value.trim();
+  var indicator = document.getElementById('url-type-indicator');
+  if (!val) {
+    indicator.textContent = '';
+    return;
+  }
+  // Normalize: auto-prefix https:// for detection if no protocol yet
+  var checkUrl = val;
+  if (!checkUrl.startsWith('http://') && !checkUrl.startsWith('https://') && !checkUrl.startsWith('/')) {
+    checkUrl = 'https://' + checkUrl;
+  }
+  if (isInternalUrl(checkUrl)) {
+    indicator.textContent = '→ TYPE: INTERNAL (bridge)';
+    indicator.style.color = 'var(--neon)';
+  } else {
+    indicator.textContent = '→ TYPE: EXTERNAL (direct redirect)';
+    indicator.style.color = '#ff9d00';
+  }
 });
 document.getElementById('short-name').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') generateLink();
