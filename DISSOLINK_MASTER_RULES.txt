@@ -29,8 +29,12 @@ SECTION 2 — THE TWO LINK TYPES AND THEIR CORRECT CODE
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 TYPE A — ARTIST/EXTERNAL BRIDGE (e.g., itsrockymontana, ivydelicate)
-  → Destination: link.me/[artist-slug]
+  → Final destination: link.me/[artist-slug]
   → These are creator profile links that route to external link-in-bio pages
+  → HOW IT WORKS: Bridge page → dissoverse.com/pages/go?url=link.me/[slug]
+    → dv-bridge.liquid fires IAB escape → user lands on link.me in native browser
+  → CRITICAL: link.me is WHITELISTED in dv-bridge.liquid (verified 2026-04-07)
+  → DO NOT route directly to link.me — this skips IAB escape entirely
 
   CORRECT CODE TEMPLATE (TYPE A):
   ┌─────────────────────────────────────────────────────────────────────────┐
@@ -41,13 +45,19 @@ TYPE A — ARTIST/EXTERNAL BRIDGE (e.g., itsrockymontana, ivydelicate)
   │ <!-- BRIDGE ROUTED (INTERNAL). DO NOT CONVERT TO DIRECT REDIRECT.      │
   │      See BRIDGE_HARDLOCK.txt -->                                        │
   │ <script>                                                                │
-  │ window.location.replace("https://link.me/[ARTIST-SLUG]");              │
+  │ window.location.replace(                                                │
+  │   "https://dissoverse.com/pages/go?url=https%3A%2F%2Flink.me%2F[SLUG]" │
+  │ );                                                                      │
   │ </script>                                                               │
-  │ <noscript><a href="https://link.me/[ARTIST-SLUG]">Click here</a>       │
-  │ </noscript>                                                             │
+  │ <noscript>                                                              │
+  │ <a href="https://dissoverse.com/pages/go?url=https%3A%2F%2Flink.me%2F[SLUG]"> │
+  │ Click here</a></noscript>                                               │
   │ </body>                                                                 │
   │ </html>                                                                 │
   └─────────────────────────────────────────────────────────────────────────┘
+  NOTE: Replace [SLUG] with the artist slug (e.g., itsrockymontana)
+  NOTE: The final user destination IS link.me — dissoverse.com/pages/go is
+        only an intermediate IAB escape handler. Users end up on link.me.
 
 TYPE B — STORE/INTERNAL BRIDGE (e.g., mainsite, shop, shopstore)
   → Destination: dissoverse.com/pages/go (or dissoverse.com/pages/go?url=...)
@@ -89,15 +99,22 @@ SECTION 3 — CURRENT LINK MAP (DO NOT MODIFY WITHOUT GRANDMASTER APPROVAL)
 SECTION 4 — WHAT MUST NEVER CHANGE
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-  ❌ NEVER change a TYPE A link destination to dissoverse.com/pages/go
-     → Artist pages ALWAYS route to link.me/[slug]
+  ❌ NEVER route a TYPE A link directly to link.me without going through
+     dissoverse.com/pages/go?url= first
+     → Skipping /pages/go means the IAB escape never fires
+     → Direct redirect to link.me = NO in-app browser escape = broken bridge
+
+  ❌ NEVER use dissoverse.com/pages/go WITHOUT the ?url= parameter for
+     TYPE A (artist) links
+     → /pages/go with no parameter defaults to dissoverse.com homepage
+     → This was the root cause of DISSOLINK-001 (12-hour outage)
 
   ❌ NEVER remove the BRIDGE ROUTED comment from any bridge page
      → The comment is a permanent marker that protects against accidental
        conversion to a simple direct redirect
 
-  ❌ NEVER use dissoverse.com/pages/go as the destination for artist links
-     → dissoverse.com/pages/go is ONLY for DISSOVERSE store navigation
+  ❌ NEVER use dissoverse.com/pages/go (no param) as the destination for
+     artist links — ALWAYS include ?url=https%3A%2F%2Flink.me%2F[slug]
 
   ❌ NEVER change any bridge page destination without:
      (1) Checking the Link Map in Section 3
@@ -160,11 +177,18 @@ TIMELINE:
                   Destination must remain link.me. Bridge format is correct for
                   forcing out of in-app browsers. Governance file mandated.
 
-  [06:19AM]       IRONWIRE applies correct fix:
-                  - Restores link.me/itsrockymontana as destination
-                  - Restores link.me/ivydelicate as destination
-                  - Keeps BRIDGE ROUTED comment format
-                  - Commits and pushes to GitHub
+  [06:19AM]       IRONWIRE applied partial fix (v2):
+                  - Restored BRIDGE ROUTED comment format
+                  - Changed destination back to link.me (direct)
+                  - Committed 9ee87bb — but this skipped IAB escape
+
+  [06:20AM]       IRONWIRE reads dv-bridge.liquid — discovers link.me IS
+                  whitelisted. Correct routing requires /pages/go?url=link.me
+                  Applies final correct fix (v3):
+                  - itsrockymontana → /pages/go?url=link.me/itsrockymontana
+                  - ivydelicate → /pages/go?url=link.me/ivydelicate
+                  - DISSOLINK_MASTER_RULES.txt updated with correct templates
+                  - Committed and pushed to GitHub
 
 ROOT CAUSE:
   Architecture documentation used the term "BRIDGE ROUTED (INTERNAL)" in the
