@@ -1,0 +1,73 @@
+================================================================================
+BRIDGE_HARDLOCK.txt
+DISSOVERSE LLC — DissOLinK Bridge Protection Document
+Generated: 2026-04-07 | Author: IRONWIRE (Claude Code)
+Mandated by: GRANDMASTER directive 06:46AM 2026-04-07
+================================================================================
+
+THIS FILE IS REFERENCED BY THE HTML COMMENT IN EVERY BRIDGE INDEX.HTML:
+  <!-- BRIDGE ROUTED (INTERNAL). DO NOT CONVERT TO DIRECT REDIRECT. See BRIDGE_HARDLOCK.txt -->
+
+THAT COMMENT IS HARDCODED PROTECTION. DO NOT REMOVE IT. DO NOT MODIFY IT.
+
+================================================================================
+WHAT "BRIDGE ROUTED (INTERNAL)" MEANS
+================================================================================
+
+"INTERNAL" refers to the ROUTING MECHANISM — the bridge is an internal part of
+the DissOLinK system. It does NOT mean the destination is an internal page.
+
+The destination can be:
+  - link.me/[artist-slug]   (TYPE A — EXTERNAL destination, INTERNAL routing)
+  - dissoverse.com/pages/go (TYPE B — INTERNAL destination, INTERNAL routing)
+
+Both use the bridge. Both have the BRIDGE ROUTED comment. The destination is
+determined by the link type (A vs B) — not by the comment.
+
+================================================================================
+WHAT MUST NEVER HAPPEN TO BRIDGE FILES
+================================================================================
+
+  ❌ NEVER convert a bridge page to a direct redirect
+     → Bridge ensures IAB escape for Instagram/TikTok/Twitter WebView users
+     → Direct redirect = broken experience for all in-app browser users
+
+  ❌ NEVER remove the <!-- BRIDGE ROUTED (INTERNAL) --> comment
+     → Comment is a permanent protection marker
+     → Its presence prevents accidental "cleanup" of bridge structure
+
+  ❌ NEVER let an audit or cleanup agent modify bridge index.html files
+     → Bridge HTML is FROZEN — only modifiable by explicit Grandmaster directive
+     → Any agent that touches these files without directive is in violation
+
+  ❌ NEVER confuse TYPE A and TYPE B routing
+     → TYPE A: window.location.replace("https://dissoverse.com/pages/go?url=https%3A%2F%2Flink.me%2F[SLUG]")
+     → TYPE B: window.location.replace("https://dissoverse.com/pages/go") or with ?url=
+
+  ❌ NEVER mix DissOLinK bridge fixes with Shopify theme fixes in the same task
+     → They are separate domains — see SECTION 8 of DISSOLINK_MASTER_RULES.txt
+
+================================================================================
+FULL GOVERNANCE DOCUMENT
+================================================================================
+
+See DISSOLINK_MASTER_RULES.txt (same directory — this repo's root) for:
+  - Complete TYPE A / TYPE B code templates
+  - Current link map for all slugs
+  - Full incident report (DISSOLINK-001)
+  - Push protocol
+  - Domain isolation hardlock (Section 8)
+
+================================================================================
+LINK MAP QUICK REFERENCE
+================================================================================
+
+  SLUG               TYPE    DESTINATION
+  /itsrockymontana   TYPE A  → /pages/go?url=link.me/itsrockymontana
+  /ivydelicate       TYPE A  → /pages/go?url=link.me/ivydelicate
+  /mainsite          TYPE B  → /pages/go (dissoverse.com homepage)
+  /shop              TYPE B  → /pages/go?url=%2Fcollections%2Fall
+
+================================================================================
+END OF BRIDGE_HARDLOCK.txt
+================================================================================

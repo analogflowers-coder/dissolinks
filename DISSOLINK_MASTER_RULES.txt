@@ -232,6 +232,42 @@ Grandmaster directive: "push to top of priority list" — this document supersed
 all previous DissOLinK handling guidance.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SECTION 8 — DOMAIN ISOLATION HARDLOCK (GRANDMASTER DIRECTIVE 06:46AM 2026-04-07)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+IRONWIRE LAW: THE TWO ISSUE DOMAINS NEVER COLLIDE.
+
+DOMAIN 1 — DissOLinK Bridge (this file)
+  Scope: GitHub Pages bridge HTML files (links.dissoverse.com/*)
+  Owner: IRONWIRE (Claude Code)
+  Fix protocol: Dedicated bridge agent only. Separate commit. Separate verify.
+
+DOMAIN 2 — Shopify Theme Image / Horizontal Lines
+  Scope: Shopify theme assets, dv-transitions.css, section CSS
+  Owner: NEURAL (Claude.ai)
+  Fix protocol: Dedicated theme agent only. Separate commit. Separate verify.
+
+ISOLATION RULE: DissOLinK bridge fixes and Shopify theme/image fixes are NEVER
+executed in the same agent task. They are separate domains. Separate agents.
+Separate commits. Separate verification passes.
+
+If both issues are detected in the same audit:
+  1. Fix bridge FIRST (dedicated bridge agent)
+  2. Verify bridge PASS
+  3. THEN fix theme/image issues (separate theme agent)
+  4. Verify theme PASS
+
+They do not share agents. They do not share commits.
+They do not share verification passes.
+This prevents cross-contamination of fixes and preserves audit accountability.
+
+AUDIT/CLEANUP PROTECTION:
+  ❌ NO audit or cleanup agent may alter bridge HTML files (index.html in slug folders)
+  ❌ NO audit agent may alter dv-transitions.css or theme CSS without NEURAL approval
+  ❌ NO Shopify theme push may include bridge HTML — bridge lives on GitHub Pages only
+  ❌ NO GitHub push may include Shopify theme files — theme lives on Shopify only
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 END OF DISSOLINK MASTER RULES
 Maintained by IRONWIRE | Questions/changes require GRANDMASTER approval
 ================================================================================
