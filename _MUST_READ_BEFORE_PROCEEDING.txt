@@ -1,10 +1,14 @@
 ================================================================================
 _MUST_READ_BEFORE_PROCEEDING.txt
 dissolinks repo — analogflowers-coder/dissolinks
-Last updated: 2026-04-06
+Last updated: 2026-04-07 (MAJOR ARCHITECTURE CORRECTION — DISSOLINK-001)
 ================================================================================
 
 READ THIS ENTIRE FILE BEFORE TOUCHING ANYTHING IN THIS REPO.
+
+⚠️  ARCHITECTURE WAS CORRECTED 2026-04-07 — OLD RULES ARE WRONG  ⚠️
+    FULL RULES: DISSOLINK_MASTER_RULES.txt (THIS REPO, ROOT LEVEL)
+    DISSOLINK_MASTER_RULES.txt SUPERSEDES ALL PREVIOUS GOVERNANCE FILES.
 
 ================================================================================
 SECTION 1: WHAT THIS REPO IS
@@ -14,52 +18,53 @@ GitHub Pages repo serving links.dissoverse.com shortlinks.
 Each subfolder = one shortlink. Each subfolder has one index.html.
 DNS: links.dissoverse.com CNAME to GitHub Pages (main branch).
 
-================================================================================
-SECTION 2: THE TWO LINK TYPES — NEVER MIX
-================================================================================
-
-TYPE 1 — INTERNAL (destination is dissoverse.com):
-  Route: window.location.replace("https://dissoverse.com/pages/go?url=[encoded_path]");
-  Current internal links: /shop /all /main /mainsite /shopstore
-
-TYPE 2 — EXTERNAL (destination is NOT dissoverse.com):
-  Route: window.location.replace("[full_destination_url]");
-  ONE LINE ONLY. No bridge. No /pages/go. No IAB escape.
-  Current external links: /ivydelicate /itsrockymontana /yt
-
-If you are unsure: parse the hostname.
-  dissoverse.com = INTERNAL (use bridge)
-  anything else  = EXTERNAL (direct redirect, one line)
-
-Full rules: DISSOLINK_ARCHITECTURE_HARDLOCK.txt (CLAUDE_BRAIN/governance/)
-Hierarchy: HARDLOCK > DEPLOY PROTOCOL > anything else
+DissOLinK's SOLE PURPOSE: Force users out of in-app browsers (Instagram/TikTok
+WebView) so links open in a native browser. The bridge pages are IAB ESCAPE
+ENGINES — not just redirects.
 
 ================================================================================
-SECTION 3: FROZEN FILES — DO NOT TOUCH — ZERO TOLERANCE
+SECTION 2: THE TWO LINK TYPES — CORRECTED 2026-04-07
 ================================================================================
 
-FROZEN FILES — DO NOT TOUCH:
-  ivydelicate/index.html
-  itsrockymontana/index.html
+ALL links use the bridge. The only difference is the final destination.
 
-These are confirmed working client-facing pages.
-They were broken THREE TIMES on April 6, 2026 by agents modifying them.
-Zero tolerance. No exceptions.
+TYPE A — ARTIST (destination: link.me):
+  Route through: dissoverse.com/pages/go?url=https%3A%2F%2Flink.me%2F[slug]
+  Current: /ivydelicate /itsrockymontana
 
-RULES:
-  1. NEVER open, read, edit, or include these files in any batch operation.
-  2. NEVER include them in any audit, scan, fix, cleanup, or optimization.
-  3. NEVER commit changes to these files under any circumstance.
-  4. To verify they work: navigate to the LIVE URL only.
-       links.dissoverse.com/ivydelicate      -> link.me/ivydelicate
-       links.dissoverse.com/itsrockymontana  -> link.me/itsrockymontana
-  5. If any task says to "fix", "audit", or "clean" dissolinks:
-       SKIP ivydelicate/ and itsrockymontana/ entirely.
+  window.location.replace(
+    "https://dissoverse.com/pages/go?url=https%3A%2F%2Flink.me%2F[SLUG]"
+  );
 
-WHY: The correct content is one line:
-  window.location.replace("https://link.me/[slug]");
-  Any agent that touches these files tries to "improve" them and breaks them.
-  They are correct as-is. They are client pages. They are FROZEN.
+TYPE B — STORE (destination: dissoverse.com path):
+  Route through: dissoverse.com/pages/go?url=%2F[path]
+  Current: /shop /all /main /mainsite /shopstore
+
+  window.location.replace("https://dissoverse.com/pages/go?url=%2F[path]");
+  OR just:
+  window.location.replace("https://dissoverse.com/pages/go");  (for homepage)
+
+CRITICAL: link.me IS whitelisted in dv-bridge.liquid. Verified 2026-04-07.
+Whitelist: ['dissoverse.com','www.dissoverse.com','link.me','youtube.com','www.youtube.com']
+
+NEVER do a direct redirect to link.me — this skips the IAB escape.
+NEVER use /pages/go without ?url= for TYPE A links — defaults to homepage.
+
+See DISSOLINK_MASTER_RULES.txt for full templates and incident report.
+
+================================================================================
+SECTION 3: LIVE LINK MAP (verified 2026-04-07)
+================================================================================
+
+  SLUG               FINAL DEST              STATUS
+  /itsrockymontana   link.me/itsrockymontana  ✅ LIVE (commit f8ac9ca)
+  /ivydelicate       link.me/ivydelicate       ✅ LIVE (commit f8ac9ca)
+  /mainsite          dissoverse.com            ✅ (verify)
+  /shop              dissoverse.com/collections/all  ✅ (verify)
+  /shopstore         (verify)
+  /yt                (verify)
+  /all               (verify)
+  /main              (verify)
 
 ================================================================================
 SECTION 4: THREE-TARGET PUSH PROTOCOL
@@ -68,10 +73,8 @@ SECTION 4: THREE-TARGET PUSH PROTOCOL
 Every change goes to ALL THREE:
   1. GitHub repo — git push origin main (this repo)
   2. Desktop hard copy:
-     C:\Users\analo\OneDrive\Desktop\claude code (dissoverse)\DISSOForge - hardfiles\dissolinks\
+     C:\Users\analo\OneDrive\Desktop\CLAUDE CODE\temp_dissolinks\
   3. Shopify themes: ONLY if dv-bridge.liquid or theme.liquid changed.
-     For external links: NO Shopify changes needed.
-     For internal links: NO Shopify changes needed (unless bridge page itself changes).
 
 ================================================================================
 SECTION 5: VERIFY AFTER EVERY DEPLOY
@@ -79,23 +82,23 @@ SECTION 5: VERIFY AFTER EVERY DEPLOY
 
 Wait 90 seconds after git push — GitHub Pages CDN (Fastly) takes up to 90s.
 Navigate to links.dissoverse.com/[slug] and confirm redirect destination.
-If fails: check deployment status at github.com/analogflowers-coder/dissolinks/settings/pages
+If fails: check github.com/analogflowers-coder/dissolinks/settings/pages
 DO NOT push another fix before verifying the current one.
 
 ================================================================================
-SECTION 6: DEPLOY NEW LINK
+SECTION 6: GOVERNANCE FILE HIERARCHY
 ================================================================================
 
-DEPLOY: [slug] -> [destination_url] | EXPIRES: [7|14|30|never]
+  1. GRANDMASTER direct orders (always top priority)
+  2. DISSOLINK_MASTER_RULES.txt (this repo) — CURRENT SUPREME AUTHORITY
+  3. This file (_MUST_READ_BEFORE_PROCEEDING.txt)
+  4. Everything else is SUPERSEDED
 
-Full protocol: DISSOLINK_DEPLOY_PROTOCOL.txt (CLAUDE_BRAIN/governance/)
-
-Quick reference:
-  External link (one-liner):
-    window.location.replace("https://[destination]");
-  Internal link (bridge):
-    window.location.replace("https://dissoverse.com/pages/go?url=%2F[path]");
+  DISSOLVED (no longer valid):
+  - DISSOLINK_ARCHITECTURE_HARDLOCK.txt (v1) — WRONG
+  - DISSOLINK_DEPLOY_PROTOCOL_V2.txt — WRONG
+  - Any prior governance in injection kits or ZIP archives
 
 ================================================================================
-END — HARDLOCK > DEPLOY PROTOCOL > EVERYTHING ELSE
+END — READ DISSOLINK_MASTER_RULES.txt FOR FULL DETAILS
 ================================================================================
