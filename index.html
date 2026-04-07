@@ -991,28 +991,65 @@ function buildEscapeHTML(targetUrl, label, mode, ageGate, expiryDays) {
   var created = Date.now();
   var expDays = (expiryDays === undefined || expiryDays === null) ? 30 : expiryDays;
 
+  // Build redirect script + noscript fallback based on URL type
+  var redirectScript, noscriptFallback;
+  if (isInternalUrl(targetUrl)) {
+    var internalPath = extractInternalPath(targetUrl);
+    var encodedPath = encodeURIComponent(internalPath);
+    var bridgeUrl = 'https://dissoverse.com/pages/go?url=' + encodedPath;
+    redirectScript = 'window.location.replace("' + bridgeUrl.replace(/"/g, '\\"') + '");';
+    noscriptFallback = '<a href="' + bridgeUrl.replace(/"/g, '&quot;') + '">Click here</a>';
+  } else {
+    redirectScript = 'window.location.replace("' + safeUrl.replace(/"/g, '\\"') + '");';
+    noscriptFallback = '<a href="' + safeUrl + '">Click here</a>';
+  }
+
   var parts = [];
   parts.push('<!DOCTYPE html>');
   parts.push('<html><head><meta charset="UTF-8">');
   parts.push('<meta name="viewport" content="width=device-width,initial-scale=1">');
   parts.push('<title>Redirecting...</title>');
 
-  if (isInternalUrl(targetUrl)) {
-    // INTERNAL — route through Shopify bridge page
-    var internalPath = extractInternalPath(targetUrl);
-    var encodedPath = encodeURIComponent(internalPath);
-    var bridgeUrl = 'https://dissoverse.com/pages/go?url=' + encodedPath;
-    parts.push('<script>window.location.replace("' + bridgeUrl.replace(/"/g, '\\"') + '");<' + '/script>');
-    parts.push('</head><body style="background:#000;">');
-    parts.push('<noscript><a href="' + bridgeUrl.replace(/"/g, '&quot;') + '">Click here</a></noscript>');
+  if (ageGate) {
+    // AGE GATE — render confirmation screen before redirect fires
+    // Design: NEURAL INTERFACE spec 2026-04-07
+    parts.push('<style>');
+    parts.push('*{box-sizing:border-box;margin:0;padding:0;}');
+    parts.push('body{background:#0A0A0A;font-family:"Courier New",Courier,monospace;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}');
+    parts.push('.gate{text-align:center;max-width:320px;width:100%;}');
+    parts.push('.brand{font-size:24px;color:#E91885;letter-spacing:4px;font-weight:bold;text-transform:uppercase;margin-bottom:20px;}');
+    parts.push('.msg{font-size:14px;color:#999999;line-height:1.6;margin-bottom:28px;}');
+    parts.push('.btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:16px;}');
+    parts.push('.btn-yes{background:#E91885;color:#000;border:none;padding:12px 20px;font-family:"Courier New",Courier,monospace;font-size:13px;font-weight:bold;cursor:pointer;letter-spacing:1px;text-transform:uppercase;}');
+    parts.push('.btn-no{background:#333333;color:#999999;border:none;padding:12px 20px;font-family:"Courier New",Courier,monospace;font-size:13px;cursor:pointer;letter-spacing:1px;text-transform:uppercase;}');
+    parts.push('.btn-yes:hover{background:#ff1a8c;}');
+    parts.push('.btn-no:hover{background:#444444;}');
+    parts.push('.disclaimer{font-size:10px;color:#555555;line-height:1.5;}');
+    parts.push('<' + '/style>');
+    parts.push('<' + '/head>');
+    parts.push('<body>');
+    parts.push('<div class="gate">');
+    parts.push('<div class="brand">DISSOVERSE</div>');
+    parts.push('<div class="msg">This link contains content intended for adults.</div>');
+    parts.push('<div class="btns">');
+    parts.push('<button class="btn-yes" onclick="proceed()">I AM 18 OR OLDER</button>');
+    parts.push('<button class="btn-no" onclick="goBack()">TAKE ME BACK</button>');
+    parts.push('<' + '/div>');
+    parts.push('<div class="disclaimer">By proceeding you confirm you are 18 years of age or older.</div>');
+    parts.push('<' + '/div>');
+    parts.push('<script>');
+    parts.push('function proceed(){' + redirectScript + '}');
+    parts.push('function goBack(){window.location.replace("https://dissoverse.com");}');
+    parts.push('<' + '/script>');
+    parts.push('<noscript>' + noscriptFallback + '<' + '/noscript>');
+    parts.push('<' + '/body><' + '/html>');
   } else {
-    // EXTERNAL — direct redirect, no bridge
-    parts.push('<script>window.location.replace("' + safeUrl.replace(/"/g, '\\"') + '");<' + '/script>');
+    // NO AGE GATE — direct redirect (original behavior preserved)
+    parts.push('<script>' + redirectScript + '<' + '/script>');
     parts.push('</head><body style="background:#000;">');
-    parts.push('<noscript><a href="' + safeUrl + '">Click here</a></noscript>');
+    parts.push('<noscript>' + noscriptFallback + '<' + '/noscript>');
+    parts.push('</body></html>');
   }
-
-  parts.push('</body></html>');
 
   return parts.join('\n');
 }
