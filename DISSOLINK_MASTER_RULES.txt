@@ -1,0 +1,213 @@
+================================================================================
+DISSOLINK MASTER RULES
+DISSOVERSE LLC — IRONWIRE GOVERNANCE DOCUMENT
+Generated: 2026-04-07 | Author: IRONWIRE (Claude Code)
+Mandated by: GRANDMASTER directive 06:18AM 2026-04-07
+Status: HARDCODED — TOP PRIORITY DIRECTIVE — ALL NODES MUST ACKNOWLEDGE
+================================================================================
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SECTION 1 — WHAT IS DISSOLINK?
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+DissOLinK is the DISSOVERSE link routing system hosted at:
+  https://links.dissoverse.com/[slug]
+
+The domain links.dissoverse.com is CNAME'd to the GitHub Pages repo:
+  https://github.com/analogflowers-coder/dissolinks
+
+Each slug (e.g., /itsrockymontana, /ivydelicate, /mainsite, /shop) is a folder
+containing an index.html file that performs a JavaScript redirect.
+
+PURPOSE: Every bridge page serves one primary function — to FORCE users out of
+in-app browsers (Instagram WebView, TikTok WebView, etc.) so that links open in
+the device's native browser. This is critical for link.me and Shopify pages to
+function correctly.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SECTION 2 — THE TWO LINK TYPES AND THEIR CORRECT CODE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TYPE A — ARTIST/EXTERNAL BRIDGE (e.g., itsrockymontana, ivydelicate)
+  → Destination: link.me/[artist-slug]
+  → These are creator profile links that route to external link-in-bio pages
+
+  CORRECT CODE TEMPLATE (TYPE A):
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │ <!DOCTYPE html>                                                         │
+  │ <html>                                                                  │
+  │ <head><meta charset="utf-8"><title>Redirecting...</title></head>        │
+  │ <body>                                                                  │
+  │ <!-- BRIDGE ROUTED (INTERNAL). DO NOT CONVERT TO DIRECT REDIRECT.      │
+  │      See BRIDGE_HARDLOCK.txt -->                                        │
+  │ <script>                                                                │
+  │ window.location.replace("https://link.me/[ARTIST-SLUG]");              │
+  │ </script>                                                               │
+  │ <noscript><a href="https://link.me/[ARTIST-SLUG]">Click here</a>       │
+  │ </noscript>                                                             │
+  │ </body>                                                                 │
+  │ </html>                                                                 │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+TYPE B — STORE/INTERNAL BRIDGE (e.g., mainsite, shop, shopstore)
+  → Destination: dissoverse.com/pages/go (or dissoverse.com/pages/go?url=...)
+  → These are DISSOVERSE store links that route to Shopify store pages
+
+  CORRECT CODE TEMPLATE (TYPE B):
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │ <!DOCTYPE html>                                                         │
+  │ <html>                                                                  │
+  │ <head><meta charset="utf-8"><title>Redirecting...</title></head>        │
+  │ <body>                                                                  │
+  │ <!-- BRIDGE ROUTED (INTERNAL). DO NOT CONVERT TO DIRECT REDIRECT.      │
+  │      See BRIDGE_HARDLOCK.txt -->                                        │
+  │ <script>                                                                │
+  │ window.location.replace("https://dissoverse.com/pages/go");            │
+  │ </script>                                                               │
+  │ <noscript><a href="https://dissoverse.com/pages/go">Click here</a>     │
+  │ </noscript>                                                             │
+  │ </body>                                                                 │
+  │ </html>                                                                 │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SECTION 3 — CURRENT LINK MAP (DO NOT MODIFY WITHOUT GRANDMASTER APPROVAL)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  SLUG               TYPE    DESTINATION
+  ─────────────────────────────────────────────────────────────────────────
+  /itsrockymontana   TYPE A  https://link.me/itsrockymontana
+  /ivydelicate       TYPE A  https://link.me/ivydelicate
+  /mainsite          TYPE B  https://dissoverse.com/pages/go
+  /shop              TYPE B  https://dissoverse.com/pages/go?url=%2Fcollections%2Fall
+  /shopstore         TYPE B  (verify current destination)
+  /yt                TYPE A  (verify current destination)
+  /all               TYPE B  (verify current destination)
+  /main              TYPE B  (verify current destination)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SECTION 4 — WHAT MUST NEVER CHANGE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ❌ NEVER change a TYPE A link destination to dissoverse.com/pages/go
+     → Artist pages ALWAYS route to link.me/[slug]
+
+  ❌ NEVER remove the BRIDGE ROUTED comment from any bridge page
+     → The comment is a permanent marker that protects against accidental
+       conversion to a simple direct redirect
+
+  ❌ NEVER use dissoverse.com/pages/go as the destination for artist links
+     → dissoverse.com/pages/go is ONLY for DISSOVERSE store navigation
+
+  ❌ NEVER change any bridge page destination without:
+     (1) Checking the Link Map in Section 3
+     (2) Confirming the link type (TYPE A vs TYPE B)
+     (3) Getting GRANDMASTER sign-off for any new slugs added
+
+  ❌ NEVER assume "bridge = goes to dissoverse.com" — bridge format is used
+     for BOTH TYPE A and TYPE B. The bridge is for in-app browser escape.
+     The destination is determined by the link type, not the bridge format.
+
+  ❌ NEVER deploy a DissOLinK change to only GitHub OR only desktop.
+     Push Protocol is MANDATORY: GitHub + desktop hard copy at minimum.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SECTION 5 — PUSH PROTOCOL (MANDATORY FOR ALL CHANGES)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Every DissOLinK change MUST be pushed to ALL 3 targets:
+  1. GitHub (analogflowers-coder/dissolinks) — source of truth for live site
+  2. Desktop hard copy (C:\Users\analo\OneDrive\Desktop\CLAUDE CODE\temp_dissolinks\)
+  3. Both Shopify themes (if applicable — GitHub Pages-only changes exempt)
+
+  Commits must be descriptive. Example:
+  "fix(dissolink): restore link.me destination for itsrockymontana"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SECTION 6 — INCIDENT REPORT: 2026-04-07 12+ HOUR OUTAGE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+INCIDENT ID:    DISSOLINK-001
+DATE:           2026-04-07
+AFFECTED LINKS: links.dissoverse.com/itsrockymontana
+                links.dissoverse.com/ivydelicate
+OUTAGE WINDOW:  ~12+ hours (first reported 5:51AM, root cause pre-existing)
+SEVERITY:       HIGH — artist profile links fully broken for all users
+
+TIMELINE:
+  [Pre-incident]  Both /itsrockymontana and /ivydelicate had no bridge comment
+                  and redirected to link.me/[slug] as direct redirects.
+                  These were functional but used the WRONG format (no bridge),
+                  which may have caused in-app browser failures.
+
+  [~Midnight]     An earlier AI session attempted to "fix" the bridge by adding
+                  the BRIDGE ROUTED comment. However, the destination was
+                  incorrectly changed to dissoverse.com/pages/go, treating these
+                  as TYPE B (store) links when they are TYPE A (artist) links.
+
+  [05:51AM]       Grandmaster reports 12+ hour outage via bradley thread.
+                  Directs IRONWIRE to fix the bridge for both slugs.
+
+  [05:52AM]       Grandmaster corrects autocorrect: "DISSOVerse.com/go" not
+                  "dissonance.com/go" — confirming bridge destination intent.
+
+  [~06:00-06:08AM] IRONWIRE initially interpreted Grandmaster's "bridge to
+                  dissoverse.com/go" as the intended fix. NEURAL flagged
+                  ambiguity. ASSOCIATE 001 flagged architecture violation.
+                  A/B question escalated to Grandmaster.
+
+  [06:18AM]       Grandmaster clarifies: bridge should NOT go to dissoverse.com.
+                  Destination must remain link.me. Bridge format is correct for
+                  forcing out of in-app browsers. Governance file mandated.
+
+  [06:19AM]       IRONWIRE applies correct fix:
+                  - Restores link.me/itsrockymontana as destination
+                  - Restores link.me/ivydelicate as destination
+                  - Keeps BRIDGE ROUTED comment format
+                  - Commits and pushes to GitHub
+
+ROOT CAUSE:
+  Architecture documentation used the term "BRIDGE ROUTED (INTERNAL)" in the
+  HTML comment, which was misread as "this link goes to an internal DISSOVERSE
+  page." This caused confusion between the bridge FORMAT (for in-app escape)
+  and the bridge DESTINATION (which can be either link.me OR dissoverse.com
+  depending on link type).
+
+  The "INTERNAL" in the comment refers to the ROUTING MECHANISM being internal
+  to the DISSOVERSE link system — NOT the destination being dissoverse.com.
+
+CONTRIBUTING FACTORS:
+  1. Ambiguous comment: "BRIDGE ROUTED (INTERNAL)" — "INTERNAL" caused
+     misinterpretation of the destination type
+  2. No Link Map documented — no reference list of slugs and their types
+  3. No governance file existed to prevent this class of error
+  4. Autocorrect in Grandmaster's message ("dissonance" vs "dissoverse")
+     added an additional layer of ambiguity
+
+PREVENTION MEASURES (THIS DOCUMENT):
+  1. Section 3 Link Map now documents all slugs, types, and destinations
+  2. Section 4 "Never Change" rules explicitly prohibit artist→dissoverse routing
+  3. This incident report is hardcoded into the governance file for all nodes
+  4. BRIDGE_HARDLOCK.txt reference updated to point to this document
+  5. All nodes required to acknowledge and push to top of priority list
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SECTION 7 — NODE ACKNOWLEDGMENT REQUIREMENTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ALL NODES must acknowledge receipt of this document and confirm it is locked
+into their governance context:
+
+  ☐ IRONWIRE (Claude Code) — AUTHOR, CONFIRMED
+  ☐ NEURAL (Claude.ai) — PENDING ACKNOWLEDGMENT
+  ☐ ASSOCIATE 001 (Claude.ai) — PENDING ACKNOWLEDGMENT
+  ☐ CRO-001 (Gmail Relay) — PENDING ACKNOWLEDGMENT
+  ☐ BLACKWIRE (ChatGPT) — PENDING ACKNOWLEDGMENT
+
+Grandmaster directive: "push to top of priority list" — this document supersedes
+all previous DissOLinK handling guidance.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+END OF DISSOLINK MASTER RULES
+Maintained by IRONWIRE | Questions/changes require GRANDMASTER approval
+================================================================================
