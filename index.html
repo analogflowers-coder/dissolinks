@@ -578,6 +578,37 @@ if(sessionStorage.getItem('dv_access')==='1'){document.getElementById('access-ga
             <div id="deploy-status-badge" style="display:none; margin-top:8px; font-size:11px; letter-spacing:4px; color:var(--neon); text-shadow:0 0 10px var(--neon-glow);">■ LIVE</div>
           </div>
 
+          <!-- Deployment Queued Notification Panel -->
+          <div id="dv-deploy-queued-panel" style="display:none; margin-top:16px; border:1px solid var(--border-mid); padding:16px; background:rgba(0,255,65,0.02);">
+            <div style="font-size:11px; color:var(--neon); letter-spacing:3px; margin-bottom:10px;">
+              ▶ TRANSMISSION QUEUED
+            </div>
+            <div style="font-size:12px; color:rgba(0,255,65,0.7); line-height:1.7; margin-bottom:14px;">
+              <strong style="color:var(--neon);">Your link is deploying now.</strong><br>
+              It will be <strong style="color:var(--neon);">publicly live in under 1 hour.</strong><br>
+              GitHub Pages CDN propagation is in progress.
+            </div>
+            <div style="font-size:11px; color:var(--text-dim); letter-spacing:2px; margin-bottom:8px;">
+              GET NOTIFIED WHEN ACTIVE <span style="color:var(--text-dim); font-size:10px;">(optional)</span>
+            </div>
+            <div style="display:flex; gap:8px; align-items:stretch; flex-wrap:wrap;">
+              <input
+                type="email"
+                id="dv-notify-email"
+                placeholder="your@email.com"
+                autocomplete="email"
+                style="flex:1; min-width:180px; padding:10px 14px; background:rgba(0,0,0,0.6); border:1px solid var(--border-mid); color:var(--neon); font-family:'Share Tech Mono',monospace; font-size:13px; outline:none;"
+                onkeydown="if(event.key==='Enter')submitNotificationEmail()"
+              >
+              <button
+                id="dv-notify-btn"
+                onclick="submitNotificationEmail()"
+                style="padding:10px 20px; background:transparent; border:1px solid var(--neon); color:var(--neon); font-family:'Share Tech Mono',monospace; font-size:12px; letter-spacing:2px; cursor:pointer; white-space:nowrap;"
+              >▶ NOTIFY ME</button>
+            </div>
+            <div id="dv-notify-feedback" style="margin-top:8px; font-size:11px; letter-spacing:1.5px; min-height:16px;"></div>
+          </div>
+
           <!-- Primary: COPY LINK -->
           <button class="btn-neon btn-deploy" onclick="copyLink()" style="width:100%; font-size:15px; padding:14px; letter-spacing:4px;">
             ⎘ COPY LINK
@@ -935,6 +966,90 @@ function showDeployStatus(shortName) {
   document.getElementById('open-link-btn').style.display = 'flex';
   document.getElementById('deploy-live-btn').style.display = 'none';
   loadActiveLinks();
+
+  // Show deployment queued panel
+  var panel = document.getElementById('dv-deploy-queued-panel');
+  if (panel) {
+    panel.style.display = 'block';
+    panel.dataset.slug = shortName;
+  }
+  addLog('QUEUE', 'Deployment queued. Link live in under 1 hour.', 'neon');
+}
+
+async function submitNotificationEmail() {
+  var panel = document.getElementById('dv-deploy-queued-panel');
+  var emailInput = document.getElementById('dv-notify-email');
+  var btn = document.getElementById('dv-notify-btn');
+  var feedback = document.getElementById('dv-notify-feedback');
+  if (!panel || !emailInput || !btn || !feedback) return;
+
+  var email = emailInput.value.trim();
+  var slug = panel.dataset.slug || '';
+  if (!email || !email.includes('@')) {
+    feedback.textContent = 'INVALID EMAIL // ENTER VALID ADDRESS';
+    feedback.style.color = 'var(--red-warn)';
+    return;
+  }
+
+  var token = sessionStorage.getItem('dv_pat') || '';
+  if (!token) {
+    feedback.textContent = 'NO TOKEN // NOTIFICATION REQUIRES GITHUB PAT';
+    feedback.style.color = 'var(--red-warn)';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = '⟳ QUEUING...';
+  feedback.textContent = '';
+
+  try {
+    // Read existing notifications.json
+    var getResp = await fetch('https://api.github.com/repos/analogflowers-coder/dissolinks/contents/notifications.json', {
+      headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json' }
+    });
+
+    var currentSha = null;
+    var notifications = { pending: [] };
+
+    if (getResp.status === 200) {
+      var getResult = await getResp.json();
+      currentSha = getResult.sha;
+      try { notifications = JSON.parse(atob(getResult.content.replace(/\n/g, ''))); } catch(e) {}
+    }
+
+    notifications.pending.push({
+      email: email,
+      slug: slug,
+      link: 'https://links.dissoverse.com/' + slug + '/',
+      queued_at: new Date().toISOString()
+    });
+
+    var body = {
+      message: 'feat(notify): queue notification for ' + slug,
+      content: btoa(JSON.stringify(notifications, null, 2))
+    };
+    if (currentSha) body.sha = currentSha;
+
+    var putResp = await fetch('https://api.github.com/repos/analogflowers-coder/dissolinks/contents/notifications.json', {
+      method: 'PUT',
+      headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github.v3+json' },
+      body: JSON.stringify(body)
+    });
+
+    if (putResp.status === 200 || putResp.status === 201) {
+      feedback.textContent = '■ QUEUED // NOTIFICATION WILL SEND WHEN LINK IS LIVE';
+      feedback.style.color = 'var(--neon)';
+      btn.textContent = '■ QUEUED';
+      emailInput.disabled = true;
+    } else {
+      throw new Error('API error ' + putResp.status);
+    }
+  } catch(e) {
+    feedback.textContent = 'ERROR // ' + e.message;
+    feedback.style.color = 'var(--red-warn)';
+    btn.disabled = false;
+    btn.textContent = '▶ NOTIFY ME';
+  }
 }
 
 function openDeployedLink() {
