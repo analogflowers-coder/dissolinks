@@ -328,6 +328,7 @@
   </div>
 </div>
 <script>
+/* SECURITY NOTE: This password gate is cosmetic UX only. The deployment PAT is the actual security boundary. */
 function checkAccess(){
   var code=document.getElementById('access-code').value;
   if(code==='444'){
@@ -998,10 +999,10 @@ function buildEscapeHTML(targetUrl, label, mode, ageGate, expiryDays) {
     var encodedPath = encodeURIComponent(internalPath);
     var bridgeUrl = 'https://dissoverse.com/pages/go?url=' + encodedPath;
     redirectScript = 'window.location.replace("' + bridgeUrl.replace(/"/g, '\\"') + '");';
-    noscriptFallback = '<a href="' + bridgeUrl.replace(/"/g, '&quot;') + '">Click here</a>';
+    noscriptFallback = '<div style="font-family:monospace;color:#00ff00;background:#000;padding:20px;text-align:center;">JAVASCRIPT REQUIRED TO CONTINUE. ENABLE JAVASCRIPT IN YOUR BROWSER AND RELOAD THIS PAGE.</div>';
   } else {
     redirectScript = 'window.location.replace("' + safeUrl.replace(/"/g, '\\"') + '");';
-    noscriptFallback = '<a href="' + safeUrl + '">Click here</a>';
+    noscriptFallback = '<div style="font-family:monospace;color:#00ff00;background:#000;padding:20px;text-align:center;">JAVASCRIPT REQUIRED TO CONTINUE. ENABLE JAVASCRIPT IN YOUR BROWSER AND RELOAD THIS PAGE.</div>';
   }
 
   var parts = [];
