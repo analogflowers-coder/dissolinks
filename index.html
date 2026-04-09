@@ -5719,55 +5719,36 @@ var dvAudio = (function() {
   document.addEventListener('click',   _onFirstInteraction, true);
   document.addEventListener('keydown', _onFirstInteraction, true);
 
-  /* ── 1. THE KINETIC STRIKE — 3-layer click (ZENITH-ZERO spec) ── */
-  /* Layer 1: 1200Hz sine snap (10ms) — industrial relay
-     Layer 2: White noise tail (5ms) HP filtered at 5kHz — electrical arc
-     Layer 3: 150Hz thud — dampened steel weight
-     Pitch varies +/-2% per click to prevent listener fatigue */
+  /* ── 1. VIDEO GAME BLEEP — clean retro click ──────────────── */
+  /* Triangle wave bleep with pitch variation. One clean tone per click.
+     Not the same pitch twice — randomizes between 800-1400Hz */
+  var _lastBleepTime = 0;
   function click() {
     try {
       var ctx = _getCtx();
       if (!ctx) return;
       var t = ctx.currentTime;
-      var pitchShift = 0.98 + Math.random() * 0.04; /* +/- 2% variation */
+      /* Debounce: min 80ms between bleeps to prevent machine-gun repeat */
+      if (t - _lastBleepTime < 0.08) return;
+      _lastBleepTime = t;
 
-      /* Layer 1: ANALOG SNAP — 1200Hz sine, 10ms */
-      var snap = ctx.createOscillator();
-      var snapG = ctx.createGain();
-      snap.connect(snapG); snapG.connect(ctx.destination);
-      snap.type = 'sine';
-      snap.frequency.setValueAtTime(1200 * pitchShift, t);
-      snapG.gain.setValueAtTime(0.09, t);
-      snapG.gain.linearRampToValueAtTime(0.0, t + 0.010);
-      snap.start(t); snap.stop(t + 0.015);
+      /* Random pitch between 800-1400Hz — never the same twice */
+      var freq = 800 + Math.random() * 600;
 
-      /* Layer 2: SILICON SHIMMER — white noise, HP 5kHz, 5ms */
-      var bufLen = Math.ceil(ctx.sampleRate * 0.008);
-      var buf = ctx.createBuffer(1, bufLen, ctx.sampleRate);
-      var data = buf.getChannelData(0);
-      for (var i = 0; i < bufLen; i++) data[i] = (Math.random() * 2 - 1);
-      var noise = ctx.createBufferSource();
-      var hp = ctx.createBiquadFilter();
-      var noiseG = ctx.createGain();
-      noise.buffer = buf;
-      hp.type = 'highpass'; hp.frequency.setValueAtTime(5000, t);
-      noise.connect(hp); hp.connect(noiseG); noiseG.connect(ctx.destination);
-      noiseG.gain.setValueAtTime(0.06, t);
-      noiseG.gain.linearRampToValueAtTime(0.0, t + 0.008);
-      noise.start(t); noise.stop(t + 0.012);
+      var osc = ctx.createOscillator();
+      var g = ctx.createGain();
+      osc.connect(g); g.connect(ctx.destination);
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, t);
+      /* Quick pitch drop for that classic bleep tail */
+      osc.frequency.linearRampToValueAtTime(freq * 0.7, t + 0.045);
+      g.gain.setValueAtTime(0.06, t);
+      g.gain.linearRampToValueAtTime(0.0, t + 0.05);
+      osc.start(t);
+      osc.stop(t + 0.055);
 
-      /* Layer 3: DAMPENED STEEL — 150Hz sine thud, instant decay */
-      var thud = ctx.createOscillator();
-      var thudG = ctx.createGain();
-      thud.connect(thudG); thudG.connect(ctx.destination);
-      thud.type = 'sine';
-      thud.frequency.setValueAtTime(150 * pitchShift, t);
-      thudG.gain.setValueAtTime(0.05, t);
-      thudG.gain.linearRampToValueAtTime(0.0, t + 0.020);
-      thud.start(t); thud.stop(t + 0.025);
-
-      /* Haptic sync on mobile — 15ms sharp pulse */
-      if ('vibrate' in navigator) try { navigator.vibrate(15); } catch(e2) {}
+      /* Haptic sync on mobile */
+      if ('vibrate' in navigator) try { navigator.vibrate(10); } catch(e2) {}
     } catch(e) {}
   }
 
