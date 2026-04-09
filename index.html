@@ -16,7 +16,7 @@
 <meta name="twitter:description" content="VOID_STRIDE PROTOCOL ACTIVE. SOVEREIGN LINK ARCHITECTURE.">
 <meta name="theme-color" content="#00FF41">
 <meta name="robots" content="noindex, nofollow">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://api.github.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://api.github.com https://discord.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
 <!-- END META TAGS // META_CRACKER -->
 <!-- TODO: Replace Tailwind Play CDN with self-hosted build for full SRI support -->
 <script src="https://cdn.tailwindcss.com" crossorigin="anonymous"></script>
@@ -1373,7 +1373,7 @@ body.dv-glitching #diss0linkz-auth-gate {
 <canvas id="dv-cursor-canvas"></canvas>
 
 <!-- ACCESS GRANTED STAMP -->
-<div id="dv-access-stamp"><div class="dv-stamp-text">ACCESS GRANTED<br><span style="font-size:0.45em;letter-spacing:0.2em;color:var(--text-dim);">WELCOME TO THE NETWORK</span></div></div>
+<div id="dv-access-stamp"><div class="dv-stamp-text">ACCESS GRANTED<br><span style="font-size:0.45em;letter-spacing:0.2em;color:var(--text-dim);">CLEARANCE CONFIRMED. OPERATIVE STATUS: ACTIVE.</span></div></div>
 
 <!-- SCREEN CRACK OVERLAY -->
 <div id="dv-crack-overlay"></div>
@@ -1498,23 +1498,23 @@ body.dv-glitching #diss0linkz-auth-gate {
     <span class="dv-corner br">[+]</span>
 
     <div class="vault-title">VAULT // OPERATOR REGISTRY</div>
-    <div class="vault-subtitle">SIGN IN OR CREATE AN ACCOUNT TO CONTINUE</div>
+    <div class="vault-subtitle">// DISSOVERSE NODE AUTHENTICATION //</div>
 
     <div class="vault-tab-row">
-      <button class="vault-tab active" id="vault-tab-signin" onclick="vaultShowTab('signin')">&#9658; SIGN IN</button>
-      <button class="vault-tab" id="vault-tab-create" onclick="vaultShowTab('create')">&#9658; CREATE ACCOUNT</button>
+      <button class="vault-tab active" id="vault-tab-signin" onclick="vaultShowTab('signin')">&#9658; OPERATOR ACCESS</button>
+      <button class="vault-tab" id="vault-tab-create" onclick="vaultShowTab('create')">&#9658; REQUEST CLEARANCE</button>
     </div>
 
     <!-- SIGN IN PANEL -->
     <div id="vault-panel-signin">
       <div class="vault-field">
-        <label class="vault-label" for="vault-signin-user">&#62; USERNAME</label>
-        <input type="text" id="vault-signin-user" class="vault-input" placeholder="OPERATOR_X"
+        <label class="vault-label" for="vault-signin-user">&#62; OPERATIVE ID</label>
+        <input type="text" id="vault-signin-user" class="vault-input" placeholder="ENTER OPERATIVE ID"
           autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" maxlength="30">
       </div>
       <div class="vault-field">
-        <label class="vault-label" for="vault-signin-pass">&#62; PASSWORD</label>
-        <input type="password" id="vault-signin-pass" class="vault-input" placeholder="MIN 12 CHARACTERS"
+        <label class="vault-label" for="vault-signin-pass">&#62; CLEARANCE CODE</label>
+        <input type="password" id="vault-signin-pass" class="vault-input" placeholder="CLEARANCE CODE // MIN 12 CHARS"
           autocomplete="off" spellcheck="false" minlength="12">
       </div>
       <button class="vault-btn-primary" id="vault-signin-btn" onclick="vaultSignIn()">&#9654; AUTHENTICATE</button>
@@ -1523,24 +1523,24 @@ body.dv-glitching #diss0linkz-auth-gate {
     <!-- CREATE ACCOUNT PANEL -->
     <div id="vault-panel-create" style="display:none;">
       <div class="vault-field">
-        <label class="vault-label" for="vault-create-user">&#62; USERNAME</label>
-        <input type="text" id="vault-create-user" class="vault-input" placeholder="OPERATOR_X"
+        <label class="vault-label" for="vault-create-user">&#62; OPERATIVE ID</label>
+        <input type="text" id="vault-create-user" class="vault-input" placeholder="ENTER OPERATIVE ID"
           autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" maxlength="30">
         <div style="font-size:9px; color:rgba(0,255,65,0.35); margin-top:4px; letter-spacing:1.5px;">
           LETTERS, NUMBERS, HYPHENS, UNDERSCORES ONLY
         </div>
       </div>
       <div class="vault-field">
-        <label class="vault-label" for="vault-create-pass">&#62; PASSWORD</label>
-        <input type="password" id="vault-create-pass" class="vault-input" placeholder="MIN 12 CHARACTERS"
+        <label class="vault-label" for="vault-create-pass">&#62; ESTABLISH CLEARANCE CODE</label>
+        <input type="password" id="vault-create-pass" class="vault-input" placeholder="ESTABLISH CODE // MIN 12 CHARS"
           autocomplete="off" spellcheck="false" minlength="12">
       </div>
       <div class="vault-field">
-        <label class="vault-label" for="vault-create-pass2">&#62; CONFIRM PASSWORD</label>
-        <input type="password" id="vault-create-pass2" class="vault-input" placeholder="MIN 12 CHARACTERS"
+        <label class="vault-label" for="vault-create-pass2">&#62; CONFIRM CLEARANCE CODE</label>
+        <input type="password" id="vault-create-pass2" class="vault-input" placeholder="REPEAT CLEARANCE CODE"
           autocomplete="off" spellcheck="false" minlength="12">
       </div>
-      <button class="vault-btn-primary" id="vault-create-btn" onclick="vaultCreateAccount()">&#9654; REGISTER OPERATOR</button>
+      <button class="vault-btn-primary" id="vault-create-btn" onclick="vaultCreateAccount()">&#9654; SUBMIT FOR CLEARANCE</button>
     </div>
 
     <div class="vault-status" id="vault-status-line"></div>
@@ -1881,7 +1881,7 @@ body.dv-glitching #diss0linkz-auth-gate {
           </button>
         </div>
         <div class="vault-locked-notice" id="vault-locked-notice">
-          ⚠ SIGN IN REQUIRED — AUTHENTICATE VIA VAULT TO GENERATE LINKS
+          ⚠ CLEARANCE REQUIRED TO GENERATE Diss0LinK — AUTHENTICATE VIA VAULT
         </div>
 
         <!-- Output -->
@@ -4097,7 +4097,7 @@ async function loadActiveLinks() {
   // VAULT: load links from account namespace
   var vaultUser = (window._vaultGetUsername && window._vaultGetUsername()) || null;
   if (!vaultUser) {
-    panel.innerHTML = '<div style="color:rgba(255,204,0,0.7); font-size:11px; letter-spacing:1px;">[ SIGN IN TO VIEW YOUR LINKS ]</div>';
+    panel.innerHTML = '<div style="color:rgba(255,204,0,0.7); font-size:11px; letter-spacing:1px;">[ CLEARANCE REQUIRED TO VIEW OPERATIVE LINKS ]</div>';
     return;
   }
 
@@ -4306,7 +4306,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!userInput || !passInput) return;
     var username = userInput.value.trim().toUpperCase();
     var password = passInput.value;
-    if (!username || !password) { vaultSetStatus('> USERNAME AND PASSWORD REQUIRED.', 'err'); return; }
+    if (!username || !password) { vaultSetStatus('> OPERATIVE ID REQUIRED. CANNOT PROCESS NULL IDENTITY.', 'err'); return; }
     if (!vaultToken()) { vaultSetStatus('> OPERATOR TOKEN REQUIRED. CONNECT IN SETTINGS \u2699', 'err'); return; }
     btn.disabled = true;
     vaultSetStatus('> AUTHENTICATING...', 'wait');
@@ -4320,11 +4320,11 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       var hash = await vaultPBKDF2(password, account.salt);
       if (hash !== account.hash) {
-        vaultSetStatus('> INVALID CREDENTIALS. ACCESS DENIED.', 'err');
+        vaultSetStatus('> AUTHENTICATION FAILED. CLEARANCE DENIED.', 'err');
         btn.disabled = false; return;
       }
       vaultSetSession(username);
-      vaultSetStatus('> ACCESS GRANTED // WELCOME, ' + username, 'ok');
+      vaultSetStatus('> ACCESS GRANTED // OPERATIVE ' + username + ' — CLEARANCE CONFIRMED', 'ok');
       passInput.value = '';
       setTimeout(function() { vaultRevealApp(username); }, 900);
     } catch(e) {
@@ -4343,11 +4343,11 @@ document.addEventListener('DOMContentLoaded', function() {
     var username = userInput.value.trim().toUpperCase().replace(/[^A-Z0-9_\-]/g, '');
     var password = passInput.value;
     var pass2    = pass2Input.value;
-    if (!username) { vaultSetStatus('> INVALID USERNAME. USE LETTERS/NUMBERS/UNDERSCORES/HYPHENS.', 'err'); return; }
-    if (!password) { vaultSetStatus('> PASSWORD REQUIRED.', 'err'); return; }
-    if (password !== pass2) { vaultSetStatus('> PASSWORDS DO NOT MATCH.', 'err'); return; }
+    if (!username) { vaultSetStatus('> OPERATIVE ID REQUIRED. CANNOT PROCESS NULL IDENTITY.', 'err'); return; }
+    if (!password) { vaultSetStatus('> CLEARANCE CODE REQUIRED. CANNOT PROCESS NULL IDENTITY.', 'err'); return; }
+    if (password !== pass2) { vaultSetStatus('> CLEARANCE CODE MISMATCH. TRANSMISSION ABORTED.', 'err'); return; }
     // STEALTH-PACKET: Min 12 chars — hashes stored in public GitHub repo
-    if (password.length < 12) { vaultSetStatus('> PASSWORD TOO SHORT. MINIMUM 12 CHARACTERS.', 'err'); return; }
+    if (password.length < 12) { vaultSetStatus('> CLEARANCE CODE INSUFFICIENT. MINIMUM 12 CHARACTERS REQUIRED.', 'err'); return; }
     if (!vaultToken()) { vaultSetStatus('> OPERATOR TOKEN REQUIRED. CONNECT IN SETTINGS \u2699', 'err'); return; }
     btn.disabled = true;
     vaultSetStatus('> HASHING CREDENTIALS...', 'wait');
@@ -4355,7 +4355,7 @@ document.addEventListener('DOMContentLoaded', function() {
       var reg = await vaultReadRegistry();
       var accounts = (reg.data && reg.data.accounts) ? reg.data.accounts : [];
       if (accounts.find(function(a) { return a.username === username; })) {
-        vaultSetStatus('> USERNAME ALREADY EXISTS. CHOOSE ANOTHER.', 'err');
+        vaultSetStatus('> OPERATIVE ID ALREADY REGISTERED.', 'err');
         btn.disabled = false; return;
       }
       vaultSetStatus('> WRITING TO REGISTRY...', 'wait');
@@ -4368,7 +4368,7 @@ document.addEventListener('DOMContentLoaded', function() {
       });
       await vaultWriteRegistry({ accounts: accounts }, reg.sha);
       vaultSetSession(username);
-      vaultSetStatus('> OPERATOR REGISTERED // WELCOME, ' + username, 'ok');
+      vaultSetStatus('> CLEARANCE GRANTED. OPERATIVE ' + username + ' — OPERATIVE STATUS: ACTIVE.', 'ok');
       passInput.value = ''; pass2Input.value = '';
       setTimeout(function() { vaultRevealApp(username); }, 900);
     } catch(e) {
@@ -4396,7 +4396,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!username) {
       var notice = document.getElementById('vault-locked-notice');
       if (notice) notice.style.display = 'block';
-      addLog('VAULT', 'SIGN IN REQUIRED before generating links.', 'red');
+      addLog('VAULT', 'CLEARANCE REQUIRED before generating links.', 'red');
       return;
     }
     generateLink();
