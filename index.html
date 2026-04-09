@@ -5640,21 +5640,10 @@ var dvAudio = (function() {
     setTimeout(function() { boot(); }, 500);
   });
 
-  /* ── HOOK: MECHANICAL CLICK on all buttons ──────────────────── */
+  /* ── HOOK: MECHANICAL CLICK on EVERY click — full interactivity ── */
   document.addEventListener('click', function(e) {
-    var el    = e.target;
-    var depth = 0;
-    while (el && depth < 4) {
-      if (el.tagName === 'BUTTON' ||
-          (el.hasAttribute && el.hasAttribute('onclick')) ||
-          (el.id && (el.id === 'f1-copy-link-btn' || el.id === 'dv-ambient-btn'))) {
-        click();
-        break;
-      }
-      el = el.parentElement;
-      depth++;
-    }
-  }, true); /* capture phase — fires before onclick handlers */
+    click();
+  }, true); /* capture phase — fires on every single click, everywhere */
 
   /* ── HOOK: SOFT CONFIRM on f1CopyOutputLink ([COPIED] flash) ─── */
   (function() {
