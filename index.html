@@ -1582,6 +1582,19 @@ body.dv-glitching #diss0linkz-auth-gate {
       <div class="ncp-stat-row" style="margin-top:8px;"><span>MATRIX LAYER</span><span style="color:var(--neon);">ACTIVE // 7% OPACITY</span></div>
       <div class="ncp-stat-row" style="margin-top:8px;"><span>ENCRYPTION</span><span style="color:var(--neon);">AES-256 // ZERO-LOG</span></div>
       <div class="ncp-stat-row" style="margin-top:8px;"><span>VERITAS ENGINE</span><span style="color:var(--neon);">GUARDING</span></div>
+      <!-- API-SCAVENGER // DISCORD NODE COUNT -->
+      <div class="ncp-stat-row" style="margin-top:8px;" data-dv-stat="discord-nodes">
+        <span>NETWORK NODES</span>
+        <span id="ncp-discord-nodes" style="display:flex; align-items:center; gap:5px; color:var(--text-dim);">
+          <span id="ncp-discord-dot" style="width:6px; height:6px; border-radius:50%; background:var(--text-dim); flex-shrink:0;"></span>
+          <span id="ncp-discord-label">SCANNING...</span>
+        </span>
+      </div>
+      <!-- API-SCAVENGER // REGISTERED OPERATIVES COUNT -->
+      <div class="ncp-stat-row" style="margin-top:8px;">
+        <span>REGISTERED OPERATIVES</span>
+        <span id="ncp-operative-count" style="color:var(--text-dim);">—</span>
+      </div>
       <!-- SONIC_PHANTOM // AMBIENT HUM CONTROL IN SYSTEM PANEL -->
       <div class="ncp-stat-row" style="margin-top:12px; border-top:1px solid var(--border-dim); padding-top:10px;">
         <span>AUDIO HUM</span>
@@ -1686,6 +1699,9 @@ body.dv-glitching #diss0linkz-auth-gate {
           <span class="status-sep" style="margin:0 10px; opacity:0.4;">|</span>
           <!-- F7: Session timer display -->
           <span id="f7-session-timer" style="color:var(--text-dim);">SESSION: 00:00:00</span>
+          <!-- API-SCAVENGER // COMPACT DISCORD NODE COUNT -->
+          <span class="status-sep" style="margin:0 10px; opacity:0.4;">|</span>
+          <span id="header-discord-nodes" style="color:var(--text-dim); font-size:10px; letter-spacing:1.5px;">◈ — NODES</span>
         </div>
 
         <!-- Right: gear + EXIT PORTAL -->
@@ -5550,6 +5566,131 @@ var dvAudio = (function() {
 
 })();
 /* END SONIC_PHANTOM // WEB AUDIO MODULE */
+</script>
+
+<script>
+/* ================================================================
+   API-SCAVENGER // DISCORD NODE COUNT + OPERATIVE REGISTRY COUNT
+   IRONWIRE | Claude Code | DISSOVERSE LLC | 2026-04-09
+   ================================================================ */
+
+/* ── OPERATOR: set your Discord Guild ID here ─────────────────── */
+const DV_DISCORD_GUILD_ID = 'YOUR_GUILD_ID'; // operator fills this in
+
+(function dvDiscordScavenger() {
+  'use strict';
+
+  /* DOM targets */
+  var dotEl    = document.getElementById('ncp-discord-dot');
+  var labelEl  = document.getElementById('ncp-discord-label');
+  var headerEl = document.getElementById('header-discord-nodes');
+  var opEl     = document.getElementById('ncp-operative-count');
+
+  /* ── HELPERS ──────────────────────────────────────────────── */
+  function setOnline(count) {
+    if (!dotEl || !labelEl || !headerEl) return;
+    /* Green pulsing dot */
+    dotEl.style.background = 'var(--neon)';
+    dotEl.style.boxShadow  = '0 0 6px var(--neon)';
+    dotEl.style.animation  = 'dv-link-pulse 2s ease-in-out infinite';
+    labelEl.style.color    = 'var(--neon)';
+    labelEl.textContent    = count + ' ONLINE';
+    headerEl.style.color   = 'var(--neon-dim)';
+    headerEl.textContent   = '\u25C8 ' + count + ' NODES';
+  }
+
+  function setOffline(msg) {
+    if (!dotEl || !labelEl || !headerEl) return;
+    dotEl.style.background = 'var(--red-warn)';
+    dotEl.style.boxShadow  = '0 0 6px var(--red-glow)';
+    dotEl.style.animation  = 'none';
+    labelEl.style.color    = 'var(--text-dim)';
+    labelEl.textContent    = msg || 'OFFLINE';
+    headerEl.style.color   = 'var(--text-dim)';
+    headerEl.textContent   = '\u25C8 ' + (msg || 'OFFLINE');
+  }
+
+  /* ── MAIN FETCH ───────────────────────────────────────────── */
+  async function dvLoadDiscordStats() {
+    /* Guard: placeholder ID → show SIGNAL DARK immediately, no fetch */
+    if (!DV_DISCORD_GUILD_ID || DV_DISCORD_GUILD_ID === 'YOUR_GUILD_ID') {
+      setOffline('SIGNAL DARK');
+      return;
+    }
+    try {
+      var resp = await fetch(
+        'https://discord.com/api/guilds/' + DV_DISCORD_GUILD_ID + '/widget.json',
+        { cache: 'no-store' }
+      );
+      if (!resp.ok) {
+        /* 403 usually means widget disabled */
+        setOffline(resp.status === 403 ? 'SIGNAL DARK' : 'OFFLINE');
+        return;
+      }
+      var data = await resp.json();
+      var count = (typeof data.presence_count === 'number') ? data.presence_count : 0;
+      if (count > 0) {
+        setOnline(count);
+      } else {
+        setOffline('0 ONLINE');
+        if (dotEl) {
+          dotEl.style.background = 'var(--neon)';
+          dotEl.style.boxShadow  = '0 0 4px var(--neon-glow)';
+          dotEl.style.animation  = 'none';
+        }
+        if (labelEl) { labelEl.style.color = 'var(--neon-dim)'; labelEl.textContent = '0 ONLINE'; }
+        if (headerEl) { headerEl.style.color = 'var(--text-dim)'; headerEl.textContent = '\u25C8 0 NODES'; }
+      }
+    } catch (e) {
+      /* Network error — fail silently */
+      setOffline('OFFLINE');
+    }
+  }
+
+  /* ── OPERATIVE COUNT (once on load, no polling) ───────────── */
+  async function dvLoadOperativeCount() {
+    if (!opEl) return;
+    try {
+      var token = sessionStorage.getItem('gh_pat') || '';
+      var headers = { 'Accept': 'application/vnd.github+json' };
+      if (token) headers['Authorization'] = 'Bearer ' + token;
+      var resp = await fetch(
+        'https://api.github.com/repos/analogflowers-coder/dissolinks/contents/accounts/registry.json',
+        { headers: headers, cache: 'no-store' }
+      );
+      if (!resp.ok) { opEl.textContent = '—'; return; }
+      var json = await resp.json();
+      var raw  = atob(json.content.replace(/\s/g, ''));
+      var reg  = JSON.parse(raw);
+      var count = 0;
+      if (reg && reg.accounts && Array.isArray(reg.accounts)) {
+        count = reg.accounts.length;
+      }
+      opEl.style.color   = 'var(--neon)';
+      opEl.textContent   = count;
+    } catch (e) {
+      /* Fail silently */
+      opEl.textContent = '—';
+    }
+  }
+
+  /* ── INIT ─────────────────────────────────────────────────── */
+  function dvScavengerInit() {
+    dvLoadDiscordStats();
+    dvLoadOperativeCount();
+    /* Refresh Discord count every 5 minutes */
+    setInterval(dvLoadDiscordStats, 5 * 60 * 1000);
+  }
+
+  /* Run after DOM ready */
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', dvScavengerInit);
+  } else {
+    dvScavengerInit();
+  }
+
+})();
+/* END API-SCAVENGER // DISCORD NODE COUNT + OPERATIVE REGISTRY COUNT */
 </script>
 </body>
 </html>
