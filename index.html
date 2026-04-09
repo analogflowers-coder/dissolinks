@@ -1360,56 +1360,7 @@ function updateTokenStatus() {
 }
 
 
-function openSettings() {
-  document.getElementById('settings-modal').style.display = 'flex';
-  const existing = sessionStorage.getItem('gh_pat');
-  if (existing) document.getElementById('pat-input').value = existing;
-  document.getElementById('token-feedback').textContent = '';
-}
-
-function closeSettings() {
-  document.getElementById('settings-modal').style.display = 'none';
-}
-
-function saveToken() {
-  const val = document.getElementById('pat-input').value.trim();
-  const fb = document.getElementById('token-feedback');
-  if (!val) {
-    fb.style.color = 'var(--red-warn)';
-    fb.textContent = 'NO TOKEN ENTERED';
-    return;
-  }
-  sessionStorage.setItem('gh_pat', val);
-  updateTokenStatus();
-  fb.style.color = 'var(--neon)';
-  fb.textContent = '✓ TOKEN SAVED TO SESSION';
-  setTimeout(closeSettings, 900);
-}
-
-function clearToken() {
-  sessionStorage.removeItem('gh_pat');
-  document.getElementById('pat-input').value = '';
-  const fb = document.getElementById('token-feedback');
-  fb.style.color = 'var(--text-dim)';
-  fb.textContent = 'TOKEN CLEARED';
-  updateTokenStatus();
-}
-
-function updateTokenStatus() {
-  const hasToken = !!sessionStorage.getItem('gh_pat');
-  const el = document.getElementById('token-status');
-  if (hasToken) {
-    el.textContent = 'CONNECTED';
-    el.style.color = 'var(--neon)';
-    el.style.textShadow = '0 0 6px var(--neon-glow)';
-  } else {
-    el.textContent = 'NO TOKEN';
-    el.style.color = 'var(--text-dim)';
-    el.style.textShadow = 'none';
-  }
-  updateDeployButtonVisibility();
-  loadActiveLinks();
-}
+// NCP settings functions defined above in NODE CONTROL PANEL block
 
 function updateDeployButtonVisibility() {
   const hasToken = !!sessionStorage.getItem('gh_pat');
@@ -2110,7 +2061,7 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
    DISS0LINKZ AUTH GATE v3.0
    IRONWIRE | Claude Code | Node 002 | DISSOVERSE LLC
    PBKDF2-SHA256 | 200,000 iterations
-   Password: 444 | Hash: 871b590d0eb2de04c0f25f7e0d69f3986b8a7e21303d909ddade2a00e1fb46a4
+   Hash: 871b590d0eb2de04c0f25f7e0d69f3986b8a7e21303d909ddade2a00e1fb46a4
    ================================================================ */
 (function() {
   'use strict';
