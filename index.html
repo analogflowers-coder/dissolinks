@@ -3876,7 +3876,7 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
   // ── GLITCH CYCLE ────────────────────────────────────────────────
   function triggerGlitch() {
     document.body.classList.add('dv-glitching');
-    if (window.dvAudio) dvAudio.glitchSound();
+    // Audio removed — visual glitch only, no sound
     setTimeout(function() { document.body.classList.remove('dv-glitching'); }, 400);
   }
   function scheduleGlitch() {
