@@ -311,6 +311,42 @@
   ::-webkit-scrollbar-track { background: var(--bg-deep); }
   ::-webkit-scrollbar-thumb { background: var(--border-mid); }
   ::-webkit-scrollbar-thumb:hover { background: var(--neon-dim); }
+
+/* === DISS0LINKZ LOGO === */
+@keyframes dv-logo-glow-pulse {
+  0%, 100% { filter: drop-shadow(0 0 6px rgba(0,255,65,0.45)) drop-shadow(0 0 12px rgba(0,255,65,0.2)); }
+  50%       { filter: drop-shadow(0 0 18px rgba(0,255,65,0.85)) drop-shadow(0 0 36px rgba(0,255,65,0.35)); }
+}
+
+@keyframes dv-logo-glitch {
+  0%   { transform: translate(0) skewX(0deg);      filter: drop-shadow(0 0 8px rgba(0,255,65,0.6)); }
+  10%  { transform: translate(-4px, 2px) skewX(-3deg); filter: drop-shadow(0 0 28px rgba(0,255,65,1)) hue-rotate(20deg) brightness(1.4); }
+  20%  { transform: translate(4px, -2px) skewX(3deg);  filter: drop-shadow(0 0 32px rgba(0,255,65,0.9)) hue-rotate(-20deg) brightness(1.3); }
+  30%  { transform: translate(-3px, -1px) skewX(-1deg); filter: drop-shadow(0 0 20px rgba(0,255,65,0.8)) brightness(1.2); }
+  40%  { transform: translate(3px, 1px) skewX(2deg);   filter: drop-shadow(0 0 36px rgba(0,255,65,1)) brightness(1.5); }
+  50%  { transform: translate(-1px, 2px) skewX(0deg);  filter: drop-shadow(0 0 14px rgba(0,255,65,0.7)); }
+  60%  { transform: translate(2px, -1px);               filter: drop-shadow(0 0 10px rgba(0,255,65,0.6)) brightness(1.1); }
+  70%  { transform: translate(-2px, 1px) skewX(-1deg); filter: drop-shadow(0 0 22px rgba(0,255,65,0.9)) hue-rotate(10deg); }
+  80%  { transform: translate(1px, -2px);               filter: drop-shadow(0 0 18px rgba(0,255,65,0.8)); }
+  90%  { transform: translate(-1px, 1px);               filter: drop-shadow(0 0 12px rgba(0,255,65,0.65)); }
+  100% { transform: translate(0) skewX(0deg);      filter: drop-shadow(0 0 8px rgba(0,255,65,0.6)); }
+}
+
+.diss0linkz-logo-wrap {
+  display: inline-block;
+  animation: dv-logo-glow-pulse 1.8s ease-in-out infinite;
+}
+
+.diss0linkz-logo-img {
+  height: clamp(40px, 7vw, 64px);
+  width: auto;
+  display: block;
+  max-width: 280px;
+}
+
+.diss0linkz-logo-wrap.glitching {
+  animation: dv-logo-glitch 0.55s steps(3) forwards;
+}
 </style>
 </head>
 <body>
@@ -391,10 +427,16 @@ if(sessionStorage.getItem('dv_access')==='1'){document.getElementById('access-ga
   <header class="p-4 sm:p-6 border-b" style="border-color: var(--border-dim);">
     <div class="max-w-4xl mx-auto flex items-center justify-between flex-wrap gap-4">
       <div>
-        <h1 class="glitch-text" style="font-family:'VT323',monospace; font-size: clamp(28px, 6vw, 42px); letter-spacing: 3px; text-shadow: 0 0 15px var(--neon-glow);">
-          DissOLinK's
-        </h1>
-        <div style="font-size:10px; color: var(--text-dim); letter-spacing: 3px; margin-top:2px;">
+        <div class="diss0linkz-logo-wrap" id="diss0linkz-logo-wrap">
+          <img
+            src="https://cdn.shopify.com/s/files/1/0897/5686/0735/files/Diss0Links---CHROME.png?v=1775720592"
+            alt="DISS0LINKZ // DISSOVERSE Neural Network"
+            class="diss0linkz-logo-img"
+            width="240"
+            height="auto"
+          >
+        </div>
+        <div style="font-size:10px; color: var(--text-dim); letter-spacing: 3px; margin-top:6px;">
           SOVEREIGN DEEP LINK GENERATOR v1.0
         </div>
       </div>
@@ -1284,6 +1326,23 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
     lbl.style.textShadow = 'none';
   }
 });
+</script>
+
+<script>
+/* === DISS0LINKZ LOGO GLITCH TRIGGER === */
+(function() {
+  var wrap = document.getElementById('diss0linkz-logo-wrap');
+  if (!wrap) return;
+  setInterval(function() {
+    wrap.classList.add('glitching');
+    setTimeout(function() {
+      wrap.classList.remove('glitching');
+      wrap.style.animation = '';
+      void wrap.offsetWidth; /* force reflow */
+      wrap.style.animation = null;
+    }, 600);
+  }, 3000);
+})();
 </script>
 
 </body>
