@@ -5938,10 +5938,9 @@ var dvAudio = (function() {
     return _humActive;
   }
 
-  /* ── BOOT TONES: fire on DOMContentLoaded (500ms delay) ──────── */
-  document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(function() { boot(); }, 500);
-  });
+  /* ── BOOT TONES: DISABLED — no auto-play sounds on load ──────── */
+  /* Boot tones removed to prevent unwanted beeping on page load.
+     All sounds now require explicit user interaction (button click). */
 
   /* ── HOOK: BLEEP only on BUTTONS + INTERACTIVE elements ── */
   document.addEventListener('click', function(e) {
