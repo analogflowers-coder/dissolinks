@@ -3667,6 +3667,7 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
   // ── GLITCH CYCLE ────────────────────────────────────────────────
   function triggerGlitch() {
     document.body.classList.add('dv-glitching');
+    if (window.dvAudio) dvAudio.glitchSound();
     setTimeout(function() { document.body.classList.remove('dv-glitching'); }, 400);
   }
   function scheduleGlitch() {
@@ -3949,6 +3950,10 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
     }
 
     document.body.classList.add('dv-gate-active');
+    // Play terminal open sound when terminal slit appears (at 2.2s delay)
+    setTimeout(function() {
+      if (window.dvAudio) dvAudio.terminalOpen();
+    }, 2200);
     // Wait for "the matrix has you" text (2.2s) + terminal open (1.8s) then boot text
     setTimeout(function() {
       runBootSequence();
@@ -5442,7 +5447,8 @@ var dvAudio = (function() {
   /* Guard: browser must support AudioContext */
   if (!window.AudioContext && !window.webkitAudioContext) {
     return { click: function(){}, confirm: function(){}, error: function(){},
-             boot: function(){}, startHum: function(){}, stopHum: function(){},
+             boot: function(){}, terminalOpen: function(){}, glitchSound: function(){},
+             startHum: function(){}, stopHum: function(){},
              toggleHum: function(){}, isHumOn: function(){ return false; } };
   }
 
@@ -5588,6 +5594,61 @@ var dvAudio = (function() {
       /* Defer until first user interaction (AudioContext requires gesture) */
       _bootQueued = true;
     }
+  }
+
+  /* ── 5b. TERMINAL OPEN SOUND ─────────────────────────────────── */
+  /* Rising sine sweep 80→400Hz over 800ms + white noise burst, gain 0.07 */
+  function terminalOpen() {
+    try {
+      var ctx = _getCtx();
+      if (!ctx) return;
+      var t = ctx.currentTime;
+      // Rising sine sweep (the "powering on" tone)
+      var osc = ctx.createOscillator();
+      var g = ctx.createGain();
+      osc.connect(g); g.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(80, t);
+      osc.frequency.exponentialRampToValueAtTime(400, t + 0.8);
+      g.gain.setValueAtTime(0.07, t);
+      g.gain.linearRampToValueAtTime(0.0, t + 1.0);
+      osc.start(t); osc.stop(t + 1.0);
+      // Layered white noise burst (CRT static)
+      var bufLen = ctx.sampleRate * 0.3;
+      var buf = ctx.createBuffer(1, bufLen, ctx.sampleRate);
+      var data = buf.getChannelData(0);
+      for (var i = 0; i < bufLen; i++) data[i] = (Math.random() * 2 - 1) * 0.4;
+      var noise = ctx.createBufferSource();
+      var ng = ctx.createGain();
+      noise.buffer = buf;
+      noise.connect(ng); ng.connect(ctx.destination);
+      ng.gain.setValueAtTime(0.04, t);
+      ng.gain.linearRampToValueAtTime(0.0, t + 0.3);
+      noise.start(t); noise.stop(t + 0.3);
+    } catch(e) {}
+  }
+
+  /* ── 5c. GLITCH SOUND (4dB below terminal open) ───────────────── */
+  /* Distorted square 200Hz + random freq jumps, gain 0.035 (~4dB below 0.07) */
+  function glitchSound() {
+    try {
+      var ctx = _getCtx();
+      if (!ctx) return;
+      var t = ctx.currentTime;
+      var osc = ctx.createOscillator();
+      var g = ctx.createGain();
+      osc.connect(g); g.connect(ctx.destination);
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(200, t);
+      osc.frequency.setValueAtTime(800, t + 0.03);
+      osc.frequency.setValueAtTime(150, t + 0.06);
+      osc.frequency.setValueAtTime(1200, t + 0.09);
+      osc.frequency.setValueAtTime(300, t + 0.12);
+      osc.frequency.setValueAtTime(60, t + 0.15);
+      g.gain.setValueAtTime(0.035, t);
+      g.gain.linearRampToValueAtTime(0.0, t + 0.2);
+      osc.start(t); osc.stop(t + 0.2);
+    } catch(e) {}
   }
 
   /* ── 5. AMBIENT LOW HUM ─────────────────────────────────────── */
@@ -5781,13 +5842,15 @@ var dvAudio = (function() {
   /* ── EXPOSE PUBLIC API ──────────────────────────────────────── */
   return {
     click:     click,
-    confirm:   confirm,
-    error:     error,
-    boot:      boot,
-    startHum:  startHum,
-    stopHum:   stopHum,
-    toggleHum: toggleHum,
-    isHumOn:   function() { return _humActive; }
+    confirm:      confirm,
+    error:        error,
+    boot:         boot,
+    terminalOpen: terminalOpen,
+    glitchSound:  glitchSound,
+    startHum:     startHum,
+    stopHum:      stopHum,
+    toggleHum:    toggleHum,
+    isHumOn:      function() { return _humActive; }
   };
 
 })();
