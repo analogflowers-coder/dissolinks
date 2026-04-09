@@ -421,6 +421,122 @@
 .diss0linkz-logo-wrap.glitching {
   animation: dv-logo-glitch 0.55s steps(3) forwards;
 }
+
+/* LUXURY OVERLAY // VANTABLACK x CHROMATIC_VOID */
+.dv-luxury-grain {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 9997;
+  opacity: 0.035;
+  mix-blend-mode: overlay;
+  filter: url(#dv-grain);
+}
+
+/* BIOMETRIC PULSE // SILK_SCANNER */
+#dv-biometric-scan {
+  position: fixed;
+  inset: 0;
+  z-index: 9996;
+  background: rgba(0,0,0,0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.6s ease;
+  font-family: 'Share Tech Mono', monospace;
+}
+#dv-biometric-scan.dv-bio-fading {
+  opacity: 0;
+  pointer-events: none;
+}
+.dv-bio-panel {
+  width: min(420px, 90vw);
+  border: 1px solid rgba(0,255,65,0.5);
+  background: rgba(0,4,0,0.92);
+  padding: 28px 24px 20px;
+  box-shadow: 0 0 40px rgba(0,255,65,0.2), inset 0 0 30px rgba(0,255,65,0.03);
+  position: relative;
+  overflow: hidden;
+}
+.dv-bio-title {
+  font-size: 11px;
+  color: rgba(0,255,65,0.5);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  text-align: center;
+}
+.dv-bio-text {
+  font-size: 14px;
+  color: var(--neon);
+  letter-spacing: 2px;
+  text-align: center;
+  text-shadow: 0 0 10px rgba(0,255,65,0.5);
+  min-height: 22px;
+  margin-bottom: 18px;
+  transition: all 0.2s;
+}
+.dv-bio-bar-wrap {
+  width: 100%; height: 3px;
+  background: rgba(0,255,65,0.08);
+  border: 1px solid rgba(0,255,65,0.15);
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.dv-bio-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--neon), #00cc33);
+  box-shadow: 0 0 8px var(--neon);
+  width: 0%;
+  transition: width 2.5s ease;
+}
+@keyframes dv-scanline {
+  0% { top: -4px; }
+  100% { top: 100%; }
+}
+.dv-bio-scanline {
+  position: absolute;
+  left: 0; right: 0;
+  height: 4px;
+  background: rgba(0,255,65,0.15);
+  box-shadow: 0 0 12px rgba(0,255,65,0.4);
+  animation: dv-scanline 1.5s linear infinite;
+  pointer-events: none;
+}
+
+/* DYNAMIC ENTROPY // RAIN_DANCER x REACTIVE_SOUL */
+#dv-entropy-message {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  padding: 14px 20px;
+  background: rgba(0,0,0,0.92);
+  border-top: 1px solid rgba(0,255,65,0.3);
+  text-align: center;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  color: var(--neon);
+  letter-spacing: 3px;
+  text-shadow: 0 0 16px rgba(0,255,65,0.8);
+  z-index: 9000;
+  display: none;
+  opacity: 0;
+  transition: opacity 1.5s ease;
+  pointer-events: none;
+}
+#dv-entropy-message.dv-entropy-visible {
+  opacity: 1;
+}
+
+.dv-entropy-glitching {
+  animation: dv-entropy-char-glitch 0.2s steps(2) forwards;
+}
+@keyframes dv-entropy-char-glitch {
+  0% { opacity: 1; filter: none; }
+  33% { opacity: 0.6; filter: hue-rotate(30deg) brightness(1.4); letter-spacing: 4px; }
+  66% { opacity: 0.8; filter: hue-rotate(-20deg); letter-spacing: 1px; }
+  100% { opacity: 1; filter: none; }
+}
 </style>
 <style>
 /* ================================================================
@@ -1198,6 +1314,39 @@ body.dv-glitching #diss0linkz-auth-gate {
 </style>
 </head>
 <body>
+
+<!-- LUXURY OVERLAY // VANTABLACK x CHROMATIC_VOID -->
+<svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden;" aria-hidden="true">
+  <defs>
+    <filter id="dv-grain" x="0%" y="0%" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" result="noise"/>
+      <feColorMatrix type="saturate" values="0" in="noise" result="grayNoise"/>
+      <feBlend in="SourceGraphic" in2="grayNoise" mode="overlay" result="blend"/>
+      <feComposite in="blend" in2="SourceGraphic" operator="in"/>
+    </filter>
+  </defs>
+</svg>
+<div class="dv-luxury-grain" aria-hidden="true"></div>
+<!-- END LUXURY OVERLAY // VANTABLACK x CHROMATIC_VOID -->
+
+<!-- BIOMETRIC PULSE // SILK_SCANNER -->
+<div id="dv-biometric-scan" style="display:none;">
+  <div class="dv-bio-panel">
+    <div class="dv-bio-scanline"></div>
+    <div class="dv-bio-title">DISSOVERSE // SECURITY CLEARANCE VERIFICATION</div>
+    <div class="dv-bio-text" id="dv-bio-text">SCANNING BIOMETRIC SIGNATURE...</div>
+    <div class="dv-bio-bar-wrap">
+      <div class="dv-bio-bar-fill" id="dv-bio-bar"></div>
+    </div>
+    <div style="font-size:9px; color:rgba(0,255,65,0.35); text-align:center; letter-spacing:2px; margin-top:6px;">VOID_STRIDE PROTOCOL // VERITAS ENGINE</div>
+  </div>
+</div>
+<!-- END BIOMETRIC PULSE // SILK_SCANNER -->
+
+<!-- DYNAMIC ENTROPY // RAIN_DANCER x REACTIVE_SOUL -->
+<div id="dv-entropy-message" aria-hidden="true">YOU HAVE BEEN IN THE VOID LONG ENOUGH. THE SIGNAL IS YOURS.</div>
+<!-- END DYNAMIC ENTROPY // RAIN_DANCER x REACTIVE_SOUL -->
+
 <!-- DEPTH PARTICLE CANVAS -->
 <canvas id="dv-particles-canvas"></canvas>
 
@@ -1506,7 +1655,7 @@ body.dv-glitching #diss0linkz-auth-gate {
           <span class="status-sep" style="margin:0 10px; opacity:0.4;">|</span>
           <span id="clock"></span>
           <span class="status-sep" style="margin:0 10px; opacity:0.4;">|</span>
-          <span>NODE: <span style="color:var(--neon);">PRPL TWR</span></span>
+          <span>NODE: <span style="color:var(--neon);" class="dv-entropy-target">PRPL TWR</span></span>
           <span class="status-sep" style="margin:0 10px; opacity:0.4;">|</span>
           <!-- F7: Session timer display -->
           <span id="f7-session-timer" style="color:var(--text-dim);">SESSION: 00:00:00</span>
@@ -1559,9 +1708,9 @@ body.dv-glitching #diss0linkz-auth-gate {
     <!-- System Status Bar -->
     <div class="glass-panel p-3 flex flex-wrap gap-4 items-center justify-between" style="font-size:11px;">
       <div class="flex gap-4 flex-wrap">
-        <span>NODE: <span style="color:var(--neon);">PRPL TWR</span></span>
+        <span>NODE: <span style="color:var(--neon);" class="dv-entropy-target">PRPL TWR</span></span>
         <span>ENCRYPTION: <span style="color:var(--neon);">AES-256</span></span>
-        <span>PROTOCOL: <span style="color:var(--neon);">VOID_STRIDE</span></span>
+        <span>PROTOCOL: <span style="color:var(--neon);" class="dv-entropy-target">VOID_STRIDE</span></span>
       </div>
       <div style="color:var(--text-dim);">
         ZERO-LOG // SERVERLESS // SOVEREIGN
@@ -1581,7 +1730,7 @@ body.dv-glitching #diss0linkz-auth-gate {
         <!-- DRAWER: VOID_STRIDE PROTOCOL -->
         <div style="border-bottom:1px solid var(--border-dim); margin-bottom:8px; font-family:'Share Tech Mono',monospace; text-transform:uppercase;">
           <button onclick="toggleDrawer('drawer-protocol')" style="width:100%; background:transparent; border:none; cursor:pointer; display:flex; align-items:center; justify-content:space-between; padding:6px 0 8px 0; font-family:'Share Tech Mono',monospace; font-size:11px; letter-spacing:3px; text-transform:uppercase; color:var(--neon); animation:manifest-glow 4s ease-in-out infinite;">
-            <span>VOID_STRIDE // MATRIX EXTRACTION PROTOCOL</span>
+            <span class="dv-entropy-target">VOID_STRIDE // MATRIX EXTRACTION PROTOCOL</span>
             <span id="drawer-protocol-icon" style="font-size:12px; transition:transform 0.3s; flex-shrink:0; margin-left:10px;">&#9658;</span>
           </button>
           <div id="drawer-protocol" style="overflow:hidden; max-height:0; transition:max-height 0.45s ease, opacity 0.35s ease; opacity:0; font-size:10px; letter-spacing:1.8px;">
@@ -1608,7 +1757,7 @@ body.dv-glitching #diss0linkz-auth-gate {
 
         <!-- F3: QUICK TARGETS // PRESETS -->
         <div id="f3-presets-section" style="margin-bottom:10px;">
-          <div style="font-size:11px; color:var(--text-dim); letter-spacing:2px; margin-bottom:6px;">QUICK TARGETS //</div>
+          <div class="dv-entropy-target" style="font-size:11px; color:var(--text-dim); letter-spacing:2px; margin-bottom:6px;">QUICK TARGETS //</div>
           <div id="f3-preset-chips" style="display:flex; flex-wrap:wrap; gap:6px; min-height:26px; margin-bottom:6px;"></div>
           <div style="display:flex; gap:6px; align-items:stretch;">
             <button onclick="f3SavePreset()" class="btn-neon" style="font-size:10px; padding:5px 12px; letter-spacing:1.5px; flex-shrink:0;">+ SAVE AS PRESET</button>
@@ -1846,7 +1995,7 @@ body.dv-glitching #diss0linkz-auth-gate {
     <div class="glass-panel" style="overflow:hidden;">
       <div class="p-3 flex items-center gap-2 border-b" style="border-color: var(--border-dim); background: rgba(0,0,0,0.3);">
         <span style="color:var(--neon);">●</span>
-        <span style="font-size:11px; color:var(--text-dim); margin-left:8px;">terminal://dissoverse/active-links</span>
+        <span class="dv-entropy-target" style="font-size:11px; color:var(--text-dim); margin-left:8px;">terminal://dissoverse/active-links</span>
         <!-- F6: SWEEP LINKS health check button -->
         <button onclick="f6SweepLinks()" style="margin-left:auto; background:transparent; border:1px solid var(--border-dim); color:var(--text-dim); font-family:'Share Tech Mono',monospace; font-size:10px; padding:3px 10px; cursor:pointer; letter-spacing:1px; transition:all 0.3s;" onmouseover="this.style.borderColor='var(--neon)';this.style.color='var(--neon)'" onmouseout="this.style.borderColor='var(--border-dim)';this.style.color='var(--text-dim)'" title="Check health of all links">⬡ SWEEP LINKS</button>
         <button onclick="loadActiveLinks()" style="background:transparent; border:1px solid var(--border-dim); color:var(--text-dim); font-family:'Share Tech Mono',monospace; font-size:10px; padding:3px 10px; cursor:pointer; letter-spacing:1px; transition:all 0.3s;" onmouseover="this.style.borderColor='var(--neon)';this.style.color='var(--neon)'" onmouseout="this.style.borderColor='var(--border-dim)';this.style.color='var(--text-dim)'">↻ REFRESH</button>
@@ -4743,6 +4892,260 @@ document.addEventListener('DOMContentLoaded', function() {
     f4F6EnhanceCards();
   }, 2000);
 });
+</script>
+
+<script>
+/* ================================================================
+   LUXE-CELL FEATURE PACK // DISSOVERSE LLC 2026
+   B: HAPTIC GLITCH // SONIC_PHANTOM
+   C: BIOMETRIC PULSE // SILK_SCANNER
+   D: DYNAMIC ENTROPY // RAIN_DANCER x REACTIVE_SOUL
+   ================================================================ */
+
+/* ── HAPTIC GLITCH // SONIC_PHANTOM ─────────────────────────── */
+function dvHaptic(pattern) {
+  if (!('vibrate' in navigator)) return;
+  try { navigator.vibrate(pattern); } catch(e) {}
+}
+/* END HAPTIC GLITCH // SONIC_PHANTOM */
+
+/* ── HOOK HAPTIC INTO KEY INTERACTIONS ──────────────────────── */
+document.addEventListener('DOMContentLoaded', function() {
+
+  // Generate button — button click haptic
+  var genBtn = document.getElementById('vault-generate-btn');
+  if (genBtn) {
+    genBtn.addEventListener('click', function() { dvHaptic([15]); }, { capture: true });
+  }
+
+  // Copy link button — success haptic
+  var copyBtn = document.querySelector('button.btn-neon.btn-deploy[onclick="copyLink()"]');
+  if (copyBtn) {
+    copyBtn.addEventListener('click', function() { dvHaptic([20]); }, { capture: true });
+  }
+
+  // QR generate button — click haptic
+  var qrBtn = document.querySelector('button[onclick="f5GenerateQR()"]');
+  if (qrBtn) {
+    qrBtn.addEventListener('click', function() { dvHaptic([15]); }, { capture: true });
+  }
+
+  // Auth submit button — click haptic
+  var authBtn = document.getElementById('dv-submit-btn');
+  if (authBtn) {
+    authBtn.addEventListener('click', function() { dvHaptic([15]); }, { capture: true });
+  }
+
+  // Vault sign in button — click haptic
+  var vaultBtn = document.getElementById('vault-signin-btn');
+  if (vaultBtn) {
+    vaultBtn.addEventListener('click', function() { dvHaptic([15]); }, { capture: true });
+  }
+
+});
+
+// Patch f1CopyOutputLink for SUCCESS haptic
+var _origF1Copy = window.f1CopyOutputLink;
+if (typeof _origF1Copy === 'function') {
+  window.f1CopyOutputLink = function(btn) {
+    dvHaptic([20]);
+    _origF1Copy.call(this, btn);
+  };
+}
+
+// Patch deployLive for SUCCESS haptic
+var _origDeployLive = window.deployLive;
+if (typeof _origDeployLive === 'function') {
+  window.deployLive = async function() {
+    dvHaptic([20]);
+    return _origDeployLive.apply(this, arguments);
+  };
+}
+
+// Patch showErrorPopup for ERROR/DEAD haptic
+var _origShowErrorPopup = window.showErrorPopup;
+if (typeof _origShowErrorPopup === 'function') {
+  window.showErrorPopup = function(code, title, msg, cb) {
+    dvHaptic([50,30,50]);
+    _origShowErrorPopup.call(this, code, title, msg, cb);
+  };
+}
+
+// Patch triggerGlitch (auth gate glitch) for haptic
+// triggerGlitch is defined inside the auth gate IIFE — patch via body class observer
+(function() {
+  var obs = new MutationObserver(function(mutations) {
+    mutations.forEach(function(m) {
+      if (m.type === 'attributes' && m.attributeName === 'class') {
+        if (document.body.classList.contains('dv-glitching')) {
+          dvHaptic([30]);
+        }
+      }
+    });
+  });
+  obs.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+})();
+
+/* ── BIOMETRIC PULSE // SILK_SCANNER ────────────────────────── */
+function dvShowBiometricScan(onDone) {
+  if (sessionStorage.getItem('dv_biometric_shown') === '1') {
+    if (onDone) onDone();
+    return;
+  }
+  sessionStorage.setItem('dv_biometric_shown', '1');
+
+  var overlay = document.getElementById('dv-biometric-scan');
+  var textEl  = document.getElementById('dv-bio-text');
+  var barEl   = document.getElementById('dv-bio-bar');
+  if (!overlay) { if (onDone) onDone(); return; }
+
+  overlay.style.display = 'flex';
+  overlay.style.opacity = '1';
+  overlay.classList.remove('dv-bio-fading');
+
+  var msgs = [
+    'SCANNING BIOMETRIC SIGNATURE...',
+    'FREQUENCY: 444Hz DETECTED',
+    'DISSOVERSE CLEARANCE: CONFIRMED',
+    'ENTERING THE VOID...'
+  ];
+  var msgIdx = 0;
+
+  function nextMsg() {
+    if (msgIdx < msgs.length && textEl) {
+      textEl.textContent = msgs[msgIdx++];
+      if (msgIdx < msgs.length) setTimeout(nextMsg, 700);
+    }
+  }
+  nextMsg();
+
+  // Start filling progress bar
+  setTimeout(function() {
+    if (barEl) barEl.style.width = '100%';
+  }, 100);
+
+  // Haptic pulse at scan start
+  dvHaptic([20]);
+
+  // Auto-dismiss after 3 seconds
+  setTimeout(function() {
+    overlay.classList.add('dv-bio-fading');
+    setTimeout(function() {
+      overlay.style.display = 'none';
+      if (onDone) onDone();
+    }, 600);
+  }, 3000);
+}
+
+// Patch vaultRevealApp to trigger biometric scan before revealing app
+(function() {
+  var patchAttempts = 0;
+  function tryPatch() {
+    if (window._vaultRevealApp) {
+      var _origReveal = window._vaultRevealApp;
+      window._vaultRevealApp = function(username) {
+        dvShowBiometricScan(function() {
+          _origReveal.call(window, username);
+        });
+      };
+      // Also patch the local vaultRevealApp called inside the IIFE
+      // via the exposed window.vaultSignIn and window.vaultCreateAccount paths
+      // which call vaultRevealApp directly — intercept via accessGranted path too
+    } else {
+      patchAttempts++;
+      if (patchAttempts < 20) setTimeout(tryPatch, 150);
+    }
+  }
+  tryPatch();
+})();
+
+// Also hook biometric scan on direct cookie-based auth (returning users)
+// by patching the app-visible class addition on DOMContentLoaded
+document.addEventListener('DOMContentLoaded', function() {
+  var app = document.getElementById('diss0linkz-app');
+  if (!app) return;
+  // If app is already visible (cookie auth skip) — trigger biometric once
+  if (app.classList.contains('app-visible')) {
+    dvShowBiometricScan(null);
+  } else {
+    // Observe for when app becomes visible
+    var bioObs = new MutationObserver(function(muts) {
+      muts.forEach(function(m) {
+        if (m.type === 'attributes' && m.attributeName === 'class') {
+          if (app.classList.contains('app-visible') && !sessionStorage.getItem('dv_biometric_shown')) {
+            dvShowBiometricScan(null);
+            bioObs.disconnect();
+          }
+        }
+      });
+    });
+    bioObs.observe(app, { attributes: true, attributeFilter: ['class'] });
+  }
+});
+/* END BIOMETRIC PULSE // SILK_SCANNER */
+
+/* ── DYNAMIC ENTROPY // RAIN_DANCER x REACTIVE_SOUL ─────────── */
+var _dvEntropyKatakana = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホ';
+var _dvEntropySymbols  = '■□▪▫▸▹▶◉◈◆◇⬡⬢⬟⬠░▒▓';
+var _dvEntropyChars    = _dvEntropyKatakana + _dvEntropySymbols + '01█▌▐';
+
+function dvEntropyGlitch(el) {
+  if (!el || el._entropyActive) return;
+  el._entropyActive = true;
+  var original = el.textContent;
+  var glitched = original.split('').map(function(c) {
+    if (c === ' ') return ' ';
+    return _dvEntropyChars[Math.floor(Math.random() * _dvEntropyChars.length)];
+  }).join('');
+  el.textContent = glitched;
+  el.classList.add('dv-entropy-glitching');
+  setTimeout(function() {
+    el.textContent = original;
+    el.classList.remove('dv-entropy-glitching');
+    el._entropyActive = false;
+  }, 200);
+}
+
+function dvEntropyStage1() {
+  // Stage 1 (5 min): random occasional glitches on entropy targets
+  var targets = document.querySelectorAll('.dv-entropy-target');
+  if (!targets.length) return;
+  function randomGlitch() {
+    var el = targets[Math.floor(Math.random() * targets.length)];
+    dvEntropyGlitch(el);
+    setTimeout(randomGlitch, 3000 + Math.random() * 5000);
+  }
+  randomGlitch();
+}
+
+function dvEntropyStage2() {
+  // Stage 2 (10 min): all targets cycle through corrupted versions every 2-4s
+  var targets = document.querySelectorAll('.dv-entropy-target');
+  if (!targets.length) return;
+  var idx = 0;
+  setInterval(function() {
+    dvEntropyGlitch(targets[idx % targets.length]);
+    idx++;
+  }, 2200 + Math.random() * 2000);
+}
+
+function dvEntropyStage3() {
+  // Stage 3 (20 min): reveal hidden message
+  var msgEl = document.getElementById('dv-entropy-message');
+  if (!msgEl) return;
+  msgEl.style.display = 'block';
+  // Force reflow before adding transition class
+  void msgEl.offsetWidth;
+  msgEl.classList.add('dv-entropy-visible');
+  dvHaptic([50, 30, 50]);
+}
+
+// Set entropy stage timers (5min, 10min, 20min)
+setTimeout(dvEntropyStage1, 5  * 60 * 1000);
+setTimeout(dvEntropyStage2, 10 * 60 * 1000);
+setTimeout(dvEntropyStage3, 20 * 60 * 1000);
+/* END DYNAMIC ENTROPY // RAIN_DANCER x REACTIVE_SOUL */
+
 </script>
 </body>
 </html>
