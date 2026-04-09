@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Diss0LinkZ // DISSOVERSE Neural Network</title>
 <meta name="description" content="Sovereign Deep Link Generator. Break the walled garden.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⛓</text></svg>">
@@ -1346,6 +1346,15 @@ body.dv-glitching #diss0linkz-auth-gate {
   </defs>
 </svg>
 <div class="dv-luxury-grain" aria-hidden="true"></div>
+<!-- GHOST-SCRIPT: disable luxury grain on low-end devices to eliminate expensive SVG feTurbulence filter -->
+<script>(function(){
+  var isLowEnd = (navigator.hardwareConcurrency <= 2) ||
+                 (navigator.deviceMemory && navigator.deviceMemory < 2);
+  if (isLowEnd) {
+    var grain = document.querySelector('.dv-luxury-grain');
+    if (grain) grain.style.display = 'none';
+  }
+})();</script>
 <!-- END LUXURY OVERLAY // VANTABLACK x CHROMATIC_VOID -->
 
 <!-- BIOMETRIC PULSE // SILK_SCANNER -->
@@ -1435,7 +1444,23 @@ body.dv-glitching #diss0linkz-auth-gate {
 <button id="dv-music-btn" onclick="dvToggleMusic()">&#9834; MUTE</button>
 
 <!-- SONIC_PHANTOM // AMBIENT HUM TOGGLE -->
+<!-- GHOST-SCRIPT: ambient hum is OFF by default on ALL devices. On mobile it is disabled by default to save battery. The toggle remains functional if the user manually enables it. -->
 <button id="dv-ambient-btn" onclick="if(window.dvAudio) dvAudio.toggleHum();">&#11041; AMBIENT // OFF</button>
+<script>(function(){
+  // GHOST-SCRIPT: on mobile, hum starts OFF (already default) — just label it clearly
+  // The toggle is still fully functional if user manually presses the button
+  var isMobile = (window.innerWidth < 768 || navigator.maxTouchPoints > 0);
+  if (isMobile) {
+    document.addEventListener('DOMContentLoaded', function() {
+      var btn = document.getElementById('dv-ambient-btn');
+      if (btn && !btn._ghostScriptMobileLabelSet) {
+        btn._ghostScriptMobileLabelSet = true;
+        // Ensure hum is off and label reflects OFF state — hum defaults off so no stopHum needed
+        btn.textContent = '\u2B21 AMBIENT // OFF';
+      }
+    });
+  }
+})();</script>
 
 <!-- FLASH OVERLAY -->
 <div id="dv-granted-flash"></div>
@@ -2168,7 +2193,8 @@ var _ncpThemes = {
     '--matrix-head':  '#ffffff',
     '--matrix-fade':  'rgba(0,255,65,0.4)',
     '--glow-color':   'rgba(0,255,65,0.6)',
-    matrixPink: false
+    matrixPink: false,
+    energy: 1.0
   },
   pink: {
     '--neon':         '#E91885',
@@ -2185,7 +2211,8 @@ var _ncpThemes = {
     '--matrix-head':  '#ff9ee0',
     '--matrix-fade':  'rgba(233,24,133,0.35)',
     '--glow-color':   'rgba(233,24,133,0.6)',
-    matrixPink: true
+    matrixPink: true,
+    energy: 1.4
   },
   void: {
     '--neon':         '#7b5ea7',
@@ -2202,7 +2229,8 @@ var _ncpThemes = {
     '--matrix-head':  '#d4b8ff',
     '--matrix-fade':  'rgba(123,94,167,0.4)',
     '--glow-color':   'rgba(123,94,167,0.6)',
-    matrixPink: false
+    matrixPink: false,
+    energy: 1.2
   },
   ice: {
     '--neon':         '#00cfff',
@@ -2219,7 +2247,8 @@ var _ncpThemes = {
     '--matrix-head':  '#ffffff',
     '--matrix-fade':  'rgba(0,207,255,0.4)',
     '--glow-color':   'rgba(0,207,255,0.6)',
-    matrixPink: false
+    matrixPink: false,
+    energy: 0.6
   },
   // ── EXORCISM — HIGH-CONTRAST EMERGENCY MODE ──────────────────────────────────
   exorcism: {
@@ -2239,7 +2268,8 @@ var _ncpThemes = {
     '--glow-color':   'rgba(255,0,0,0.6)',
     '--bg-deep':      '#FFFFFF',
     '--bg-panel':     '#F2F2F2',
-    matrixPink: false
+    matrixPink: false,
+    energy: 2.0
   },
   // ── COVENANT — LUXURY-SOVEREIGN // GOLD TIER ─────────────────────────────────
   covenant: {
@@ -2259,7 +2289,8 @@ var _ncpThemes = {
     '--glow-color':   'rgba(212,175,55,0.6)',
     '--bg-deep':      '#1A1A1A',
     '--bg-panel':     '#1f1f1f',
-    matrixPink: false
+    matrixPink: false,
+    energy: 0.5
   },
   // ── VOID_BLOOM — PRPL_TWR FREQUENCY ─────────────────────────────────────────
   void_bloom: {
@@ -2279,7 +2310,8 @@ var _ncpThemes = {
     '--glow-color':   'rgba(188,19,254,0.6)',
     '--bg-deep':      '#000000',
     '--bg-panel':     '#0a0006',
-    matrixPink: false
+    matrixPink: false,
+    energy: 1.6
   },
   // ── ARCHITECT_SIGHT — RAW TERMINAL // SOVEREIGN GREEN ────────────────────────
   architect_sight: {
@@ -2299,7 +2331,8 @@ var _ncpThemes = {
     '--glow-color':   'rgba(0,255,65,0.6)',
     '--bg-deep':      '#050505',
     '--bg-panel':     '#080808',
-    matrixPink: false
+    matrixPink: false,
+    energy: 1.0
   }
 };
 
@@ -3270,7 +3303,26 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
       }
     }
 
-    setInterval(drawMatrix, 45);
+    // GHOST-SCRIPT: mobile throttle — half frame rate + half column density on mobile
+    var _dvMatrixIsMobile = (window.innerWidth < 768 || navigator.maxTouchPoints > 0);
+    if (_dvMatrixIsMobile) {
+      fontSize = 28; // 50% column density (was 14px step → 28px step)
+      resize();      // recompute cols at new fontSize
+    }
+    var _dvMatrixInterval = _dvMatrixIsMobile ? 90 : 45; // 90ms on mobile, 45ms desktop
+    var _dvMatrixTimer = setInterval(drawMatrix, _dvMatrixInterval);
+
+    // GHOST-SCRIPT: pause matrix rain when tab is hidden, resume on visibility
+    document.addEventListener('visibilitychange', function() {
+      if (document.hidden) {
+        clearInterval(_dvMatrixTimer);
+        _dvMatrixTimer = null;
+      } else {
+        if (!_dvMatrixTimer) {
+          _dvMatrixTimer = setInterval(drawMatrix, _dvMatrixInterval);
+        }
+      }
+    });
   })();
 
   // ── AUDIO VISUALIZER ─────────────────────────────────────────────
@@ -3290,6 +3342,7 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
 
     function draw() {
       requestAnimationFrame(draw);
+      if (document.hidden) return; // GHOST-SCRIPT: pause visualizer when tab hidden
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       phase += 0.06;
       var w = canvas.width / bars;
@@ -3752,7 +3805,9 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
     var parts = [];
     function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
     resize(); window.addEventListener('resize', resize);
-    for (var i = 0; i < 90; i++) parts.push({
+    // GHOST-SCRIPT: reduce particle count by 75% on mobile to save CPU
+    var _dvParticleCount = (window.innerWidth < 768 || navigator.maxTouchPoints > 0) ? 22 : 90;
+    for (var i = 0; i < _dvParticleCount; i++) parts.push({
       x: Math.random() * window.innerWidth,
       y: Math.random() * window.innerHeight,
       r: 0.4 + Math.random() * 1.4,
@@ -3800,6 +3855,7 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
     }, { passive: true });
     (function drawTrail() {
       requestAnimationFrame(drawTrail);
+      if (document.hidden) return; // GHOST-SCRIPT: pause cursor trail when tab hidden
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       var rgb = getComputedStyle(document.documentElement).getPropertyValue('--neon-rgb').trim() || '233,24,133';
       trail.forEach(function(p, i) {
@@ -3835,6 +3891,7 @@ function showNeuralLoadScreen(onComplete) {
   var animFrame;
 
   function drawNLMatrix() {
+    if (document.hidden) { animFrame = requestAnimationFrame(drawNLMatrix); return; } // GHOST-SCRIPT: pause NL matrix when tab hidden
     var nlCol  = window.dvMatrixColor || getComputedStyle(document.documentElement).getPropertyValue('--matrix-color').trim() || '#00ff41';
     var nlRgb  = getComputedStyle(document.documentElement).getPropertyValue('--neon-rgb').trim() || '0,255,65';
     ctx.fillStyle = 'rgba(0,0,0,0.08)';
@@ -5184,10 +5241,12 @@ function dvEntropyStage3() {
   dvHaptic([50, 30, 50]);
 }
 
-// Set entropy stage timers (5min, 10min, 20min)
-setTimeout(dvEntropyStage1, 5  * 60 * 1000);
-setTimeout(dvEntropyStage2, 10 * 60 * 1000);
-setTimeout(dvEntropyStage3, 20 * 60 * 1000);
+// GHOST-SCRIPT: extend entropy timers on mobile (10/20/40 min) to reduce CPU glitch cost on low-power devices
+// Desktop: 5/10/20 min | Mobile: 10/20/40 min
+var _dvEntropyMobile = (window.innerWidth < 768 || navigator.maxTouchPoints > 0);
+setTimeout(dvEntropyStage1, (_dvEntropyMobile ? 10 : 5)  * 60 * 1000);
+setTimeout(dvEntropyStage2, (_dvEntropyMobile ? 20 : 10) * 60 * 1000);
+setTimeout(dvEntropyStage3, (_dvEntropyMobile ? 40 : 20) * 60 * 1000);
 /* END DYNAMIC ENTROPY // RAIN_DANCER x REACTIVE_SOUL */
 
 </script>
