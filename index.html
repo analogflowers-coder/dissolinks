@@ -1195,7 +1195,7 @@ body.dv-glitching #diss0linkz-auth-gate {
       <span style="color:var(--red-warn);">●</span>
       <span style="color:#ffcc00;">●</span>
       <span style="color:var(--neon);">●</span>
-      <span style="font-size:11px; color:var(--neon); margin-left:8px; letter-spacing:2px;">NODE CONTROL PANEL // DISSOVERSE-01</span>
+      <span style="font-size:11px; color:var(--neon); margin-left:8px; letter-spacing:2px;">NODE CONTROL PANEL // VERITAS_ENGINE</span>
       <button onclick="closeSettings()" style="margin-left:auto; background:transparent; border:none; color:var(--text-dim); cursor:pointer; font-size:20px; line-height:1; padding:0 4px;">✕</button>
     </div>
     <!-- NCP Tab Bar -->
@@ -1208,7 +1208,7 @@ body.dv-glitching #diss0linkz-auth-gate {
     <!-- Tab: STATUS -->
     <div id="ncp-panel-status" class="p-5" style="display:block; min-height:220px;">
       <div style="font-size:11px; color:var(--text-dim); letter-spacing:2px; margin-bottom:14px;">root@dissoverse:~$ <span style="color:var(--neon);">node --status</span></div>
-      <div class="ncp-stat-row"><span>NODE ID</span><span style="color:var(--neon);">DISSOVERSE-01</span></div>
+      <div class="ncp-stat-row"><span>NODE ID</span><span style="color:var(--neon);">VERITAS_ENGINE</span></div>
       <div class="ncp-stat-row" style="margin-top:8px;"><span>SESSION UPTIME</span><span id="ncp-uptime" style="color:var(--neon);">00:00:00</span></div>
       <div class="ncp-stat-row" style="margin-top:8px;"><span>AUTH METHOD</span><span style="color:var(--neon);">PBKDF2-SHA256 / 200K</span></div>
       <div class="ncp-stat-row" style="margin-top:8px;"><span>LINKS LOADED</span><span id="ncp-link-count" style="color:var(--neon);">—</span></div>
@@ -1299,7 +1299,7 @@ body.dv-glitching #diss0linkz-auth-gate {
           <span style="margin:0 10px; opacity:0.4;">|</span>
           <span id="clock"></span>
           <span style="margin:0 10px; opacity:0.4;">|</span>
-          <span>NODE: <span style="color:var(--neon);">DISSOVERSE-01</span></span>
+          <span>NODE: <span style="color:var(--neon);">VERITAS_ENGINE</span></span>
         </div>
 
         <!-- Right: gear + EXIT PORTAL -->
@@ -1343,7 +1343,7 @@ body.dv-glitching #diss0linkz-auth-gate {
     <!-- System Status Bar -->
     <div class="glass-panel p-3 flex flex-wrap gap-4 items-center justify-between" style="font-size:11px;">
       <div class="flex gap-4 flex-wrap">
-        <span>NODE: <span style="color:var(--neon);">DISSOVERSE-01</span></span>
+        <span>NODE: <span style="color:var(--neon);">VERITAS_ENGINE</span></span>
         <span>ENCRYPTION: <span style="color:var(--neon);">AES-256</span></span>
         <span>PROTOCOL: <span style="color:var(--neon);">FORCE-OP</span></span>
       </div>
@@ -1707,7 +1707,7 @@ function ncpExportLinks() {
     });
   });
   var payload = JSON.stringify({
-    node: 'DISSOVERSE-01',
+    node: 'VERITAS_ENGINE',
     exported: new Date().toISOString(),
     count: links.length,
     links: links
