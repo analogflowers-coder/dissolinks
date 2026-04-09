@@ -831,21 +831,32 @@ body.dv-glitching #diss0linkz-auth-gate {
 /* ── MUSIC BUTTON ───────────────────────────────────────────── */
 #dv-music-btn {
   position: fixed;
-  bottom: 14px;
+  top: 14px;
   right: 14px;
-  z-index: 150;
+  z-index: 200;
   background: rgba(0,4,0,0.85);
-  border: 1px solid rgba(var(--neon-rgb),0.35);
+  border: 1px solid rgba(var(--neon-rgb),0.3);
   color: rgba(var(--neon-rgb),0.7);
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 9px;
-  letter-spacing: 0.1em;
-  padding: 5px 9px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 7px;
+  letter-spacing: 1.5px;
+  padding: 6px 10px;
   cursor: pointer;
   display: none;
-  transition: all 0.2s;
+  transition: all 0.3s;
+  text-align: center;
+  line-height: 1.4;
+}
+#dv-music-btn img {
+  width: 22px;
+  height: 22px;
+  display: block;
+  margin: 0 auto 3px;
+  filter: var(--dv-icon-filter, none);
+  opacity: 0.85;
 }
 #dv-music-btn:hover { border-color: var(--neon); color: var(--neon); }
+#dv-music-btn:hover img { opacity: 1; }
 /* ── SONIC_PHANTOM // AMBIENT HUM BUTTON ────────────────── */
 #dv-ambient-btn {
   position: fixed;
@@ -1453,12 +1464,11 @@ body.dv-glitching #diss0linkz-auth-gate {
   <source src="https://cdn.shopify.com/s/files/1/0897/5686/0735/files/TRAP_BEAT_256KPS.mp3?v=1775267721" type="audio/mpeg">
 </audio>
 
-<!-- MUSIC TOGGLE -->
-<button id="dv-music-btn" onclick="dvToggleMusic()">&#9834; MUTE</button>
+<!-- OLD MUSIC TOGGLE REMOVED — now inside terminal as dv-music-btn-terminal -->
 
 <!-- SONIC_PHANTOM // AMBIENT HUM TOGGLE -->
 <!-- GHOST-SCRIPT: ambient hum is OFF by default on ALL devices. On mobile it is disabled by default to save battery. The toggle remains functional if the user manually enables it. -->
-<button id="dv-ambient-btn" onclick="if(window.dvAudio) dvAudio.toggleHum();">&#11041; AMBIENT // OFF</button>
+<!-- AMBIENT HUM REMOVED — 40Hz sub-bass inaudible on most devices, button cluttered mobile UX -->
 <script>(function(){
   // GHOST-SCRIPT: on mobile, hum starts OFF (already default) — just label it clearly
   // The toggle is still fully functional if user manually presses the button
@@ -1494,6 +1504,14 @@ body.dv-glitching #diss0linkz-auth-gate {
     <span class="dv-corner tr">[+]</span>
     <span class="dv-corner bl">[+]</span>
     <span class="dv-corner br">[+]</span>
+
+    <!-- MUSIC CONTROL — system initiation element -->
+    <div id="dv-music-init" style="text-align:center; margin-bottom:12px; display:none;">
+      <button id="dv-music-btn-terminal" onclick="dvToggleMusic()" style="background:transparent; border:1px solid rgba(var(--neon-rgb),0.25); padding:8px 16px; cursor:pointer; text-align:center; transition:all 0.3s;">
+        <img src="https://cdn.shopify.com/s/files/1/0897/5686/0735/files/GREEN_Cart-Drawer-Close-V2.png?v=1775772113" alt="AUDIO" draggable="false" style="width:24px; height:24px; display:block; margin:0 auto 4px; opacity:0.75;">
+        <span style="font-family:'Share Tech Mono',monospace; font-size:7px; letter-spacing:2px; color:rgba(var(--neon-rgb),0.6);">MUTE</span>
+      </button>
+    </div>
 
     <div id="dv-boot-output"></div>
 
@@ -3444,15 +3462,15 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
       music.volume = 0.45;
       music.play().then(function() {
         musicStarted = true;
-        var btn = document.getElementById('dv-music-btn');
-        if (btn) btn.style.display = 'block';
+        var initDiv = document.getElementById('dv-music-init');
+        if (initDiv) initDiv.style.display = 'block';
       }).catch(function() {});
     }
   }
 
   window.dvToggleMusic = function() {
     var music = document.getElementById('dv-bg-music');
-    var btn = document.getElementById('dv-music-btn');
+    var btn = document.getElementById('dv-music-btn-terminal');
     if (!music) return;
     musicMuted = !musicMuted;
     music.muted = musicMuted;
@@ -3653,8 +3671,8 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
         }
 
         // Fade + stop music
-        var btn = document.getElementById('dv-music-btn');
-        if (btn) btn.style.display = 'none';
+        var initDiv = document.getElementById('dv-music-init');
+        if (initDiv) initDiv.style.display = 'none';
         var music = document.getElementById('dv-bg-music');
         if (music && !music.paused) {
           var vol = music.volume;
@@ -3847,8 +3865,8 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
       if (mtxR) { mtxR.classList.add('dv-matrix-app-mode'); window.dvMatrixSpeed = 0.7; }
       var inputRow = document.getElementById('dv-input-row');
       if (inputRow) inputRow.classList.add('dv-input-visible');
-      var btn = document.getElementById('dv-music-btn');
-      if (btn) btn.style.display = 'block';
+      var initDiv = document.getElementById('dv-music-init');
+      if (initDiv) initDiv.style.display = 'block';
       return;
     }
 
