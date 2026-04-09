@@ -337,12 +337,7 @@
   animation: dv-logo-glow-pulse 1.8s ease-in-out infinite;
 }
 
-.diss0linkz-logo-img {
-  height: clamp(40px, 7vw, 64px);
-  width: auto;
-  display: block;
-  max-width: 280px;
-}
+/* .diss0linkz-logo-img: overridden below by responsive rules */
 
 .diss0linkz-logo-wrap.glitching {
   animation: dv-logo-glitch 0.55s steps(3) forwards;
@@ -641,9 +636,140 @@ body.dv-glitching #diss0linkz-auth-gate {
   transition: all 0.2s;
 }
 #dv-music-btn:hover { border-color: #00ff41; color: #00ff41; }
+/* ── INPUT HIDDEN UNTIL BOOT DONE ───────────────────────── */
+#dv-input-row {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  pointer-events: none;
+}
+#dv-input-row.dv-input-visible {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+.dv-separator {
+  opacity: 0;
+  transition: opacity 0.5s ease 0.2s;
+}
+.dv-separator.dv-sep-visible { opacity: 1; }
+#dv-status-line {
+  opacity: 0;
+  transition: opacity 0.5s ease 0.4s;
+}
+#dv-status-line.dv-status-visible { opacity: 1; }
+
+/* ── ACCESS GRANTED STAMP ───────────────────────────────── */
+#dv-access-stamp {
+  position: fixed; inset: 0; z-index: 300;
+  display: flex; align-items: center; justify-content: center;
+  pointer-events: none; opacity: 0;
+  background: rgba(0,0,0,0.5);
+  transition: opacity 0.25s;
+}
+#dv-access-stamp.active { opacity: 1; }
+.dv-stamp-text {
+  font-family: 'VT323', 'JetBrains Mono', monospace;
+  font-size: clamp(44px, 11vw, 82px);
+  color: #00ff41;
+  text-shadow: 0 0 25px #00ff41, 0 0 60px #00ff41, 0 0 100px rgba(0,255,65,0.4);
+  letter-spacing: 0.08em;
+  text-align: center;
+  line-height: 1.2;
+  animation: dv-stamp-in 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+@keyframes dv-stamp-in {
+  0% { transform: scale(3.5); opacity: 0; filter: blur(10px); }
+  100% { transform: scale(1); opacity: 1; filter: none; }
+}
+
+/* ── CRACK OVERLAY ──────────────────────────────────────── */
+#dv-crack-overlay {
+  position: fixed; inset: 0; z-index: 250;
+  pointer-events: none; opacity: 0;
+  transition: opacity 0.08s;
+}
+#dv-crack-overlay.active { opacity: 1; }
+
+/* ── PARTICLES CANVAS ───────────────────────────────────── */
+#dv-particles-canvas {
+  position: fixed; top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: -1; pointer-events: none;
+}
+
+/* ── CURSOR TRAIL CANVAS ────────────────────────────────── */
+#dv-cursor-canvas {
+  position: fixed; top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 200; pointer-events: none;
+}
+
+/* ── MATRIX RAIN PERSISTS BEHIND APP ───────────────────── */
+#dv-matrix-canvas.dv-matrix-app-mode {
+  opacity: 0.07;
+  z-index: -2;
+}
+#diss0linkz-app {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── LOGO 3X MOBILE ─────────────────────────────────────── */
+.diss0linkz-logo-img {
+  height: clamp(90px, 20vw, 150px);
+  width: auto;
+  display: block;
+  max-width: 480px;
+}
+@media (min-width: 640px) {
+  .diss0linkz-logo-img {
+    height: clamp(64px, 9vw, 120px);
+    max-width: 400px;
+  }
+}
+
+/* ── NODE CONTROL PANEL ─────────────────────────────────── */
+.ncp-tab {
+  flex: 1; padding: 8px 6px; background: transparent; border: none;
+  color: var(--text-dim); font-family: 'Share Tech Mono', monospace;
+  font-size: 10px; letter-spacing: 1.5px; cursor: pointer;
+  transition: all 0.2s; border-bottom: 2px solid transparent;
+}
+.ncp-tab:hover { color: var(--neon); }
+.ncp-tab.active { color: var(--neon); border-bottom-color: var(--neon); }
+#ncp-tab-panic { color: rgba(255,68,68,0.7); }
+#ncp-tab-panic.active { color: #ff4444; border-bottom-color: #ff4444; }
+.ncp-stat-row {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 10px; letter-spacing: 1.5px;
+  border-bottom: 1px solid rgba(255,255,255,0.04); padding-bottom: 6px;
+}
+.ncp-stat-row span:first-child { color: var(--text-dim); }
+.ncp-theme-btn {
+  display: block; width: 100%; padding: 10px 14px; background: rgba(0,255,65,0.03);
+  border: 1px solid var(--border-dim); color: var(--text-dim);
+  font-family: 'Share Tech Mono', monospace; font-size: 11px; letter-spacing: 2px;
+  text-align: left; cursor: pointer; transition: all 0.2s; margin-bottom: 6px;
+}
+.ncp-theme-btn:hover { border-color: var(--neon); color: var(--neon); background: rgba(0,255,65,0.06); }
+.ncp-theme-btn.active { border-color: var(--neon); background: rgba(0,255,65,0.08); color: var(--neon); }
+
 </style>
 </head>
 <body>
+<!-- DEPTH PARTICLE CANVAS -->
+<canvas id="dv-particles-canvas"></canvas>
+
+<!-- CURSOR TRAIL CANVAS -->
+<canvas id="dv-cursor-canvas"></canvas>
+
+<!-- ACCESS GRANTED STAMP -->
+<div id="dv-access-stamp"><div class="dv-stamp-text">ACCESS GRANTED<br><span style="font-size:0.45em;letter-spacing:0.2em;color:rgba(0,255,65,0.7);">WELCOME TO THE NETWORK</span></div></div>
+
+<!-- SCREEN CRACK OVERLAY -->
+<div id="dv-crack-overlay"></div>
+
 <!-- MATRIX RAIN CANVAS -->
 <canvas id="dv-matrix-canvas"></canvas>
 
@@ -709,35 +835,66 @@ body.dv-glitching #diss0linkz-auth-gate {
 <!-- ==================== SETTINGS MODAL ==================== -->
 <div id="settings-modal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeSettings()">
   <div class="modal-panel">
-    <div class="p-3 flex items-center gap-2 border-b" style="border-color: var(--border-dim); background: rgba(0,0,0,0.4);">
+    <!-- NCP Header -->
+    <div class="p-3 flex items-center gap-2 border-b" style="border-color:var(--border-dim); background:rgba(0,0,0,0.6);">
       <span style="color:var(--red-warn);">●</span>
       <span style="color:#ffcc00;">●</span>
       <span style="color:var(--neon);">●</span>
-      <span style="font-size:11px; color:var(--text-dim); margin-left:8px;">terminal://dissoverse/config</span>
+      <span style="font-size:11px; color:var(--neon); margin-left:8px; letter-spacing:2px;">NODE CONTROL PANEL // DISSOVERSE-01</span>
       <button onclick="closeSettings()" style="margin-left:auto; background:transparent; border:none; color:var(--text-dim); cursor:pointer; font-size:20px; line-height:1; padding:0 4px;">✕</button>
     </div>
-    <div class="p-6 space-y-4">
-      <div style="font-size:12px; color:var(--text-dim);">root@dissoverse:~$ <span style="color:var(--neon);">config auth --github</span></div>
-      <div>
-        <label style="font-size:11px; color:var(--text-dim); letter-spacing:2px; display:block; margin-bottom:6px;">GITHUB PAT</label>
-        <input
-          type="password"
-          id="pat-input"
-          class="terminal-input"
-          placeholder="github_pat_xxxxxxxxxxxxxxxxxxxx"
-          autocomplete="off"
-          spellcheck="false"
-        >
-      </div>
-      <div style="font-size:10px; color:var(--text-dim); line-height:1.8; border-left:2px solid var(--border-dim); padding-left:10px;">
-        Generate a fine-grained PAT at github.com/settings/tokens with Contents read/write permission for the dissolinks repo. Stored in sessionStorage only — cleared on tab close.
-      </div>
-      <div class="flex gap-3">
-        <button class="btn-neon flex-1" onclick="saveToken()">▶ SAVE TOKEN</button>
-        <button class="btn-neon btn-red" onclick="clearToken()" style="flex:0 0 auto;">✕ CLEAR</button>
-      </div>
-      <div id="token-feedback" style="font-size:11px; min-height:16px; text-align:center; letter-spacing:1px;"></div>
+    <!-- NCP Tab Bar -->
+    <div style="display:flex; border-bottom:1px solid var(--border-dim); background:rgba(0,0,0,0.4);">
+      <button class="ncp-tab active" onclick="ncpTab('status')" id="ncp-tab-status">▸ STATUS</button>
+      <button class="ncp-tab" onclick="ncpTab('theme')" id="ncp-tab-theme">▸ THEME</button>
+      <button class="ncp-tab" onclick="ncpTab('export')" id="ncp-tab-export">▸ EXPORT</button>
+      <button class="ncp-tab" onclick="ncpTab('panic')" id="ncp-tab-panic">▸ PANIC</button>
     </div>
+    <!-- Tab: STATUS -->
+    <div id="ncp-panel-status" class="p-5" style="display:block; min-height:220px;">
+      <div style="font-size:11px; color:var(--text-dim); letter-spacing:2px; margin-bottom:14px;">root@dissoverse:~$ <span style="color:var(--neon);">node --status</span></div>
+      <div class="ncp-stat-row"><span>NODE ID</span><span style="color:var(--neon);">DISSOVERSE-01</span></div>
+      <div class="ncp-stat-row" style="margin-top:8px;"><span>SESSION UPTIME</span><span id="ncp-uptime" style="color:var(--neon);">00:00:00</span></div>
+      <div class="ncp-stat-row" style="margin-top:8px;"><span>AUTH METHOD</span><span style="color:var(--neon);">PBKDF2-SHA256 / 200K</span></div>
+      <div class="ncp-stat-row" style="margin-top:8px;"><span>LINKS LOADED</span><span id="ncp-link-count" style="color:var(--neon);">—</span></div>
+      <div class="ncp-stat-row" style="margin-top:8px;"><span>LAST LOGIN</span><span id="ncp-last-login" style="color:var(--neon);">—</span></div>
+      <div class="ncp-stat-row" style="margin-top:8px;"><span>MATRIX LAYER</span><span style="color:var(--neon);">ACTIVE // 7% OPACITY</span></div>
+      <div class="ncp-stat-row" style="margin-top:8px;"><span>ENCRYPTION</span><span style="color:var(--neon);">AES-256 // ZERO-LOG</span></div>
+      <div class="ncp-stat-row" style="margin-top:8px;"><span>VERITAS ENGINE</span><span style="color:var(--neon);">GUARDING</span></div>
+    </div>
+    <!-- Tab: THEME -->
+    <div id="ncp-panel-theme" class="p-5" style="display:none; min-height:220px;">
+      <div style="font-size:11px; color:var(--text-dim); letter-spacing:2px; margin-bottom:14px;">root@dissoverse:~$ <span style="color:var(--neon);">theme --select</span></div>
+      <button class="ncp-theme-btn active" id="theme-btn-matrix" onclick="ncpSetTheme('matrix')">
+        <span style="color:#00ff41;">■</span>&nbsp; MATRIX GREEN &nbsp;<span style="font-size:9px; opacity:0.6;">// DEFAULT</span>
+      </button>
+      <button class="ncp-theme-btn" id="theme-btn-pink" onclick="ncpSetTheme('pink')">
+        <span style="color:#E91885;">■</span>&nbsp; DISSOVERSE PINK &nbsp;<span style="font-size:9px; opacity:0.6;">// BRAND</span>
+      </button>
+      <button class="ncp-theme-btn" id="theme-btn-void" onclick="ncpSetTheme('void')">
+        <span style="color:#7b5ea7;">■</span>&nbsp; VOID PURPLE &nbsp;<span style="font-size:9px; opacity:0.6;">// DEEP</span>
+      </button>
+      <button class="ncp-theme-btn" id="theme-btn-ice" onclick="ncpSetTheme('ice')">
+        <span style="color:#00cfff;">■</span>&nbsp; ICE BLUE &nbsp;<span style="font-size:9px; opacity:0.6;">// CRISP</span>
+      </button>
+      <div id="ncp-theme-feedback" style="font-size:10px; color:var(--neon); text-align:center; letter-spacing:2px; min-height:16px; margin-top:10px;"></div>
+    </div>
+    <!-- Tab: EXPORT -->
+    <div id="ncp-panel-export" class="p-5" style="display:none; min-height:220px;">
+      <div style="font-size:11px; color:var(--text-dim); letter-spacing:2px; margin-bottom:14px;">root@dissoverse:~$ <span style="color:var(--neon);">export --links</span></div>
+      <div style="font-size:10px; color:var(--text-dim); line-height:1.9; margin-bottom:14px;">Dump all Diss0LinkZ as a JSON payload. Back up your link architecture or port to another node.</div>
+      <button class="btn-neon" style="width:100%; margin-bottom:8px;" onclick="ncpExportLinks()">▶ EXPORT AS JSON</button>
+      <button class="btn-neon" style="width:100%; margin-bottom:8px;" onclick="ncpCopySession()">▶ COPY SESSION TOKEN</button>
+      <div id="ncp-export-feedback" style="font-size:10px; color:var(--neon); text-align:center; letter-spacing:2px; min-height:16px;"></div>
+    </div>
+    <!-- Tab: PANIC -->
+    <div id="ncp-panel-panic" class="p-5" style="display:none; min-height:220px;">
+      <div style="font-size:11px; color:#ff4444; letter-spacing:2px; margin-bottom:14px;">root@dissoverse:~$ <span>⚠ PANIC PROTOCOL</span></div>
+      <div style="font-size:10px; color:var(--text-dim); line-height:1.9; border-left:2px solid #ff4444; padding-left:10px; margin-bottom:14px;">EMERGENCY SESSION WIPE. Clears all session + storage data, revokes auth cookie, forces re-authentication. Cannot be undone.</div>
+      <button class="btn-neon btn-red" style="width:100%;" onclick="ncpPanic()">⚠ INITIATE PANIC WIPE</button>
+      <div id="ncp-panic-feedback" style="font-size:10px; color:#ff4444; text-align:center; letter-spacing:2px; min-height:16px; margin-top:8px;"></div>
+    </div>
+    <div id="token-feedback" style="display:none;"></div>
   </div>
 </div>
 
@@ -749,28 +906,35 @@ body.dv-glitching #diss0linkz-auth-gate {
 
   <!-- Header -->
   <header class="p-4 sm:p-6 border-b" style="border-color: var(--border-dim);">
-    <div class="max-w-4xl mx-auto flex items-center justify-between flex-wrap gap-4">
-      <div>
-        <div class="diss0linkz-logo-wrap" id="diss0linkz-logo-wrap">
+    <div class="max-w-4xl mx-auto" style="display:flex; flex-direction:column; align-items:center; gap:10px;">
+      <!-- LOGO: centered, 3x bigger on mobile -->
+      <div style="width:100%; display:flex; flex-direction:column; align-items:center; text-align:center;">
+        <div class="diss0linkz-logo-wrap" id="diss0linkz-logo-wrap" style="display:flex; justify-content:center;">
           <img
             src="https://cdn.shopify.com/s/files/1/0897/5686/0735/files/Diss0Links---CHROME.png?v=1775720592"
             alt="DISS0LINKZ // DISSOVERSE Neural Network"
             class="diss0linkz-logo-img"
-            width="240"
             height="auto"
           >
         </div>
-        <div style="font-size:10px; color: var(--text-dim); letter-spacing: 3px; margin-top:6px;">
+        <div style="font-size:10px; color:var(--text-dim); letter-spacing:3px; margin-top:8px;">
           SOVEREIGN DEEP LINK GENERATOR v1.0
         </div>
       </div>
-      <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap; justify-content:flex-end;">
-        <div style="font-size:10px; color: var(--text-dim); text-align:right;">
-          <div>STATUS: <span style="color:var(--neon);">■</span> ONLINE</div>
-          <div id="clock"></div>
-          <div style="margin-top:2px;">GITHUB: <span id="token-status" style="color:var(--text-dim);">NO TOKEN</span></div>
+      <!-- STATUS BAR: centered below logo -->
+      <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap; justify-content:center; width:100%;">
+        <div style="font-size:10px; color:var(--text-dim); text-align:center;">
+          <span>STATUS: <span style="color:var(--neon);">■</span> ONLINE</span>
+          <span style="margin:0 10px; opacity:0.4;">|</span>
+          <span id="clock"></span>
+          <span style="margin:0 10px; opacity:0.4;">|</span>
+          <span>NODE: <span style="color:var(--neon);">DISSOVERSE-01</span></span>
         </div>
-        <button id="gear-btn" onclick="openSettings()" title="Config" style="background:transparent; border:1px solid var(--border-mid); color:var(--text-dim); font-family:'Share Tech Mono',monospace; font-size:18px; width:36px; height:36px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.3s; flex-shrink:0;">⚙</button>
+        <button id="gear-btn" onclick="openSettings()" title="NODE CONTROL PANEL"
+          style="background:transparent; border:1px solid var(--border-mid); color:var(--text-dim);
+          font-family:'Share Tech Mono',monospace; font-size:18px; width:36px; height:36px;
+          cursor:pointer; display:flex; align-items:center; justify-content:center;
+          transition:all 0.3s; flex-shrink:0;">⚙</button>
       </div>
     </div>
   </header>
@@ -1043,7 +1207,159 @@ function updateClock() {
 setInterval(updateClock, 1000);
 updateClock();
 
-// ==================== SETTINGS / TOKEN ====================
+// ==================== NODE CONTROL PANEL ====================
+var _ncpSessionStart = Date.now();
+var _ncpUptimeInterval = null;
+
+function openSettings() {
+  document.getElementById('settings-modal').style.display = 'flex';
+  ncpTab('status');
+  ncpRefreshStatus();
+  if (_ncpUptimeInterval) clearInterval(_ncpUptimeInterval);
+  _ncpUptimeInterval = setInterval(ncpTickUptime, 1000);
+  ncpTickUptime();
+}
+
+function closeSettings() {
+  document.getElementById('settings-modal').style.display = 'none';
+  if (_ncpUptimeInterval) { clearInterval(_ncpUptimeInterval); _ncpUptimeInterval = null; }
+}
+
+function ncpTab(name) {
+  ['status','theme','export','panic'].forEach(function(t) {
+    var panel = document.getElementById('ncp-panel-' + t);
+    var tab   = document.getElementById('ncp-tab-' + t);
+    if (panel) panel.style.display = (t === name) ? 'block' : 'none';
+    if (tab)   tab.classList.toggle('active', t === name);
+  });
+}
+
+function ncpRefreshStatus() {
+  // Link count
+  var cnt = document.querySelectorAll('.link-item').length;
+  var cntEl = document.getElementById('ncp-link-count');
+  if (cntEl) cntEl.textContent = cnt > 0 ? cnt + ' LINKS' : 'NONE LOADED';
+  // Last login from cookie
+  var cookies = document.cookie.split(';');
+  var authCookie = null;
+  for (var i = 0; i < cookies.length; i++) {
+    if (cookies[i].trim().indexOf('diss0linkz_auth=') === 0) {
+      authCookie = cookies[i].trim().split('=')[1]; break;
+    }
+  }
+  var llEl = document.getElementById('ncp-last-login');
+  if (llEl && authCookie) {
+    var tsHex = authCookie.replace('d0lz_', '');
+    try {
+      var ts = parseInt(tsHex, 36);
+      llEl.textContent = new Date(ts).toLocaleString();
+    } catch(e) { llEl.textContent = 'THIS SESSION'; }
+  } else if (llEl) { llEl.textContent = 'THIS SESSION'; }
+}
+
+function ncpTickUptime() {
+  var elapsed = Math.floor((Date.now() - _ncpSessionStart) / 1000);
+  var h = Math.floor(elapsed / 3600);
+  var m = Math.floor((elapsed % 3600) / 60);
+  var s = elapsed % 60;
+  var el = document.getElementById('ncp-uptime');
+  if (el) el.textContent =
+    (h < 10 ? '0' : '') + h + ':' +
+    (m < 10 ? '0' : '') + m + ':' +
+    (s < 10 ? '0' : '') + s;
+}
+
+// ── THEME ENGINE ─────────────────────────────────────────────────────────────
+var _ncpThemes = {
+  matrix: { '--neon': '#00ff41', '--neon-dim': 'rgba(0,255,65,0.15)', matrix: false },
+  pink:   { '--neon': '#E91885', '--neon-dim': 'rgba(233,24,133,0.15)', matrix: true  },
+  void:   { '--neon': '#7b5ea7', '--neon-dim': 'rgba(123,94,167,0.15)', matrix: false },
+  ice:    { '--neon': '#00cfff', '--neon-dim': 'rgba(0,207,255,0.15)',  matrix: false }
+};
+
+function ncpSetTheme(name) {
+  var theme = _ncpThemes[name];
+  if (!theme) return;
+  Object.keys(theme).forEach(function(k) {
+    if (k.startsWith('--')) document.documentElement.style.setProperty(k, theme[k]);
+  });
+  if (typeof window.dvMatrixPink !== 'undefined') window.dvMatrixPink = theme.matrix;
+  ['matrix','pink','void','ice'].forEach(function(t) {
+    var btn = document.getElementById('theme-btn-' + t);
+    if (btn) btn.classList.toggle('active', t === name);
+  });
+  var fb = document.getElementById('ncp-theme-feedback');
+  if (fb) {
+    fb.textContent = '✓ THEME: ' + name.toUpperCase() + ' LOADED';
+    setTimeout(function() { fb.textContent = ''; }, 2200);
+  }
+}
+
+// ── EXPORT ───────────────────────────────────────────────────────────────────
+function ncpExportLinks() {
+  var links = [];
+  document.querySelectorAll('.link-item').forEach(function(el) {
+    var label = el.querySelector('.link-label');
+    var urlEl = el.querySelector('.link-url, a');
+    links.push({
+      label: label ? label.textContent.trim() : '',
+      url:   urlEl ? (urlEl.href || urlEl.textContent.trim()) : ''
+    });
+  });
+  var payload = JSON.stringify({
+    node: 'DISSOVERSE-01',
+    exported: new Date().toISOString(),
+    count: links.length,
+    links: links
+  }, null, 2);
+  var blob = new Blob([payload], { type: 'application/json' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'diss0linkz_export_' + Date.now() + '.json';
+  a.click();
+  var fb = document.getElementById('ncp-export-feedback');
+  if (fb) { fb.textContent = '✓ EXPORT DISPATCHED'; setTimeout(function() { fb.textContent = ''; }, 2500); }
+}
+
+function ncpCopySession() {
+  var cookies = document.cookie.split(';');
+  var val = 'NO_ACTIVE_SESSION';
+  for (var i = 0; i < cookies.length; i++) {
+    if (cookies[i].trim().indexOf('diss0linkz_auth=') === 0) {
+      val = cookies[i].trim().split('=')[1]; break;
+    }
+  }
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(val).then(function() {
+      var fb = document.getElementById('ncp-export-feedback');
+      if (fb) { fb.textContent = '✓ SESSION TOKEN COPIED'; setTimeout(function() { fb.textContent = ''; }, 2000); }
+    });
+  }
+}
+
+// ── PANIC ─────────────────────────────────────────────────────────────────────
+function ncpPanic() {
+  var fb = document.getElementById('ncp-panic-feedback');
+  if (fb) fb.textContent = '⚠ WIPING SESSION...';
+  try { sessionStorage.clear(); } catch(e) {}
+  try { localStorage.clear(); }  catch(e) {}
+  // Expire auth cookie
+  document.cookie = 'diss0linkz_auth=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Strict';
+  setTimeout(function() {
+    if (fb) fb.textContent = '⚠ WIPED. RELOADING...';
+    setTimeout(function() { window.location.reload(); }, 1200);
+  }, 600);
+}
+
+// Legacy stubs (keep so existing code references don't throw)
+function saveToken() {}
+function clearToken() {}
+function updateTokenStatus() {
+  var el = document.getElementById('token-status');
+  if (el) el.textContent = 'CONNECTED';
+}
+
+
 function openSettings() {
   document.getElementById('settings-modal').style.display = 'flex';
   const existing = sessionStorage.getItem('gh_pat');
@@ -1851,21 +2167,24 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
     resize();
 
     function drawMatrix() {
+      var isPink = window.dvMatrixPink;
+      var spd    = window.dvMatrixSpeed || 1;
       ctx.fillStyle = 'rgba(0,0,0,0.055)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       for (var i = 0; i < cols; i++) {
         var char = chars[Math.floor(Math.random() * chars.length)];
         var y = drops[i] * fontSize;
-        // Lead character: bright white-green
         if (drops[i] > 0) {
-          ctx.fillStyle = drops[i] < 2 ? '#ffffff' : (Math.random() > 0.1 ? '#00ff41' : 'rgba(0,255,65,0.4)');
+          if (isPink) {
+            ctx.fillStyle = drops[i] < 2 ? '#ff9ee0' : (Math.random() > 0.1 ? '#E91885' : 'rgba(233,24,133,0.35)');
+          } else {
+            ctx.fillStyle = drops[i] < 2 ? '#ffffff' : (Math.random() > 0.1 ? '#00ff41' : 'rgba(0,255,65,0.4)');
+          }
           ctx.font = fontSize + 'px "JetBrains Mono", monospace';
           ctx.fillText(char, i * fontSize, y);
         }
-        if (y > canvas.height && Math.random() > 0.975) {
-          drops[i] = 0;
-        }
-        drops[i] += 0.5 + Math.random() * 0.5;
+        if (y > canvas.height && Math.random() > 0.975) drops[i] = 0;
+        drops[i] += (0.5 + Math.random() * 0.5) * spd;
       }
     }
 
@@ -2014,8 +2333,16 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
         typeWriter(span, line.text, 28, function() {
           if (line === BOOT_LINES[BOOT_LINES.length-1]) {
             bootDone = true;
-            var input = document.getElementById('dv-passphrase-input');
-            if (input) input.focus();
+            var inputRow = document.getElementById('dv-input-row');
+            var sep = document.querySelector('.dv-separator');
+            var statusEl = document.getElementById('dv-status-line');
+            if (sep) sep.classList.add('dv-sep-visible');
+            if (statusEl) statusEl.classList.add('dv-status-visible');
+            setTimeout(function() {
+              if (inputRow) inputRow.classList.add('dv-input-visible');
+              var input = document.getElementById('dv-passphrase-input');
+              if (input) input.focus();
+            }, 150);
           }
         });
         out.appendChild(span);
@@ -2050,80 +2377,116 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
     }, 8000 + Math.random() * 7000);
   }
 
-  // ── ACCESS GRANTED ──────────────────────────────────────────────
+  // ── ACCESS GRANTED ──────────────────────────────────────────
   function accessGranted() {
     if (glitchTimeout) clearTimeout(glitchTimeout);
     playGrantedSound();
 
-    // Flash green
-    var flash = document.getElementById('dv-granted-flash');
-    if (flash) {
-      flash.classList.add('active');
-      setTimeout(function() { flash.classList.remove('active'); }, 300);
-    }
+    // 1. Activate pink Matrix rain at 3x speed
+    window.dvMatrixPink  = true;
+    window.dvMatrixSpeed = 3;
 
-    // Type success lines then show app
+    // 2. Green flash
+    var flash = document.getElementById('dv-granted-flash');
+    if (flash) { flash.classList.add('active'); setTimeout(function() { flash.classList.remove('active'); }, 350); }
+
+    // 3. Scramble terminal text (green)
     var out = document.getElementById('dv-boot-output');
     if (out) {
-      var lines = ['\n> ..........', '> ACCESS GRANTED', '> WELCOME TO THE NETWORK', '> LOADING NEURAL HUB...'];
-      var delay = 0;
-      lines.forEach(function(txt) {
-        setTimeout(function() {
-          var span = document.createElement('span');
-          span.className = 'dv-line dv-bright';
-          span.style.color = '#00ff41';
-          span.textContent = txt;
-          out.appendChild(span);
-          out.appendChild(document.createTextNode('\n'));
-        }, delay);
-        delay += 180;
-      });
+      var lines = out.querySelectorAll('.dv-line');
+      var saved = Array.from(lines).map(function(el) { return el.textContent; });
+      var sc = 0;
+      var scInt = setInterval(function() {
+        lines.forEach(function(el) {
+          el.textContent = el.textContent.split('').map(function(c) {
+            return c === ' ' ? ' ' : String.fromCharCode(33 + Math.floor(Math.random() * 94));
+          }).join('');
+          el.style.color = 'rgba(0,255,65,0.6)';
+        });
+        sc++;
+        if (sc > 6) {
+          clearInterval(scInt);
+          lines.forEach(function(el, i) { el.textContent = saved[i] || ''; el.style.color = ''; });
+        }
+      }, 75);
     }
+
+    // 4. ACCESS GRANTED stamp at 500ms
+    setTimeout(function() {
+      var stamp = document.getElementById('dv-access-stamp');
+      if (stamp) stamp.classList.add('active');
+    }, 500);
 
     setAuthCookie();
 
+    // 5. Transition to app at 2s -- Matrix stays as background layer
     setTimeout(function() {
-      var gate = document.getElementById('diss0linkz-auth-gate');
-      var app  = document.getElementById('diss0linkz-app');
-      var matrix = document.getElementById('dv-matrix-canvas');
-      if (gate) gate.classList.add('gate-exit');
+      var gate  = document.getElementById('diss0linkz-auth-gate');
+      var stamp = document.getElementById('dv-access-stamp');
+      var app   = document.getElementById('diss0linkz-app');
+      var auxElems = ['dv-particles-canvas','dv-cursor-canvas','dv-granted-flash']
+                     .map(function(id) { return document.getElementById(id); });
+
+      if (stamp) stamp.classList.remove('active');
+      if (gate)  gate.classList.add('gate-exit');
+
       setTimeout(function() {
         if (gate) gate.style.display = 'none';
-        if (matrix) { matrix.style.transition = 'opacity 1s'; matrix.style.opacity = '0'; }
+        auxElems.forEach(function(el) { if (el) el.style.display = 'none'; });
+
+        // Matrix rain enters low-opacity app mode (persists behind content)
+        var mtx = document.getElementById('dv-matrix-canvas');
+        if (mtx) {
+          mtx.classList.add('dv-matrix-app-mode');
+          window.dvMatrixPink  = false;
+          window.dvMatrixSpeed = 0.7;
+        }
+
         document.body.classList.remove('dv-gate-active');
         if (app) app.classList.add('app-visible');
-        // Fade out music
+
+        // Fade + stop music
+        var btn = document.getElementById('dv-music-btn');
+        if (btn) btn.style.display = 'none';
         var music = document.getElementById('dv-bg-music');
         if (music && !music.paused) {
           var vol = music.volume;
           var fade = setInterval(function() {
-            vol = Math.max(0, vol - 0.04);
+            vol = Math.max(0, vol - 0.05);
             music.volume = vol;
             if (vol <= 0) { clearInterval(fade); music.pause(); }
-          }, 80);
+          }, 70);
         }
-        var btn = document.getElementById('dv-music-btn');
-        if (btn) btn.style.display = 'none';
       }, 800);
-    }, 1000);
+    }, 2000);
   }
-
-  // ── ACCESS DENIED ───────────────────────────────────────────────
+  // ── ACCESS DENIED ───────────────────────────────────────────
   function accessDenied() {
     attempts++;
     playDeniedSound();
     triggerGlitch();
 
+    // Red body flash
+    document.body.style.transition = 'background 0.05s';
+    document.body.style.background = '#220000';
+    setTimeout(function() { document.body.style.background = ''; }, 120);
+
+    // SVG screen crack
+    showScreenCrack();
+
+    // Shake terminal box
     var box = document.getElementById('dv-terminal-box');
     if (box) {
       box.classList.add('dv-denied-shake');
       setTimeout(function() { box.classList.remove('dv-denied-shake'); }, 500);
     }
 
-    var status = document.getElementById('dv-status-line');
-    var input  = document.getElementById('dv-passphrase-input');
-    var remaining = CFG.MAX_ATTEMPTS - attempts;
+    // Scramble + reform boot text (red)
+    scrambleBootText();
 
+    var status    = document.getElementById('dv-status-line');
+    var input     = document.getElementById('dv-passphrase-input');
+    var remaining = CFG.MAX_ATTEMPTS - attempts;
     if (input) input.value = '';
 
     if (attempts >= CFG.MAX_ATTEMPTS) {
@@ -2131,17 +2494,62 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
     } else {
       if (status) {
         status.style.color = '#ff3333';
-        status.textContent = '> ACCESS DENIED -- ' + remaining + ' ATTEMPT' + (remaining !== 1 ? 'S' : '') + ' REMAINING.';
+        status.textContent = '> INVALID CREDENTIALS — RETRY. ' + remaining + ' ATTEMPT' + (remaining !== 1 ? 'S' : '') + ' LEFT.';
         setTimeout(function() {
           status.style.color = '';
           status.textContent = '> ATTEMPT ' + (attempts + 1) + ' OF ' + CFG.MAX_ATTEMPTS + '.';
-        }, 2000);
+        }, 2500);
       }
       if (input) input.focus();
     }
   }
 
-  // ── LOCKOUT ─────────────────────────────────────────────────────
+  function showScreenCrack() {
+    var overlay = document.getElementById('dv-crack-overlay');
+    if (!overlay) return;
+    var cx = window.innerWidth * 0.5, cy = window.innerHeight * 0.55;
+    var lines = '';
+    for (var i = 0; i < 14; i++) {
+      var angle = (i / 14) * Math.PI * 2 + Math.random() * 0.3;
+      var len1  = 60 + Math.random() * 220;
+      var x1 = cx + Math.cos(angle) * len1;
+      var y1 = cy + Math.sin(angle) * len1;
+      var x2 = x1 + (Math.random() - 0.5) * 80;
+      var y2 = y1 + (Math.random() - 0.5) * 80;
+      lines += '<line x1="' + cx.toFixed(0) + '" y1="' + cy.toFixed(0) +
+               '" x2="' + x1.toFixed(0) + '" y2="' + y1.toFixed(0) +
+               '" stroke="rgba(255,51,51,0.85)" stroke-width="1.5"/>';
+      lines += '<line x1="' + x1.toFixed(0) + '" y1="' + y1.toFixed(0) +
+               '" x2="' + x2.toFixed(0) + '" y2="' + y2.toFixed(0) +
+               '" stroke="rgba(255,51,51,0.5)" stroke-width="1"/>';
+    }
+    overlay.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">' + lines + '</svg>';
+    overlay.classList.add('active');
+    setTimeout(function() { overlay.classList.remove('active'); overlay.innerHTML = ''; }, 650);
+  }
+
+  function scrambleBootText() {
+    var out = document.getElementById('dv-boot-output');
+    if (!out) return;
+    var lines = out.querySelectorAll('.dv-line');
+    var saved = Array.from(lines).map(function(el) { return el.textContent; });
+    var sc = 0;
+    var scInt = setInterval(function() {
+      lines.forEach(function(el) {
+        el.textContent = el.textContent.split('').map(function(c) {
+          return c === ' ' ? ' ' : String.fromCharCode(33 + Math.floor(Math.random() * 94));
+        }).join('');
+        el.style.color = 'rgba(255,51,51,0.75)';
+      });
+      sc++;
+      if (sc > 5) {
+        clearInterval(scInt);
+        lines.forEach(function(el, i) { el.textContent = saved[i] || ''; el.style.color = ''; });
+      }
+    }, 80);
+  }
+
+    // ── LOCKOUT ─────────────────────────────────────────────────────
   function startLockout() {
     locked = true;
     document.getElementById('diss0linkz-auth-gate').classList.add('dv-lockout-mode');
@@ -2210,6 +2618,11 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
       if (flash)  flash.style.display = 'none';
       document.body.classList.remove('dv-gate-active');
       if (app) app.classList.add('app-visible');
+      // Matrix persists behind app for returning users too
+      var mtxR = document.getElementById('dv-matrix-canvas');
+      if (mtxR) { mtxR.classList.add('dv-matrix-app-mode'); window.dvMatrixSpeed = 0.7; }
+      var inputRow = document.getElementById('dv-input-row');
+      if (inputRow) inputRow.classList.add('dv-input-visible');
       var btn = document.getElementById('dv-music-btn');
       if (btn) btn.style.display = 'none';
       return;
@@ -2231,6 +2644,72 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
       });
     }
   });
+
+
+  // ── PARTICLE FIELD ─────────────────────────────────────────────
+  (function() {
+    var canvas = document.getElementById('dv-particles-canvas');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var parts = [];
+    function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    resize(); window.addEventListener('resize', resize);
+    for (var i = 0; i < 90; i++) parts.push({
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight,
+      r: 0.4 + Math.random() * 1.4,
+      vy: -(0.15 + Math.random() * 0.5),
+      vx: (Math.random() - 0.5) * 0.25,
+      a: 0.05 + Math.random() * 0.18
+    });
+    setInterval(function() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      parts.forEach(function(p) {
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 6.28);
+        ctx.fillStyle = 'rgba(0,255,65,' + p.a.toFixed(2) + ')'; ctx.fill();
+        p.x += p.vx; p.y += p.vy;
+        if (p.y < -5) { p.y = canvas.height + 5; p.x = Math.random() * canvas.width; }
+        if (p.x < -5) p.x = canvas.width + 5;
+        if (p.x > canvas.width + 5) p.x = -5;
+      });
+    }, 33);
+  })();
+
+  // ── CURSOR GLOW TRAIL ──────────────────────────────────────────
+  (function() {
+    var canvas = document.getElementById('dv-cursor-canvas');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var trail = [];
+    function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    resize(); window.addEventListener('resize', resize);
+    document.addEventListener('mousemove', function(e) {
+      trail.push({ x: e.clientX, y: e.clientY, age: 0 });
+      if (trail.length > 20) trail.shift();
+    });
+    document.addEventListener('touchstart', function(e) {
+      var t = e.touches[0]; var step = 0;
+      var pulse = setInterval(function() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        var a = Math.max(0, (8 - step) / 8 * 0.5);
+        ctx.beginPath(); ctx.arc(t.clientX, t.clientY, 8 + step * 7, 0, 6.28);
+        ctx.strokeStyle = 'rgba(233,24,133,' + a + ')'; ctx.lineWidth = 2; ctx.stroke();
+        step++;
+        if (step >= 8) clearInterval(pulse);
+      }, 28);
+    }, { passive: true });
+    (function drawTrail() {
+      requestAnimationFrame(drawTrail);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      trail.forEach(function(p, i) {
+        var frac = i / trail.length;
+        ctx.beginPath(); ctx.arc(p.x, p.y, frac * 5 + 1, 0, 6.28);
+        ctx.fillStyle = 'rgba(233,24,133,' + (frac * 0.35).toFixed(2) + ')'; ctx.fill();
+        p.age++;
+      });
+      trail = trail.filter(function(p) { return p.age < 22; });
+    })();
+  })();
 
 })();
 </script>
