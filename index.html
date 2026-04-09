@@ -608,10 +608,33 @@ body.dv-gate-active * { cursor: none !important; }
 
 /* ── TERMINAL CINEMATIC OPEN ────────────────────────────────── */
 @keyframes dv-terminal-open {
-  0%   { transform: scaleY(0.02) scaleX(0.4); opacity:0; border-color: rgba(var(--neon-rgb),0); box-shadow: none; }
-  15%  { transform: scaleY(0.02) scaleX(1); opacity:1; border-color: rgba(var(--neon-rgb),0.8); box-shadow: 0 0 40px rgba(var(--neon-rgb),0.6); }
-  30%  { transform: scaleY(0.02) scaleX(1); border-color: rgba(var(--neon-rgb),1); box-shadow: 0 0 60px rgba(var(--neon-rgb),0.8), inset 0 0 20px rgba(var(--neon-rgb),0.1); }
+  0%   { transform: scaleY(0.015) scaleX(0.3); opacity:0; border-color: rgba(var(--neon-rgb),0); box-shadow: none; }
+  10%  { transform: scaleY(0.015) scaleX(0.8); opacity:1; border-color: rgba(var(--neon-rgb),0.6); box-shadow: 0 0 30px rgba(var(--neon-rgb),0.4); }
+  20%  { transform: scaleY(0.015) scaleX(1); border-color: rgba(var(--neon-rgb),0.9); box-shadow: 0 0 50px rgba(var(--neon-rgb),0.7); }
+  28%  { transform: scaleY(0.015) scaleX(1); border-color: rgba(var(--neon-rgb),1); box-shadow: 0 0 60px rgba(var(--neon-rgb),0.9), inset 0 0 20px rgba(var(--neon-rgb),0.15); }
+  33%  { transform: scaleY(0.015) scaleX(1); border-color: rgba(var(--neon-rgb),0.4); box-shadow: 0 0 15px rgba(var(--neon-rgb),0.2); }
+  36%  { transform: scaleY(0.015) scaleX(1); border-color: rgba(var(--neon-rgb),1); box-shadow: 0 0 70px rgba(var(--neon-rgb),1); }
+  45%  { transform: scaleY(0.06) scaleX(1); border-color: rgba(var(--neon-rgb),0.8); }
   100% { transform: scaleY(1) scaleX(1); opacity:1; border-color: rgba(var(--neon-rgb),0.55); box-shadow: 0 0 0 1px rgba(var(--neon-rgb),0.1), 0 0 20px rgba(var(--neon-rgb),0.25), 0 0 60px rgba(var(--neon-rgb),0.1), inset 0 0 30px rgba(var(--neon-rgb),0.03); }
+}
+/* ── SCAN BAR — glowing line sweeps across terminal during open ── */
+@keyframes dv-scanbar-sweep {
+  0%   { left: -10%; opacity:0; }
+  10%  { opacity:1; }
+  90%  { opacity:1; }
+  100% { left: 110%; opacity:0; }
+}
+.dv-terminal-wrap::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -10%;
+  width: 3px; height: 100%;
+  background: linear-gradient(180deg, transparent, rgba(var(--neon-rgb),0.9), rgba(var(--neon-rgb),0.4), transparent);
+  box-shadow: 0 0 15px rgba(var(--neon-rgb),0.8), 0 0 40px rgba(var(--neon-rgb),0.4);
+  z-index: 10;
+  pointer-events: none;
+  animation: dv-scanbar-sweep 1.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation-delay: 0.3s;
 }
 /* ── TERMINAL BOX ───────────────────────────────────────────── */
 .dv-terminal-wrap {
@@ -627,7 +650,7 @@ body.dv-gate-active * { cursor: none !important; }
   padding: 24px 22px 18px;
   font-family: 'JetBrains Mono', 'Share Tech Mono', monospace;
   overflow: hidden;
-  animation: dv-terminal-open 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: dv-terminal-open 1.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   transform-origin: center center;
 }
 
@@ -3616,7 +3639,7 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
   }
   function scheduleGlitch() {
     if (glitchTimeout) clearTimeout(glitchTimeout);
-    // Immediate first glitch on load, then every 3s like clockwork
+    // Immediate first glitch on load, then every 6s like clockwork
     triggerGlitch();
     glitchTimeout = setInterval(function() {
       if (document.getElementById('diss0linkz-auth-gate')) {
@@ -3624,7 +3647,7 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
       } else {
         clearInterval(glitchTimeout);
       }
-    }, 3000);
+    }, 6000);
   }
 
   // ── ACCESS GRANTED ──────────────────────────────────────────
@@ -3894,11 +3917,11 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
     }
 
     document.body.classList.add('dv-gate-active');
-    // Wait for terminal cinematic open (1.2s) then start boot text
+    // Wait for terminal cinematic open (1.8s) + scan bar (1.4s) then start boot text
     setTimeout(function() {
       runBootSequence();
       scheduleGlitch();
-    }, 1300);
+    }, 2000);
 
     // Keyboard handler
     var inputEl = document.getElementById('dv-passphrase-input');
