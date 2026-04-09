@@ -2951,7 +2951,7 @@ async function submitNotificationEmail() {
     return;
   }
 
-  var token = sessionStorage.getItem('dv_pat') || '';
+  var token = sessionStorage.getItem('gh_pat') || '';
   if (!token) {
     feedback.textContent = 'NO TOKEN // NOTIFICATION REQUIRES GITHUB PAT';
     feedback.style.color = 'var(--red-warn)';
