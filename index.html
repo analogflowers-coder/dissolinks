@@ -16,9 +16,11 @@
 <meta name="twitter:description" content="VOID_STRIDE PROTOCOL ACTIVE. SOVEREIGN LINK ARCHITECTURE.">
 <meta name="theme-color" content="#00FF41">
 <meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://api.github.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
 <!-- END META TAGS // META_CRACKER -->
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<!-- TODO: Replace Tailwind Play CDN with self-hosted build for full SRI support -->
+<script src="https://cdn.tailwindcss.com" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" integrity="sha512-CNvpLwFDaYITwIOb9XLz6pAQnS6P5a5D1jtSc30wUW7sVuS1r1lP5DfFHOeJrEqdpOBHRgrW7MGQq3nSWjKg==" crossorigin="anonymous"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap');
 
@@ -1492,8 +1494,8 @@ body.dv-glitching #diss0linkz-auth-gate {
       </div>
       <div class="vault-field">
         <label class="vault-label" for="vault-signin-pass">&#62; PASSWORD</label>
-        <input type="password" id="vault-signin-pass" class="vault-input" placeholder="&#95;&#95;&#95;&#95;&#95;&#95;&#95;&#95;"
-          autocomplete="off" spellcheck="false">
+        <input type="password" id="vault-signin-pass" class="vault-input" placeholder="MIN 12 CHARACTERS"
+          autocomplete="off" spellcheck="false" minlength="12">
       </div>
       <button class="vault-btn-primary" id="vault-signin-btn" onclick="vaultSignIn()">&#9654; AUTHENTICATE</button>
     </div>
@@ -1510,13 +1512,13 @@ body.dv-glitching #diss0linkz-auth-gate {
       </div>
       <div class="vault-field">
         <label class="vault-label" for="vault-create-pass">&#62; PASSWORD</label>
-        <input type="password" id="vault-create-pass" class="vault-input" placeholder="&#95;&#95;&#95;&#95;&#95;&#95;&#95;&#95;"
-          autocomplete="off" spellcheck="false">
+        <input type="password" id="vault-create-pass" class="vault-input" placeholder="MIN 12 CHARACTERS"
+          autocomplete="off" spellcheck="false" minlength="12">
       </div>
       <div class="vault-field">
         <label class="vault-label" for="vault-create-pass2">&#62; CONFIRM PASSWORD</label>
-        <input type="password" id="vault-create-pass2" class="vault-input" placeholder="&#95;&#95;&#95;&#95;&#95;&#95;&#95;&#95;"
-          autocomplete="off" spellcheck="false">
+        <input type="password" id="vault-create-pass2" class="vault-input" placeholder="MIN 12 CHARACTERS"
+          autocomplete="off" spellcheck="false" minlength="12">
       </div>
       <button class="vault-btn-primary" id="vault-create-btn" onclick="vaultCreateAccount()">&#9654; REGISTER OPERATOR</button>
     </div>
@@ -4319,7 +4321,8 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!username) { vaultSetStatus('> INVALID USERNAME. USE LETTERS/NUMBERS/UNDERSCORES/HYPHENS.', 'err'); return; }
     if (!password) { vaultSetStatus('> PASSWORD REQUIRED.', 'err'); return; }
     if (password !== pass2) { vaultSetStatus('> PASSWORDS DO NOT MATCH.', 'err'); return; }
-    if (password.length < 6) { vaultSetStatus('> PASSWORD TOO SHORT. MINIMUM 6 CHARACTERS.', 'err'); return; }
+    // STEALTH-PACKET: Min 12 chars — hashes stored in public GitHub repo
+    if (password.length < 12) { vaultSetStatus('> PASSWORD TOO SHORT. MINIMUM 12 CHARACTERS.', 'err'); return; }
     if (!vaultToken()) { vaultSetStatus('> OPERATOR TOKEN REQUIRED. CONNECT IN SETTINGS \u2699', 'err'); return; }
     btn.disabled = true;
     vaultSetStatus('> HASHING CREDENTIALS...', 'wait');
