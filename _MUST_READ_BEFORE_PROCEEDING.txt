@@ -18,7 +18,7 @@ GitHub Pages repo serving links.dissoverse.com shortlinks.
 Each subfolder = one shortlink. Each subfolder has one index.html.
 DNS: links.dissoverse.com CNAME to GitHub Pages (main branch).
 
-DissOLinK's SOLE PURPOSE: Force users out of in-app browsers (Instagram/TikTok
+Diss0LinkZ's SOLE PURPOSE: Force users out of in-app browsers (Instagram/TikTok
 WebView) so links open in a native browser. The bridge pages are IAB ESCAPE
 ENGINES — not just redirects.
 
