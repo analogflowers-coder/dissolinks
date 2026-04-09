@@ -349,219 +349,338 @@
 }
 </style>
 <style>
-  /* ================================================================
-     DISS0LINKZ AUTH GATE -- TERMINAL PORTAL v2.0
-     IRONWIRE | Claude Code | Node 002 | DISSOVERSE LLC
-     ================================================================ */
+/* ================================================================
+   DISS0LINKZ AUTH GATE v3.0 -- TERMINAL PORTAL
+   IRONWIRE | Claude Code | Node 002 | DISSOVERSE LLC
+   2026-04-09 -- FULL OVERHAUL
+   Password: 444 | PBKDF2-SHA256 | 200k iterations
+   ================================================================ */
 
-  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=VT323&display=swap');
 
-  #diss0linkz-auth-gate {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: #000;
-    z-index: 99999;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-family: 'JetBrains Mono', 'Share Tech Mono', monospace;
-    color: #00FF41;
-    overflow: hidden;
-    transition: opacity 0.6s ease;
-  }
+/* ── BODY LOCK ───────────────────────────────────────────────── */
+body.dv-gate-active {
+  overflow: hidden;
+  cursor: none;
+}
+body.dv-gate-active * { cursor: none !important; }
 
-  #diss0linkz-auth-gate.gate-exit {
-    opacity: 0;
-    pointer-events: none;
-  }
+/* ── MATRIX CANVAS ──────────────────────────────────────────── */
+#dv-matrix-canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
 
-  #diss0linkz-auth-gate::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      rgba(0,0,0,0.15) 2px,
-      rgba(0,0,0,0.15) 4px
-    );
-    pointer-events: none;
-    z-index: 1;
-  }
+/* ── GATE WRAPPER ───────────────────────────────────────────── */
+#diss0linkz-auth-gate {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 16px;
+  background: transparent;
+  transition: opacity 0.8s ease, filter 0.8s ease;
+}
+#diss0linkz-auth-gate.gate-exit {
+  opacity: 0;
+  filter: blur(12px) brightness(2);
+  pointer-events: none;
+}
 
-  .dv-terminal-container {
-    position: relative;
-    z-index: 2;
-    width: min(600px, 90vw);
-    padding: 32px 24px;
-    border: 1px solid rgba(0,255,65,0.2);
-    background: rgba(0,255,65,0.02);
-    box-shadow:
-      0 0 40px rgba(0,255,65,0.12),
-      0 0 80px rgba(0,255,65,0.05),
-      inset 0 0 30px rgba(0,255,65,0.02);
-    animation: dv-glow-pulse 3s ease-in-out infinite;
-  }
+/* ── LOGO ───────────────────────────────────────────────────── */
+.dv-logo-section {
+  margin-bottom: 28px;
+  text-align: center;
+  animation: dv-logo-float 4s ease-in-out infinite;
+}
+.dv-logo-img {
+  width: min(340px, 80vw);
+  height: auto;
+  filter: drop-shadow(0 0 18px rgba(0,255,65,0.6)) drop-shadow(0 0 40px rgba(0,255,65,0.25));
+  animation: dv-logo-glow 2.5s ease-in-out infinite;
+}
+@keyframes dv-logo-float {
+  0%,100% { transform: translateY(0px); }
+  50%      { transform: translateY(-6px); }
+}
+@keyframes dv-logo-glow {
+  0%,100% { filter: drop-shadow(0 0 14px rgba(0,255,65,0.5)) drop-shadow(0 0 30px rgba(0,255,65,0.2)); }
+  50%     { filter: drop-shadow(0 0 28px rgba(0,255,65,0.9)) drop-shadow(0 0 60px rgba(0,255,65,0.4)); }
+}
 
-  @keyframes dv-glow-pulse {
-    0%, 100% { box-shadow: 0 0 40px rgba(0,255,65,0.12), 0 0 80px rgba(0,255,65,0.05); }
-    50% { box-shadow: 0 0 60px rgba(0,255,65,0.20), 0 0 120px rgba(0,255,65,0.08); }
-  }
+/* ── TERMINAL BOX ───────────────────────────────────────────── */
+.dv-terminal-wrap {
+  position: relative;
+  width: min(520px, 92vw);
+  background: rgba(0, 4, 0, 0.92);
+  border: 1px solid rgba(0,255,65,0.55);
+  box-shadow:
+    0 0 0 1px rgba(0,255,65,0.1),
+    0 0 20px rgba(0,255,65,0.25),
+    0 0 60px rgba(0,255,65,0.1),
+    inset 0 0 30px rgba(0,255,65,0.03);
+  padding: 24px 22px 18px;
+  font-family: 'JetBrains Mono', 'Share Tech Mono', monospace;
+  overflow: hidden;
+}
 
-  .dv-terminal-container.lockout-mode {
-    animation: dv-glow-red 1s ease-in-out infinite;
-    border-color: rgba(255,0,60,0.3);
-  }
+/* CRT scanlines overlay */
+.dv-terminal-wrap::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.18) 2px,
+    rgba(0,0,0,0.18) 4px
+  );
+  pointer-events: none;
+  z-index: 10;
+}
 
-  @keyframes dv-glow-red {
-    0%, 100% { box-shadow: 0 0 40px rgba(255,0,60,0.2), 0 0 80px rgba(255,0,60,0.08); }
-    50% { box-shadow: 0 0 60px rgba(255,0,60,0.35), 0 0 120px rgba(255,0,60,0.15); }
-  }
+/* Corner decorations */
+.dv-corner {
+  position: absolute;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: rgba(0,255,65,0.4);
+  line-height: 1;
+}
+.dv-corner.tl { top: 6px; left: 8px; }
+.dv-corner.tr { top: 6px; right: 8px; }
+.dv-corner.bl { bottom: 6px; left: 8px; }
+.dv-corner.br { bottom: 6px; right: 8px; }
 
-  #dv-boot-output {
-    min-height: 220px;
-    line-height: 1.7;
-    font-size: clamp(12px, 2.5vw, 14px);
-    letter-spacing: 0.03em;
-    white-space: pre-wrap;
-  }
+/* Boot output */
+#dv-boot-output {
+  font-size: clamp(11px, 2.2vw, 13px);
+  color: rgba(0,255,65,0.85);
+  line-height: 1.65;
+  min-height: 120px;
+  margin-bottom: 12px;
+  letter-spacing: 0.04em;
+  white-space: pre-wrap;
+}
+#dv-boot-output .dv-line { display: block; }
+#dv-boot-output .dv-line.dv-bright { color: #00ff41; }
+#dv-boot-output .dv-line.dv-dim    { color: rgba(0,255,65,0.45); }
+#dv-boot-output .dv-line.dv-warn   { color: #ffcc00; }
 
-  .dv-boot-line { display: block; }
+/* Separator */
+.dv-separator {
+  color: rgba(0,255,65,0.2);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  margin-bottom: 14px;
+  overflow: hidden;
+}
 
-  .dv-cursor {
-    display: inline-block;
-    width: 8px;
-    height: 14px;
-    background: #00FF41;
-    vertical-align: bottom;
-    animation: dv-blink 1s step-end infinite;
-  }
+/* Input row */
+#dv-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid rgba(0,255,65,0.2);
+  padding-bottom: 10px;
+}
+.dv-prompt {
+  color: #00ff41;
+  font-size: 14px;
+  user-select: none;
+  flex-shrink: 0;
+}
+#dv-passphrase-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #00ff41;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(14px, 3vw, 17px);
+  letter-spacing: 0.25em;
+  caret-color: #00ff41;
+  min-width: 0;
+}
+#dv-passphrase-input::placeholder { color: rgba(0,255,65,0.2); }
+#dv-submit-btn {
+  background: transparent;
+  border: 1px solid rgba(0,255,65,0.6);
+  color: #00ff41;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+#dv-submit-btn:hover, #dv-submit-btn:focus {
+  background: rgba(0,255,65,0.12);
+  border-color: #00ff41;
+  box-shadow: 0 0 10px rgba(0,255,65,0.3);
+}
 
-  @keyframes dv-blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
-  }
+/* Status / lockout */
+#dv-status-line {
+  font-size: 11px;
+  color: rgba(0,255,65,0.55);
+  letter-spacing: 0.08em;
+  min-height: 16px;
+  margin-bottom: 10px;
+}
+#dv-lockout-timer {
+  font-size: 13px;
+  color: #ff3333;
+  letter-spacing: 0.08em;
+  min-height: 16px;
+  margin-bottom: 6px;
+  text-align: center;
+}
 
-  #dv-input-row {
-    display: none;
-    align-items: center;
-    margin-top: 8px;
-    gap: 8px;
-    font-size: clamp(12px, 2.5vw, 14px);
-  }
+/* Audio visualizer */
+#dv-visualizer {
+  display: block;
+  width: 100%;
+  height: 36px;
+  margin-top: 4px;
+  opacity: 0.7;
+}
 
-  #dv-input-row.visible { display: flex; }
+/* VERITAS badge */
+.dv-veritas-badge {
+  margin-top: 18px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: rgba(0,255,65,0.25);
+  text-align: center;
+}
 
-  #dv-passphrase-input {
-    flex: 1;
-    background: transparent;
-    border: none;
-    border-bottom: 1px solid rgba(0,255,65,0.4);
-    color: #00FF41;
-    font-family: inherit;
-    font-size: inherit;
-    letter-spacing: 0.15em;
-    outline: none;
-    padding: 4px 0;
-    caret-color: #00FF41;
-  }
+/* ── ACCESS GRANTED ─────────────────────────────────────────── */
+#dv-granted-flash {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, rgba(0,255,65,0.6) 0%, transparent 70%);
+  z-index: 200;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+#dv-granted-flash.active { opacity: 1; }
 
-  #dv-passphrase-input::placeholder { color: rgba(0,255,65,0.3); }
+/* ── ACCESS DENIED shake ────────────────────────────────────── */
+@keyframes dv-shake {
+  0%,100% { transform: translateX(0); }
+  15%     { transform: translateX(-8px); }
+  30%     { transform: translateX(8px); }
+  45%     { transform: translateX(-6px); }
+  60%     { transform: translateX(6px); }
+  75%     { transform: translateX(-3px); }
+  90%     { transform: translateX(3px); }
+}
+.dv-denied-shake { animation: dv-shake 0.45s ease-out; }
 
-  #dv-submit-btn {
-    background: transparent;
-    border: 1px solid rgba(0,255,65,0.4);
-    color: #00FF41;
-    font-family: inherit;
-    font-size: 11px;
-    letter-spacing: 0.1em;
-    padding: 4px 12px;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
+/* ── LOCKOUT RED GLOW ───────────────────────────────────────── */
+@keyframes dv-lockout-pulse {
+  0%,100% { box-shadow: 0 0 0 1px rgba(255,51,51,0.1), 0 0 20px rgba(255,51,51,0.2), 0 0 60px rgba(255,51,51,0.08), inset 0 0 30px rgba(255,51,51,0.03); border-color: rgba(255,51,51,0.4); }
+  50%     { box-shadow: 0 0 0 1px rgba(255,51,51,0.2), 0 0 35px rgba(255,51,51,0.45), 0 0 90px rgba(255,51,51,0.2), inset 0 0 40px rgba(255,51,51,0.06); border-color: rgba(255,51,51,0.7); }
+}
+.dv-lockout-mode .dv-terminal-wrap {
+  animation: dv-lockout-pulse 1.2s ease-in-out infinite;
+}
+.dv-lockout-mode #dv-status-line { color: #ff3333; }
 
-  #dv-submit-btn:hover {
-    background: rgba(0,255,65,0.1);
-    border-color: #00FF41;
-  }
+/* ── APP (hidden until auth) ────────────────────────────────── */
+#diss0linkz-app {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+#diss0linkz-app.app-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
 
-  #dv-status-line {
-    min-height: 20px;
-    font-size: 12px;
-    margin-top: 12px;
-    letter-spacing: 0.05em;
-    transition: color 0.2s;
-  }
+/* ── GLOBAL GLITCH ──────────────────────────────────────────── */
+@keyframes dv-glitch-body {
+  0%,100% { filter: none; }
+  20%     { filter: hue-rotate(60deg) saturate(3) brightness(1.5); }
+  40%     { filter: hue-rotate(-40deg) saturate(2); transform: skewX(1deg); }
+  60%     { filter: brightness(2) saturate(0.2); }
+  80%     { filter: hue-rotate(120deg); transform: skewX(-1deg); }
+}
+body.dv-glitching #diss0linkz-auth-gate {
+  animation: dv-glitch-body 0.4s steps(2) forwards;
+}
 
-  #dv-lockout-timer {
-    display: none;
-    font-size: 28px;
-    font-weight: 700;
-    color: #FF003C;
-    text-align: center;
-    margin-top: 16px;
-    letter-spacing: 0.1em;
-  }
-
-  body.dv-glitching #diss0linkz-auth-gate {
-    animation: dv-glitch-body 0.15s linear;
-  }
-
-  @keyframes dv-glitch-body {
-    0%   { transform: translate(0); }
-    20%  { transform: translate(-2px, 1px); filter: hue-rotate(90deg); }
-    40%  { transform: translate(2px, -1px); }
-    60%  { transform: translate(-1px, 2px); filter: hue-rotate(-90deg); }
-    80%  { transform: translate(1px, -2px); }
-    100% { transform: translate(0); filter: none; }
-  }
-
-  .dv-text-glitch {
-    text-shadow: 2px 0 #FF003C, -2px 0 #00FFFF;
-    animation: dv-rgb-split 0.15s linear;
-  }
-
-  @keyframes dv-rgb-split {
-    0%   { text-shadow: 2px 0 #FF003C, -2px 0 #00FFFF; }
-    50%  { text-shadow: -2px 0 #FF003C, 2px 0 #00FFFF; }
-    100% { text-shadow: none; }
-  }
-
-  .dv-denied-text { color: #FF003C !important; }
-  .dv-granted-text { color: #00FF41; text-shadow: 0 0 10px rgba(0,255,65,0.8); }
-
-  #dv-white-flash {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: #fff;
-    opacity: 0;
-    z-index: 999999;
-    pointer-events: none;
-    transition: opacity 0.05s;
-  }
-
-  #diss0linkz-app {
-    opacity: 0;
-    transition: opacity 0.5s ease;
-  }
-  #diss0linkz-app.app-visible { opacity: 1; }
-
-  @media (max-width: 480px) {
-    .dv-terminal-container { padding: 20px 16px; }
-    #dv-boot-output { min-height: 180px; }
-  }
+/* ── MUSIC BUTTON ───────────────────────────────────────────── */
+#dv-music-btn {
+  position: fixed;
+  bottom: 14px;
+  right: 14px;
+  z-index: 150;
+  background: rgba(0,4,0,0.85);
+  border: 1px solid rgba(0,255,65,0.35);
+  color: rgba(0,255,65,0.7);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  padding: 5px 9px;
+  cursor: pointer;
+  display: none;
+  transition: all 0.2s;
+}
+#dv-music-btn:hover { border-color: #00ff41; color: #00ff41; }
 </style>
 </head>
 <body>
-<!-- DISS0LINKZ AUTH GATE v2.0 | IRONWIRE Node 002 | DISSOVERSE LLC -->
-<!-- PLACEHOLDER HASH -- OPERATOR MUST REPLACE BEFORE GO-LIVE -->
+<!-- MATRIX RAIN CANVAS -->
+<canvas id="dv-matrix-canvas"></canvas>
+
+<!-- BACKGROUND MUSIC -->
+<audio id="dv-bg-music" loop preload="auto" crossorigin="anonymous">
+  <source src="https://cdn.shopify.com/s/files/1/0897/5686/0735/files/TRAP_BEAT_256KPS.mp3?v=1775267721" type="audio/mpeg">
+</audio>
+
+<!-- MUSIC TOGGLE -->
+<button id="dv-music-btn" onclick="dvToggleMusic()">&#9834; MUTE</button>
+
+<!-- FLASH OVERLAY -->
+<div id="dv-granted-flash"></div>
+
+<!-- ================================================================
+     DISS0LINKZ AUTH GATE v3.0 | IRONWIRE | DISSOVERSE LLC
+     ================================================================ -->
 <div id="diss0linkz-auth-gate">
-  <div class="dv-terminal-container" id="dv-terminal-box">
+  <div class="dv-logo-section">
+    <img src="https://cdn.shopify.com/s/files/1/0897/5686/0735/files/Diss0Links---CHROME.png?v=1775720592"
+         class="dv-logo-img"
+         alt="Diss0LinkZ"
+         draggable="false">
+  </div>
+
+  <div class="dv-terminal-wrap" id="dv-terminal-box">
+    <span class="dv-corner tl">[+]</span>
+    <span class="dv-corner tr">[+]</span>
+    <span class="dv-corner bl">[+]</span>
+    <span class="dv-corner br">[+]</span>
+
     <div id="dv-boot-output"></div>
+
+    <div class="dv-separator">&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</div>
+
     <div id="dv-input-row">
-      <span style="color:rgba(0,255,65,0.6);user-select:none;">&gt;&nbsp;</span>
+      <span class="dv-prompt">&gt;</span>
       <input
         type="password"
         id="dv-passphrase-input"
@@ -569,52 +688,23 @@
         autocorrect="off"
         autocapitalize="off"
         spellcheck="false"
-        placeholder=""
+        placeholder="&#95;&#95;&#95;&#95;&#95;&#95;&#95;&#95;"
         aria-label="Access code"
+        maxlength="32"
       />
       <button id="dv-submit-btn" onclick="dvSubmitPassphrase()">ENTER</button>
     </div>
-    <div id="dv-status-line"></div>
+
+    <div id="dv-status-line">&gt; ATTEMPT 1 OF 5.</div>
     <div id="dv-lockout-timer"></div>
+
+    <canvas id="dv-visualizer"></canvas>
   </div>
-  <div style="position:fixed;bottom:10px;left:0;right:0;text-align:center;font-size:10px;font-family:'JetBrains Mono',monospace;color:#00FF41;opacity:0.35;letter-spacing:0.12em;pointer-events:none;z-index:100000;">
-    PROTECTED BY VERITAS_ENGINE // DISSOVERSE NEURAL NETWORK
-  </div>
+
+  <div class="dv-veritas-badge">PROTECTED BY VERITAS_ENGINE // DISSOVERSE NEURAL NETWORK</div>
 </div>
-<div id="dv-white-flash"></div>
 
 <div id="diss0linkz-app">
-
-<!-- ==================== ACCESS GATE ==================== -->
-<div id="access-gate" style="position:fixed;top:0;left:0;right:0;bottom:0;background:#0a0a0a;z-index:10000;display:flex;align-items:center;justify-content:center;flex-direction:column;padding:24px;">
-  <div style="text-align:center;max-width:360px;">
-    <div style="font-size:11px;color:#ff0033;letter-spacing:4px;margin-bottom:16px;">&#9888; RESTRICTED ACCESS &#9888;</div>
-    <div style="font-size:clamp(28px,6vw,42px);font-family:'VT323',monospace;color:#00ff41;text-shadow:0 0 15px rgba(0,255,65,0.5);margin-bottom:8px;line-height:1.1;">Diss0LinkZ</div>
-    <div style="font-size:12px;color:rgba(0,255,65,0.5);margin:16px 0 32px;letter-spacing:2px;">ENTER ACCESS CODE</div>
-    <input type="password" id="access-code" placeholder="ACCESS CODE" autocomplete="off" style="width:100%;padding:14px 16px;background:rgba(0,255,65,0.03);border:1px solid rgba(0,255,65,0.25);color:#00ff41;font-family:'Share Tech Mono',monospace;font-size:16px;text-align:center;letter-spacing:4px;outline:none;" onkeydown="if(event.key==='Enter')checkAccess()">
-    <button onclick="checkAccess()" style="width:100%;margin-top:12px;padding:14px;background:transparent;border:1px solid #00ff41;color:#00ff41;font-family:'Share Tech Mono',monospace;font-size:14px;cursor:pointer;letter-spacing:3px;text-transform:uppercase;">&#9654; AUTHENTICATE</button>
-    <div id="access-error" style="color:#ff0033;font-size:12px;margin-top:12px;min-height:20px;letter-spacing:2px;"></div>
-    <div style="font-size:10px;color:rgba(0,255,65,0.2);margin-top:24px;letter-spacing:2px;">DISSOVERSE NEURAL NETWORK // SOVEREIGN ACCESS</div>
-  </div>
-</div>
-<script>
-/* SECURITY NOTE: This password gate is cosmetic UX only. The deployment PAT is the actual security boundary. */
-function checkAccess(){
-  var code=document.getElementById('access-code').value;
-  if(code==='444'){
-    document.getElementById('access-gate').style.transition='opacity 0.5s,filter 0.5s';
-    document.getElementById('access-gate').style.opacity='0';
-    document.getElementById('access-gate').style.filter='blur(10px)';
-    setTimeout(function(){document.getElementById('access-gate').style.display='none';},600);
-    sessionStorage.setItem('dv_access','1');
-  } else {
-    document.getElementById('access-error').textContent='ACCESS DENIED // INVALID CODE';
-    document.getElementById('access-code').value='';
-    document.getElementById('access-code').focus();
-  }
-}
-if(sessionStorage.getItem('dv_access')==='1'){document.getElementById('access-gate').style.display='none';}
-</script>
 
 <!-- ==================== SETTINGS MODAL ==================== -->
 <div id="settings-modal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeSettings()">
@@ -1698,250 +1788,450 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
   PROTECTED BY VERITAS_ENGINE // DISSOVERSE NEURAL NETWORK
 </div>
 </div><!-- end #diss0linkz-app -->
+
 <script>
-/* DISS0LINKZ AUTH GATE -- AUTHENTICATION LOGIC
-   PBKDF2-SHA256 | 200,000 iterations | SameSite:Strict cookie
-   PLACEHOLDER HASH: e7795363e32c718c65f69da6d8922f42b98b6560465723f676a1f084ee01d3fb
-   OPERATOR: replace AUTH_CONFIG.HASH with real hash before go-live */
+/* ================================================================
+   DISS0LINKZ AUTH GATE v3.0
+   IRONWIRE | Claude Code | Node 002 | DISSOVERSE LLC
+   PBKDF2-SHA256 | 200,000 iterations
+   Password: 444 | Hash: 554489d0f5193116cdb314a2c70eda968029af1890bf628e4fd912b6804ce38f
+   ================================================================ */
 (function() {
   'use strict';
 
-  var AUTH_CONFIG = {
+  // ── CONFIG ─────────────────────────────────────────────────────
+  var CFG = {
     SALT: 'DISS0LINKZ_SALT_2026_v1',
-    HASH: 'e7795363e32c718c65f69da6d8922f42b98b6560465723f676a1f084ee01d3fb',
-    ITERATIONS: 200000
+    HASH: '554489d0f5193116cdb314a2c70eda968029af1890bf628e4fd912b6804ce38f',
+    ITER: 200000,
+    MAX_ATTEMPTS: 5,
+    LOCKOUT_SECS: 60,
+    COOKIE_NAME: 'diss0linkz_auth',
+    COOKIE_PREFIX: 'd0lz_'
   };
 
-  var MAX_ATTEMPTS = 5;
-  var LOCKOUT_SECS = 60;
   var attempts = 0;
   var locked = false;
-  var lockoutTimer = null;
+  var lockTimer = null;
+  var audioCtx = null;
+  var musicStarted = false;
+  var musicMuted = false;
   var glitchTimeout = null;
 
-  function setAuthCookie() {
-    var val = 'd0lz_' + Date.now().toString(36);
-    var exp = new Date(Date.now() + 24*60*60*1000).toUTCString();
-    document.cookie = 'diss0linkz_auth=' + val + '; expires=' + exp + '; path=/; SameSite=Strict; Secure';
-  }
-
-  function checkAuthCookie() {
-    return document.cookie.split(';').some(function(c) {
-      return c.trim().indexOf('diss0linkz_auth=d0lz_') === 0;
-    });
-  }
-
-  async function hashPassphrase(passphrase) {
-    var encoder = new TextEncoder();
-    var keyMaterial = await crypto.subtle.importKey(
-      'raw', encoder.encode(passphrase), 'PBKDF2', false, ['deriveBits']
-    );
-    var hashBuffer = await crypto.subtle.deriveBits({
-      name: 'PBKDF2',
-      salt: encoder.encode(AUTH_CONFIG.SALT),
-      iterations: AUTH_CONFIG.ITERATIONS,
-      hash: 'SHA-256'
-    }, keyMaterial, 256);
-    return Array.from(new Uint8Array(hashBuffer))
-      .map(function(b) { return b.toString(16).padStart(2, '0'); })
-      .join('');
-  }
-
+  // ── BOOT SEQUENCE ───────────────────────────────────────────────
   var BOOT_LINES = [
-    '> DISS0LINKZ NEURAL NETWORK v2.0',
-    '> INITIALIZING SECURE CHANNEL...',
-    '> ENCRYPTION: AES-256 [ACTIVE]',
-    '> FIREWALL: [ARMED]',
-    '> SCANNING PERIMETER... [CLEAR]',
-    '> SIGNAL INTEGRITY: [VERIFIED]',
-    '',
-    '> ENTER ACCESS CODE:'
+    { text: '> DISS0LINKZ NEURAL NETWORK v3.0', cls: 'dv-bright', delay: 0 },
+    { text: '> INITIALIZING SECURE CHANNEL...', cls: '', delay: 120 },
+    { text: '> ENCRYPTION: AES-256 [ACTIVE]', cls: '', delay: 240 },
+    { text: '> FIREWALL: [ARMED]', cls: '', delay: 360 },
+    { text: '> SCANNING PERIMETER... [CLEAR]', cls: '', delay: 480 },
+    { text: '> SIGNAL INTEGRITY: [VERIFIED]', cls: 'dv-bright', delay: 600 },
+    { text: '> ENTER ACCESS CODE:', cls: 'dv-bright', delay: 720 }
   ];
 
-  var bootOutput, inputRow, passphraseInput, statusLine, lockoutDisplay, terminalBox;
+  // ── MATRIX RAIN ─────────────────────────────────────────────────
+  (function initMatrix() {
+    var canvas = document.getElementById('dv-matrix-canvas');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var cols, drops, fontSize = 14;
+    var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()_+-=[]{}|;:,.<>?/\\~`゠ァアィイゥウェエォコデブプホラン';
 
-  function typeBootLine(lineIdx, charIdx, onComplete) {
-    if (lineIdx >= BOOT_LINES.length) { onComplete(); return; }
-    var line = BOOT_LINES[lineIdx];
-    var span = bootOutput.querySelector('[data-line="' + lineIdx + '"]');
-    if (!span) {
-      span = document.createElement('span');
-      span.className = 'dv-boot-line';
-      span.setAttribute('data-line', String(lineIdx));
-      bootOutput.appendChild(span);
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      cols = Math.floor(canvas.width / fontSize);
+      drops = [];
+      for (var i = 0; i < cols; i++) {
+        drops[i] = Math.random() * -canvas.height / fontSize;
+      }
     }
-    if (charIdx < line.length) {
-      span.textContent = line.substring(0, charIdx + 1);
-      setTimeout(function() { typeBootLine(lineIdx, charIdx + 1, onComplete); },
-        Math.floor(25 + Math.random() * 20));
-    } else {
-      setTimeout(function() { typeBootLine(lineIdx + 1, 0, onComplete); },
-        lineIdx < BOOT_LINES.length - 2 ? 100 : 50);
+
+    window.addEventListener('resize', resize);
+    resize();
+
+    function drawMatrix() {
+      ctx.fillStyle = 'rgba(0,0,0,0.055)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      for (var i = 0; i < cols; i++) {
+        var char = chars[Math.floor(Math.random() * chars.length)];
+        var y = drops[i] * fontSize;
+        // Lead character: bright white-green
+        if (drops[i] > 0) {
+          ctx.fillStyle = drops[i] < 2 ? '#ffffff' : (Math.random() > 0.1 ? '#00ff41' : 'rgba(0,255,65,0.4)');
+          ctx.font = fontSize + 'px "JetBrains Mono", monospace';
+          ctx.fillText(char, i * fontSize, y);
+        }
+        if (y > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i] += 0.5 + Math.random() * 0.5;
+      }
+    }
+
+    setInterval(drawMatrix, 45);
+  })();
+
+  // ── AUDIO VISUALIZER ─────────────────────────────────────────────
+  (function initVisualizer() {
+    var canvas = document.getElementById('dv-visualizer');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var bars = 48;
+    var phase = 0;
+
+    function resize() {
+      canvas.width = canvas.offsetWidth || 480;
+      canvas.height = 36;
+    }
+    resize();
+    new ResizeObserver(resize).observe(canvas);
+
+    function draw() {
+      requestAnimationFrame(draw);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      phase += 0.06;
+      var w = canvas.width / bars;
+      for (var i = 0; i < bars; i++) {
+        var h = (Math.sin(i * 0.35 + phase) + Math.sin(i * 0.7 + phase * 1.3) + 2) * 0.25 * canvas.height;
+        h = Math.max(2, h);
+        var alpha = 0.3 + h / canvas.height * 0.55;
+        ctx.fillStyle = 'rgba(0,255,65,' + alpha.toFixed(2) + ')';
+        ctx.fillRect(i * w + 1, canvas.height - h, w - 2, h);
+      }
+    }
+    draw();
+  })();
+
+  // ── AUDIO / MUSIC ───────────────────────────────────────────────
+  function getAudioCtx() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    return audioCtx;
+  }
+
+  function startMusic() {
+    if (musicStarted) return;
+    var music = document.getElementById('dv-bg-music');
+    if (music) {
+      music.volume = 0.45;
+      music.play().then(function() {
+        musicStarted = true;
+        var btn = document.getElementById('dv-music-btn');
+        if (btn) btn.style.display = 'block';
+      }).catch(function() {});
     }
   }
 
-  function runBootSequence() {
-    bootOutput.innerHTML = '';
-    typeBootLine(0, 0, function() {
-      inputRow.classList.add('visible');
-      passphraseInput.focus();
-      startGlitchCycle();
+  window.dvToggleMusic = function() {
+    var music = document.getElementById('dv-bg-music');
+    var btn = document.getElementById('dv-music-btn');
+    if (!music) return;
+    musicMuted = !musicMuted;
+    music.muted = musicMuted;
+    if (btn) btn.textContent = musicMuted ? '\u266a PLAY' : '\u266a MUTE';
+  };
+
+  function playTypingSound() {
+    try {
+      var ctx = getAudioCtx();
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.frequency.setValueAtTime(900 + Math.random() * 200, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + 0.04);
+      gain.gain.setValueAtTime(0.07, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.04);
+      osc.start(); osc.stop(ctx.currentTime + 0.04);
+    } catch(e) {}
+  }
+
+  function playDeniedSound() {
+    try {
+      var ctx = getAudioCtx();
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.frequency.setValueAtTime(180, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(40, ctx.currentTime + 0.35);
+      gain.gain.setValueAtTime(0.22, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.35);
+      osc.start(); osc.stop(ctx.currentTime + 0.35);
+    } catch(e) {}
+  }
+
+  function playGrantedSound() {
+    try {
+      var ctx = getAudioCtx();
+      [440,554,659,880].forEach(function(freq, i) {
+        var osc = ctx.createOscillator();
+        var gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.frequency.value = freq;
+        osc.type = 'sine';
+        var t = ctx.currentTime + i * 0.08;
+        gain.gain.setValueAtTime(0, t);
+        gain.gain.linearRampToValueAtTime(0.15, t + 0.04);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.3);
+        osc.start(t); osc.stop(t + 0.3);
+      });
+    } catch(e) {}
+  }
+
+  // ── COOKIE ──────────────────────────────────────────────────────
+  function setAuthCookie() {
+    var val = CFG.COOKIE_PREFIX + Date.now().toString(36);
+    var exp = new Date(Date.now() + 86400000).toUTCString();
+    document.cookie = CFG.COOKIE_NAME + '=' + val + '; expires=' + exp + '; path=/; SameSite=Strict; Secure';
+  }
+  function checkAuthCookie() {
+    return document.cookie.split(';').some(function(c) {
+      return c.trim().startsWith(CFG.COOKIE_NAME + '=' + CFG.COOKIE_PREFIX);
     });
   }
 
-  function triggerGlitch(duration) {
-    document.body.classList.add('dv-glitching');
-    var bootLines = bootOutput.querySelectorAll('.dv-boot-line');
-    bootLines.forEach(function(el) { el.classList.add('dv-text-glitch'); });
-    setTimeout(function() {
-      document.body.classList.remove('dv-glitching');
-      bootLines.forEach(function(el) { el.classList.remove('dv-text-glitch'); });
-    }, duration || 150);
+  // ── PBKDF2 HASH ─────────────────────────────────────────────────
+  async function hashPassphrase(pw) {
+    var enc = new TextEncoder();
+    var key = await crypto.subtle.importKey('raw', enc.encode(pw), 'PBKDF2', false, ['deriveBits']);
+    var bits = await crypto.subtle.deriveBits(
+      { name:'PBKDF2', salt:enc.encode(CFG.SALT), iterations:CFG.ITER, hash:'SHA-256' },
+      key, 256
+    );
+    return Array.from(new Uint8Array(bits)).map(b => b.toString(16).padStart(2,'0')).join('');
   }
 
-  function startGlitchCycle() {
-    function scheduleNext() {
-      var delay = 8000 + Math.random() * 7000;
-      glitchTimeout = setTimeout(function() {
-        if (!locked) triggerGlitch(150);
-        scheduleNext();
-      }, delay);
-    }
-    scheduleNext();
-  }
-
-  function accessGranted() {
-    if (glitchTimeout) clearTimeout(glitchTimeout);
-    setAuthCookie();
-    statusLine.className = 'dv-granted-text';
-    statusLine.textContent = '> ACCESS GRANTED';
-    var grantLines = ['> SIGNAL LOCKED.', '> DECRYPTING DIRECTORY...', '> WELCOME TO THE NETWORK.'];
-    var delay = 400;
-    grantLines.forEach(function(line) {
+  // ── BOOT SEQUENCE ───────────────────────────────────────────────
+  var bootDone = false;
+  function runBootSequence() {
+    var out = document.getElementById('dv-boot-output');
+    if (!out) return;
+    out.innerHTML = '';
+    BOOT_LINES.forEach(function(line) {
       setTimeout(function() {
         var span = document.createElement('span');
-        span.className = 'dv-boot-line dv-granted-text';
-        span.textContent = line;
-        bootOutput.appendChild(span);
-      }, delay);
-      delay += 250;
+        span.className = 'dv-line' + (line.cls ? ' ' + line.cls : '');
+        typeWriter(span, line.text, 28, function() {
+          if (line === BOOT_LINES[BOOT_LINES.length-1]) {
+            bootDone = true;
+            var input = document.getElementById('dv-passphrase-input');
+            if (input) input.focus();
+          }
+        });
+        out.appendChild(span);
+        out.appendChild(document.createTextNode('\n'));
+      }, line.delay);
     });
-    setTimeout(function() {
-      var flash = document.getElementById('dv-white-flash');
-      flash.style.opacity = '0.3';
-      setTimeout(function() { flash.style.opacity = '0'; }, 80);
-    }, delay);
-    setTimeout(function() {
-      var gate = document.getElementById('diss0linkz-auth-gate');
-      gate.classList.add('gate-exit');
-      var app = document.getElementById('diss0linkz-app');
-      app.style.display = 'block';
-      setTimeout(function() { app.classList.add('app-visible'); }, 50);
-      setTimeout(function() { gate.style.display = 'none'; }, 650);
-    }, delay + 300);
   }
 
-  function accessDenied() {
-    attempts++;
-    triggerGlitch(600);
-    statusLine.className = 'dv-denied-text';
-    statusLine.textContent = '> ACCESS DENIED. SIGNAL REJECTED.';
-    passphraseInput.disabled = true;
-    if (attempts >= MAX_ATTEMPTS) {
-      setTimeout(startLockout, 800);
-    } else {
-      setTimeout(function() {
-        statusLine.textContent = '> ATTEMPT ' + attempts + ' OF ' + MAX_ATTEMPTS + '.';
-        statusLine.className = '';
-        statusLine.style.color = 'rgba(0,255,65,0.6)';
-        passphraseInput.value = '';
-        passphraseInput.disabled = false;
-        passphraseInput.focus();
-      }, 1500);
-    }
-  }
-
-  function startLockout() {
-    locked = true;
-    terminalBox.classList.add('lockout-mode');
-    triggerGlitch(1000);
-    passphraseInput.disabled = true;
-    document.getElementById('dv-submit-btn').disabled = true;
-    statusLine.className = 'dv-denied-text';
-    statusLine.textContent = '> CONNECTION TERMINATED.';
-    lockoutDisplay.style.display = 'block';
-    var remaining = LOCKOUT_SECS;
+  function typeWriter(el, text, speed, cb) {
+    var i = 0;
     function tick() {
-      lockoutDisplay.textContent = '[ LOCKOUT: ' + remaining + ' ]';
-      if (remaining <= 0) { endLockout(); return; }
-      remaining--;
-      lockoutTimer = setTimeout(tick, 1000);
+      if (i < text.length) {
+        el.textContent += text[i++];
+        setTimeout(tick, speed + Math.random() * 20);
+      } else if (cb) cb();
     }
     tick();
   }
 
-  function endLockout() {
-    locked = false;
-    attempts = 0;
-    terminalBox.classList.remove('lockout-mode');
-    lockoutDisplay.style.display = 'none';
-    statusLine.textContent = '';
-    statusLine.className = '';
-    passphraseInput.value = '';
-    passphraseInput.disabled = false;
-    document.getElementById('dv-submit-btn').disabled = false;
-    passphraseInput.focus();
+  // ── GLITCH CYCLE ────────────────────────────────────────────────
+  function triggerGlitch() {
+    document.body.classList.add('dv-glitching');
+    setTimeout(function() { document.body.classList.remove('dv-glitching'); }, 400);
+  }
+  function scheduleGlitch() {
+    if (glitchTimeout) clearTimeout(glitchTimeout);
+    glitchTimeout = setTimeout(function() {
+      if (document.getElementById('diss0linkz-auth-gate')) {
+        triggerGlitch();
+        scheduleGlitch();
+      }
+    }, 8000 + Math.random() * 7000);
   }
 
+  // ── ACCESS GRANTED ──────────────────────────────────────────────
+  function accessGranted() {
+    if (glitchTimeout) clearTimeout(glitchTimeout);
+    playGrantedSound();
+
+    // Flash green
+    var flash = document.getElementById('dv-granted-flash');
+    if (flash) {
+      flash.classList.add('active');
+      setTimeout(function() { flash.classList.remove('active'); }, 300);
+    }
+
+    // Type success lines then show app
+    var out = document.getElementById('dv-boot-output');
+    if (out) {
+      var lines = ['\n> ..........', '> ACCESS GRANTED', '> WELCOME TO THE NETWORK', '> LOADING NEURAL HUB...'];
+      var delay = 0;
+      lines.forEach(function(txt) {
+        setTimeout(function() {
+          var span = document.createElement('span');
+          span.className = 'dv-line dv-bright';
+          span.style.color = '#00ff41';
+          span.textContent = txt;
+          out.appendChild(span);
+          out.appendChild(document.createTextNode('\n'));
+        }, delay);
+        delay += 180;
+      });
+    }
+
+    setAuthCookie();
+
+    setTimeout(function() {
+      var gate = document.getElementById('diss0linkz-auth-gate');
+      var app  = document.getElementById('diss0linkz-app');
+      var matrix = document.getElementById('dv-matrix-canvas');
+      if (gate) gate.classList.add('gate-exit');
+      setTimeout(function() {
+        if (gate) gate.style.display = 'none';
+        if (matrix) { matrix.style.transition = 'opacity 1s'; matrix.style.opacity = '0'; }
+        document.body.classList.remove('dv-gate-active');
+        if (app) app.classList.add('app-visible');
+        // Fade out music
+        var music = document.getElementById('dv-bg-music');
+        if (music && !music.paused) {
+          var vol = music.volume;
+          var fade = setInterval(function() {
+            vol = Math.max(0, vol - 0.04);
+            music.volume = vol;
+            if (vol <= 0) { clearInterval(fade); music.pause(); }
+          }, 80);
+        }
+        var btn = document.getElementById('dv-music-btn');
+        if (btn) btn.style.display = 'none';
+      }, 800);
+    }, 1000);
+  }
+
+  // ── ACCESS DENIED ───────────────────────────────────────────────
+  function accessDenied() {
+    attempts++;
+    playDeniedSound();
+    triggerGlitch();
+
+    var box = document.getElementById('dv-terminal-box');
+    if (box) {
+      box.classList.add('dv-denied-shake');
+      setTimeout(function() { box.classList.remove('dv-denied-shake'); }, 500);
+    }
+
+    var status = document.getElementById('dv-status-line');
+    var input  = document.getElementById('dv-passphrase-input');
+    var remaining = CFG.MAX_ATTEMPTS - attempts;
+
+    if (input) input.value = '';
+
+    if (attempts >= CFG.MAX_ATTEMPTS) {
+      startLockout();
+    } else {
+      if (status) {
+        status.style.color = '#ff3333';
+        status.textContent = '> ACCESS DENIED -- ' + remaining + ' ATTEMPT' + (remaining !== 1 ? 'S' : '') + ' REMAINING.';
+        setTimeout(function() {
+          status.style.color = '';
+          status.textContent = '> ATTEMPT ' + (attempts + 1) + ' OF ' + CFG.MAX_ATTEMPTS + '.';
+        }, 2000);
+      }
+      if (input) input.focus();
+    }
+  }
+
+  // ── LOCKOUT ─────────────────────────────────────────────────────
+  function startLockout() {
+    locked = true;
+    document.getElementById('diss0linkz-auth-gate').classList.add('dv-lockout-mode');
+    var timer  = document.getElementById('dv-lockout-timer');
+    var status = document.getElementById('dv-status-line');
+    var input  = document.getElementById('dv-passphrase-input');
+    var btn    = document.getElementById('dv-submit-btn');
+    if (status) status.textContent = '> LOCKOUT INITIATED -- TOO MANY FAILED ATTEMPTS.';
+    if (input)  input.disabled = true;
+    if (btn)    btn.disabled = true;
+    var secs = CFG.LOCKOUT_SECS;
+    function tick() {
+      if (timer) timer.textContent = '> SYSTEM LOCKED -- ' + secs + 's REMAINING';
+      if (secs <= 0) {
+        locked = false; attempts = 0;
+        document.getElementById('diss0linkz-auth-gate').classList.remove('dv-lockout-mode');
+        if (timer)  timer.textContent = '';
+        if (status) status.textContent = '> ATTEMPT 1 OF ' + CFG.MAX_ATTEMPTS + '.';
+        if (input)  { input.disabled = false; input.focus(); }
+        if (btn)    btn.disabled = false;
+      } else {
+        secs--;
+        lockTimer = setTimeout(tick, 1000);
+      }
+    }
+    tick();
+  }
+
+  // ── SUBMIT ──────────────────────────────────────────────────────
   window.dvSubmitPassphrase = async function() {
     if (locked) return;
-    var pass = passphraseInput.value;
-    if (!pass) return;
-    statusLine.textContent = '> VERIFYING...';
-    statusLine.className = '';
-    statusLine.style.color = 'rgba(0,255,65,0.7)';
-    passphraseInput.disabled = true;
-    document.getElementById('dv-submit-btn').disabled = true;
+    var input = document.getElementById('dv-passphrase-input');
+    if (!input) return;
+    var pw = input.value.trim();
+    if (!pw) { input.focus(); return; }
+
+    startMusic(); // start music on first interaction
+
+    var btn = document.getElementById('dv-submit-btn');
+    if (btn) { btn.disabled = true; btn.textContent = '...'; }
+
     try {
-      var hash = await hashPassphrase(pass);
-      if (hash === AUTH_CONFIG.HASH) {
+      var hash = await hashPassphrase(pw);
+      if (hash === CFG.HASH) {
         accessGranted();
       } else {
-        document.getElementById('dv-submit-btn').disabled = false;
+        if (btn) { btn.disabled = false; btn.textContent = 'ENTER'; }
         accessDenied();
       }
     } catch(e) {
-      statusLine.textContent = '> CRYPTO ERROR. RELOAD PAGE.';
-      statusLine.style.color = '#FF003C';
+      if (btn) { btn.disabled = false; btn.textContent = 'ENTER'; }
+      console.error('Auth error:', e);
     }
   };
 
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter' && inputRow && inputRow.classList.contains('visible')) {
-      window.dvSubmitPassphrase();
-    }
-  });
-
+  // ── INIT ────────────────────────────────────────────────────────
   document.addEventListener('DOMContentLoaded', function() {
-    bootOutput = document.getElementById('dv-boot-output');
-    inputRow = document.getElementById('dv-input-row');
-    passphraseInput = document.getElementById('dv-passphrase-input');
-    statusLine = document.getElementById('dv-status-line');
-    lockoutDisplay = document.getElementById('dv-lockout-timer');
-    terminalBox = document.getElementById('dv-terminal-box');
-
-    var gate = document.getElementById('diss0linkz-auth-gate');
-    var app = document.getElementById('diss0linkz-app');
-
+    // Check existing session
     if (checkAuthCookie()) {
-      gate.style.display = 'none';
-      app.style.display = 'block';
-      app.classList.add('app-visible');
-    } else {
-      app.style.display = 'none';
-      runBootSequence();
+      var gate = document.getElementById('diss0linkz-auth-gate');
+      var app  = document.getElementById('diss0linkz-app');
+      var matrix = document.getElementById('dv-matrix-canvas');
+      var flash  = document.getElementById('dv-granted-flash');
+      if (gate)   gate.style.display = 'none';
+      if (matrix) matrix.style.display = 'none';
+      if (flash)  flash.style.display = 'none';
+      document.body.classList.remove('dv-gate-active');
+      if (app) app.classList.add('app-visible');
+      var btn = document.getElementById('dv-music-btn');
+      if (btn) btn.style.display = 'none';
+      return;
+    }
+
+    document.body.classList.add('dv-gate-active');
+    runBootSequence();
+    scheduleGlitch();
+
+    // Keyboard handler
+    var inputEl = document.getElementById('dv-passphrase-input');
+    if (inputEl) {
+      inputEl.addEventListener('keydown', function(e) {
+        if (!locked) {
+          startMusic();
+          playTypingSound();
+          if (e.key === 'Enter') dvSubmitPassphrase();
+        }
+      });
     }
   });
+
 })();
 </script>
 
