@@ -1,6 +1,6 @@
 ================================================================================
 BRIDGE_HARDLOCK.txt
-DISSOVERSE LLC — Diss0LinkZ Bridge Protection Document
+DISSOVERSE LLC — DissOLinK Bridge Protection Document
 Generated: 2026-04-07 | Author: IRONWIRE (Claude Code)
 Mandated by: GRANDMASTER directive 06:46AM 2026-04-07
 ================================================================================
@@ -15,7 +15,7 @@ WHAT "BRIDGE ROUTED (INTERNAL)" MEANS
 ================================================================================
 
 "INTERNAL" refers to the ROUTING MECHANISM — the bridge is an internal part of
-the Diss0LinkZ system. It does NOT mean the destination is an internal page.
+the DissOLinK system. It does NOT mean the destination is an internal page.
 
 The destination can be:
   - link.me/[artist-slug]   (TYPE A — EXTERNAL destination, INTERNAL routing)
@@ -44,7 +44,7 @@ WHAT MUST NEVER HAPPEN TO BRIDGE FILES
      → TYPE A: window.location.replace("https://dissoverse.com/pages/go?url=https%3A%2F%2Flink.me%2F[SLUG]")
      → TYPE B: window.location.replace("https://dissoverse.com/pages/go") or with ?url=
 
-  ❌ NEVER mix Diss0LinkZ bridge fixes with Shopify theme fixes in the same task
+  ❌ NEVER mix DissOLinK bridge fixes with Shopify theme fixes in the same task
      → They are separate domains — see SECTION 8 of DISSOLINK_MASTER_RULES.txt
 
 ================================================================================

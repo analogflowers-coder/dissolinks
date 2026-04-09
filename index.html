@@ -61,6 +61,12 @@
     animation: flicker 0.15s infinite;
   }
 
+  @keyframes exit-portal-glow {
+    0%   { box-shadow: 0 0 4px rgba(0,255,65,0.10); border-color: rgba(0,255,65,0.25); }
+    50%  { box-shadow: 0 0 10px rgba(0,255,65,0.28); border-color: rgba(0,255,65,0.55); }
+    100% { box-shadow: 0 0 4px rgba(0,255,65,0.10); border-color: rgba(0,255,65,0.25); }
+  }
+
   @keyframes flicker {
     0% { opacity: 0.97; }
     50% { opacity: 1; }
@@ -1226,7 +1232,29 @@ body.dv-glitching #diss0linkz-auth-gate {
 
   <!-- Header -->
   <header class="p-4 sm:p-6 border-b" style="border-color: var(--border-dim);">
-    <div class="max-w-4xl mx-auto" style="display:flex; flex-direction:column; align-items:center; gap:10px;">
+    <div class="max-w-4xl mx-auto" style="display:flex; flex-direction:column; align-items:center; gap:10px; position:relative;">
+
+      <!-- EXIT PORTAL button — top right -->
+      <button
+        onclick="ncpPanic()"
+        title="EXIT PORTAL"
+        style="
+          position:absolute; top:0; right:0;
+          background:transparent;
+          border:1px solid rgba(0,255,65,0.35);
+          color:rgba(0,255,65,0.75);
+          font-family:'Share Tech Mono',monospace;
+          font-size:9px;
+          letter-spacing:2.5px;
+          padding:5px 10px;
+          cursor:pointer;
+          text-transform:uppercase;
+          animation: exit-portal-glow 3s ease-in-out infinite;
+          transition:all 0.3s;
+        "
+        onmouseover="this.style.color='#00ff41';this.style.borderColor='rgba(0,255,65,0.8)';this.style.boxShadow='0 0 12px rgba(0,255,65,0.4)';"
+        onmouseout="this.style.color='rgba(0,255,65,0.75)';this.style.borderColor='rgba(0,255,65,0.35)';this.style.boxShadow='';"
+      >EXIT PORTAL</button>
       <!-- LOGO: centered, 3x bigger on mobile -->
       <div style="width:100%; display:flex; flex-direction:column; align-items:center; text-align:center;">
         <div class="diss0linkz-logo-wrap" id="diss0linkz-logo-wrap" style="display:flex; justify-content:center;">

@@ -10,7 +10,7 @@ Status: HARDCODED — TOP PRIORITY DIRECTIVE — ALL NODES MUST ACKNOWLEDGE
 SECTION 1 — WHAT IS DISSOLINK?
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Diss0LinkZ is the DISSOVERSE link routing system hosted at:
+DissOLinK is the DISSOVERSE link routing system hosted at:
   https://links.dissoverse.com/[slug]
 
 The domain links.dissoverse.com is CNAME'd to the GitHub Pages repo:
@@ -125,14 +125,14 @@ SECTION 4 — WHAT MUST NEVER CHANGE
      for BOTH TYPE A and TYPE B. The bridge is for in-app browser escape.
      The destination is determined by the link type, not the bridge format.
 
-  ❌ NEVER deploy a Diss0LinkZ change to only GitHub OR only desktop.
+  ❌ NEVER deploy a DissOLinK change to only GitHub OR only desktop.
      Push Protocol is MANDATORY: GitHub + desktop hard copy at minimum.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 SECTION 5 — PUSH PROTOCOL (MANDATORY FOR ALL CHANGES)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-  Every Diss0LinkZ change MUST be pushed to ALL 3 targets:
+  Every DissOLinK change MUST be pushed to ALL 3 targets:
   1. GitHub (analogflowers-coder/dissolinks) — source of truth for live site
   2. Desktop hard copy (C:\Users\analo\OneDrive\Desktop\CLAUDE CODE\temp_dissolinks\)
   3. Both Shopify themes (if applicable — GitHub Pages-only changes exempt)
@@ -229,7 +229,7 @@ into their governance context:
   ☐ BLACKWIRE (ChatGPT) — PENDING ACKNOWLEDGMENT
 
 Grandmaster directive: "push to top of priority list" — this document supersedes
-all previous Diss0LinkZ handling guidance.
+all previous DissOLinK handling guidance.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 SECTION 8 — DOMAIN ISOLATION HARDLOCK (GRANDMASTER DIRECTIVE 06:46AM 2026-04-07)
@@ -237,7 +237,7 @@ SECTION 8 — DOMAIN ISOLATION HARDLOCK (GRANDMASTER DIRECTIVE 06:46AM 2026-04-0
 
 IRONWIRE LAW: THE TWO ISSUE DOMAINS NEVER COLLIDE.
 
-DOMAIN 1 — Diss0LinkZ Bridge (this file)
+DOMAIN 1 — DissOLinK Bridge (this file)
   Scope: GitHub Pages bridge HTML files (links.dissoverse.com/*)
   Owner: IRONWIRE (Claude Code)
   Fix protocol: Dedicated bridge agent only. Separate commit. Separate verify.
@@ -247,7 +247,7 @@ DOMAIN 2 — Shopify Theme Image / Horizontal Lines
   Owner: NEURAL (Claude.ai)
   Fix protocol: Dedicated theme agent only. Separate commit. Separate verify.
 
-ISOLATION RULE: Diss0LinkZ bridge fixes and Shopify theme/image fixes are NEVER
+ISOLATION RULE: DissOLinK bridge fixes and Shopify theme/image fixes are NEVER
 executed in the same agent task. They are separate domains. Separate agents.
 Separate commits. Separate verification passes.
 
