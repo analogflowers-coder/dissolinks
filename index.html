@@ -3605,12 +3605,15 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
   }
   function scheduleGlitch() {
     if (glitchTimeout) clearTimeout(glitchTimeout);
-    glitchTimeout = setTimeout(function() {
+    // Immediate first glitch on load, then every 3s like clockwork
+    triggerGlitch();
+    glitchTimeout = setInterval(function() {
       if (document.getElementById('diss0linkz-auth-gate')) {
         triggerGlitch();
-        scheduleGlitch();
+      } else {
+        clearInterval(glitchTimeout);
       }
-    }, 8000 + Math.random() * 7000);
+    }, 3000);
   }
 
   // ── ACCESS GRANTED ──────────────────────────────────────────
