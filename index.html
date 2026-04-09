@@ -3735,6 +3735,7 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
   function accessGranted() {
     if (glitchTimeout) clearTimeout(glitchTimeout);
     playGrantedSound();
+    startMusic(); // Music plays when UX opens, not on password screen
 
     // 1. Activate pink Matrix rain at 3x speed
     window.dvMatrixPink  = true;
@@ -3955,7 +3956,7 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
     var pw = input.value.trim();
     if (!pw) { input.focus(); return; }
 
-    startMusic(); // start music on first interaction
+    // Music moved to UX open — not password screen
 
     var btn = document.getElementById('dv-submit-btn');
     if (btn) { btn.disabled = true; btn.textContent = '...'; }
@@ -4013,7 +4014,7 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
     if (inputEl) {
       inputEl.addEventListener('keydown', function(e) {
         if (!locked) {
-          startMusic();
+          // Music moved to UX open
           playTypingSound();
           if (e.key === 'Enter') dvSubmitPassphrase();
         }
