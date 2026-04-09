@@ -6229,5 +6229,185 @@ window.dvShowVaultCore = function() {
   alert('VAULT_CORE SETTINGS — COMING SOON');
 };
 </script>
+
+<script>
+/* ================================================================
+   BLACKWIRE 11 FX — JAVASCRIPT IMPLEMENTATIONS
+   BLACKWIRE-GITHUB | Forensic Extraction Node | DISSOVERSE LLC 2026
+   ================================================================ */
+
+/* FX 1: CHARACTER SCRAMBLE / DECODE */
+(function(){
+'use strict';
+var K='アイウエオカキクケコサシスセソタチツテト';
+var S='■□▪▫▸▹◉◈◆◇⬡⬢░▒▓@#$%&';
+var P=K+S;
+window.dvScrambleReveal=function(el,txt,dur){
+if(!el||!txt)return;dur=dur||500;
+var len=txt.length,t0=performance.now();
+function tick(now){
+var p=Math.min((now-t0)/dur,1),r=Math.floor(p*len),d='';
+for(var i=0;i<len;i++)d+=i<r?txt[i]:P[Math.floor(Math.random()*P.length)];
+el.textContent=d;if(p<1)requestAnimationFrame(tick);else el.textContent=txt;
+}requestAnimationFrame(tick);
+};
+var done=false,hs=new WeakSet();
+function goSub(){var el=document.getElementById('dv-subtitle-scramble');if(el)dvScrambleReveal(el,el.textContent.trim(),500);}
+function goHeaders(){
+var hh=document.querySelectorAll('.dv-section-header');
+if(!hh.length||!('IntersectionObserver' in window))return;
+var obs=new IntersectionObserver(function(ee){ee.forEach(function(e){
+if(e.isIntersecting&&!hs.has(e.target)){hs.add(e.target);dvScrambleReveal(e.target,e.target.textContent.trim(),500);}
+});},{threshold:0.3});
+hh.forEach(function(h){obs.observe(h);});
+}
+document.addEventListener('DOMContentLoaded',function(){
+var app=document.getElementById('diss0linkz-app');if(!app)return;
+function go(){if(done)return;done=true;setTimeout(goSub,300);goHeaders();}
+if(app.classList.contains('app-visible')){go();return;}
+var o=new MutationObserver(function(){if(app.classList.contains('app-visible')){go();o.disconnect();}});
+o.observe(app,{attributes:true,attributeFilter:['class']});
+});
+})();
+
+/* FX 3: QUANTUM DOTS / PHASE PARTICLES */
+(function(){
+'use strict';
+var c=document.getElementById('dv-particles-canvas');if(!c)return;
+var ctx=c.getContext('2d'),pp=[];
+function rs(){c.width=window.innerWidth;c.height=window.innerHeight;}
+rs();window.addEventListener('resize',rs);
+var n=(window.innerWidth<768||navigator.maxTouchPoints>0)?22:90;
+for(var i=0;i<n;i++)pp.push({x:Math.random()*window.innerWidth,y:Math.random()*window.innerHeight,
+r:0.4+Math.random()*1.4,vx:(Math.random()-0.5)*0.4,vy:(Math.random()-0.5)*0.4,
+phase:Math.random()*Math.PI*2,ba:0.05+Math.random()*0.18});
+function draw(){
+requestAnimationFrame(draw);if(document.hidden)return;
+ctx.clearRect(0,0,c.width,c.height);
+var rgb=getComputedStyle(document.documentElement).getPropertyValue('--neon-rgb').trim()||'0,255,65';
+var t=performance.now()*0.001;
+for(var i=0;i<pp.length;i++)for(var j=i+1;j<pp.length;j++){
+var dx=pp[i].x-pp[j].x,dy=pp[i].y-pp[j].y,d=Math.sqrt(dx*dx+dy*dy);
+if(d<80){ctx.beginPath();ctx.moveTo(pp[i].x,pp[i].y);ctx.lineTo(pp[j].x,pp[j].y);
+ctx.strokeStyle='rgba('+rgb+',0.05)';ctx.lineWidth=0.5;ctx.stroke();}
+}
+pp.forEach(function(p){
+var a=p.ba*(0.5+0.5*Math.sin(t*1.5+p.phase));
+ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,6.28);
+ctx.fillStyle='rgba('+rgb+','+a.toFixed(3)+')';ctx.fill();
+p.x+=p.vx;p.y+=p.vy;
+if(p.x<-10)p.x=c.width+10;if(p.x>c.width+10)p.x=-10;
+if(p.y<-10)p.y=c.height+10;if(p.y>c.height+10)p.y=-10;
+});
+}draw();
+})();
+
+/* FX 4: HOLOGRAPHIC MATERIAL — logo hover */
+(function(){
+document.addEventListener('DOMContentLoaded',function(){
+var w=document.getElementById('diss0linkz-logo-wrap');if(!w)return;
+w.addEventListener('mouseenter',function(){this.classList.add('dv-holographic');});
+w.addEventListener('mouseleave',function(){this.classList.remove('dv-holographic');});
+});
+})();
+
+/* FX 5: VHS TRACKING — hover hooks */
+(function(){
+document.addEventListener('DOMContentLoaded',function(){
+var v=document.querySelector('.vault-terminal-wrap');
+if(v){v.addEventListener('mouseenter',function(){this.classList.add('dv-vhs-track');});
+v.addEventListener('mouseleave',function(){this.classList.remove('dv-vhs-track');});
+v.addEventListener('animationend',function(){this.classList.remove('dv-vhs-track');});}
+var d=document.getElementById('drawer-protocol-header');
+if(d){d.addEventListener('mouseenter',function(){this.classList.add('dv-vhs-track');});
+d.addEventListener('mouseleave',function(){this.classList.remove('dv-vhs-track');});
+d.addEventListener('animationend',function(){this.classList.remove('dv-vhs-track');});}
+});
+})();
+
+/* FX 7: DATAMOSH — CSS filter burst on theme switch */
+(function(){
+var orig=window.ncpSetTheme;if(typeof orig!=='function')return;
+window.ncpSetTheme=function(name){
+var app=document.getElementById('diss0linkz-app');
+if(app){app.classList.add('dv-datamosh-active');setTimeout(function(){app.classList.remove('dv-datamosh-active');},400);}
+orig.call(this,name);
+};
+})();
+
+/* FX 8: HEX CODE RAIN (inside VOID_STRIDE drawer only) */
+(function(){
+var timer=null,active=false,hx='0123456789ABCDEF';
+function start(){
+var cv=document.getElementById('dv-hex-rain-canvas');if(!cv||active)return;active=true;
+var par=cv.parentElement;cv.width=par.offsetWidth||400;cv.height=par.scrollHeight||300;
+var ctx=cv.getContext('2d'),fs=8,cols=Math.floor(cv.width/fs),dr=[];
+for(var i=0;i<cols;i++)dr[i]=Math.random()*-10;
+timer=setInterval(function(){
+if(document.hidden)return;
+var rgb=getComputedStyle(document.documentElement).getPropertyValue('--neon-rgb').trim()||'0,255,65';
+var nh=par.scrollHeight||300;if(cv.height!==nh)cv.height=nh;
+ctx.fillStyle='rgba(0,0,0,0.15)';ctx.fillRect(0,0,cv.width,cv.height);
+ctx.font=fs+'px "Share Tech Mono",monospace';ctx.fillStyle='rgba('+rgb+',0.35)';
+for(var i=0;i<cols;i++){ctx.fillText(hx[Math.floor(Math.random()*16)],i*fs,dr[i]*fs);
+if(dr[i]*fs>cv.height&&Math.random()>0.95)dr[i]=0;dr[i]+=0.8+Math.random()*0.4;}
+},60);
+}
+function stop(){if(timer){clearInterval(timer);timer=null;}active=false;
+var cv=document.getElementById('dv-hex-rain-canvas');if(cv){cv.getContext('2d').clearRect(0,0,cv.width,cv.height);}
+}
+var origTD=window.toggleDrawer;
+window.toggleDrawer=function(id){origTD.call(this,id);
+if(id==='drawer-protocol'){var el=document.getElementById('drawer-protocol');if(!el)return;
+var isO=el.style.maxHeight&&el.style.maxHeight!=='0px';
+if(isO){setTimeout(start,200);}else{stop();}}
+};
+})();
+
+/* FX 9: DNA HELIX LOADER */
+(function(){
+document.addEventListener('DOMContentLoaded',function(){
+var nl=document.querySelector('.dv-nl-content');if(!nl)return;
+var d=document.createElement('div');d.className='dv-dna-loader';d.style.marginTop='16px';
+for(var i=0;i<12;i++){var p=document.createElement('div');p.className='dv-dna-pair';
+p.style.animationDelay=(i*0.125).toFixed(3)+'s';
+var t=document.createElement('div');t.className='dv-dna-dot';
+var s=document.createElement('div');s.className='dv-dna-strand';
+var b=document.createElement('div');b.className='dv-dna-dot';
+p.appendChild(t);p.appendChild(s);p.appendChild(b);d.appendChild(p);}
+nl.appendChild(d);
+});
+})();
+
+/* FX 10: PIXEL SORT — logo long-press / double-click */
+(function(){
+document.addEventListener('DOMContentLoaded',function(){
+var w=document.getElementById('diss0linkz-logo-wrap');if(!w)return;var lt=null;
+w.addEventListener('dblclick',function(e){e.preventDefault();
+this.classList.add('dv-pixel-sort');var s=this;setTimeout(function(){s.classList.remove('dv-pixel-sort');},600);});
+w.addEventListener('mousedown',function(){var s=this;
+lt=setTimeout(function(){s.classList.add('dv-pixel-sort');setTimeout(function(){s.classList.remove('dv-pixel-sort');},600);},600);});
+w.addEventListener('mouseup',function(){clearTimeout(lt);});
+w.addEventListener('mouseleave',function(){clearTimeout(lt);});
+w.addEventListener('touchstart',function(){var s=this;
+lt=setTimeout(function(){s.classList.add('dv-pixel-sort');setTimeout(function(){s.classList.remove('dv-pixel-sort');},600);},600);},{passive:true});
+w.addEventListener('touchend',function(){clearTimeout(lt);});
+});
+})();
+
+/* FX 11: NIGHT VISION / GREEN MONO */
+(function(){
+var on=false,lastN=0;
+window.dvNightVision=function(){on=!on;document.body.classList.toggle('dv-night-vision',on);
+if(typeof addLog==='function')addLog('FX','NIGHT VISION '+(on?'ENGAGED':'DISENGAGED'),'neon');};
+document.addEventListener('keydown',function(e){
+if(e.key==='n'||e.key==='N'){var tg=(e.target.tagName||'').toLowerCase();
+if(tg==='input'||tg==='textarea'||tg==='select')return;
+var now=Date.now();if(now-lastN<400){dvNightVision();lastN=0;}else{lastN=now;}}
+});
+})();
+
+/* END BLACKWIRE 11 FX */
+</script>
 </body>
 </html>
