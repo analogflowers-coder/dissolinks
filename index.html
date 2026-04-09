@@ -7,6 +7,7 @@
 <meta name="description" content="Sovereign Deep Link Generator. Break the walled garden.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⛓</text></svg>">
 <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap');
 
@@ -1483,6 +1484,9 @@ body.dv-glitching #diss0linkz-auth-gate {
           <span id="clock"></span>
           <span class="status-sep" style="margin:0 10px; opacity:0.4;">|</span>
           <span>NODE: <span style="color:var(--neon);">PRPL TWR</span></span>
+          <span class="status-sep" style="margin:0 10px; opacity:0.4;">|</span>
+          <!-- F7: Session timer display -->
+          <span id="f7-session-timer" style="color:var(--text-dim);">SESSION: 00:00:00</span>
         </div>
 
         <!-- Right: gear + EXIT PORTAL -->
@@ -1576,6 +1580,15 @@ body.dv-glitching #diss0linkz-auth-gate {
               </div>
               <div style="color:var(--neon); font-size:10px; letter-spacing:3px; text-align:center; animation:manifest-glow 3s ease-in-out infinite; padding-top:4px;">VOID_TELEMETRY &nbsp;&middot;&nbsp; PARASITIC_EXTERMINATION &nbsp;&middot;&nbsp; GOD-MODE SOVEREIGNTY</div>
             </div>
+          </div>
+        </div>
+
+        <!-- F3: QUICK TARGETS // PRESETS -->
+        <div id="f3-presets-section" style="margin-bottom:10px;">
+          <div style="font-size:11px; color:var(--text-dim); letter-spacing:2px; margin-bottom:6px;">QUICK TARGETS //</div>
+          <div id="f3-preset-chips" style="display:flex; flex-wrap:wrap; gap:6px; min-height:26px; margin-bottom:6px;"></div>
+          <div style="display:flex; gap:6px; align-items:stretch;">
+            <button onclick="f3SavePreset()" class="btn-neon" style="font-size:10px; padding:5px 12px; letter-spacing:1.5px; flex-shrink:0;">+ SAVE AS PRESET</button>
           </div>
         </div>
 
@@ -1678,7 +1691,17 @@ body.dv-glitching #diss0linkz-auth-gate {
           <!-- Link display -->
           <div style="text-align:center; padding: 8px 0 4px;">
             <div style="font-size:10px; color:var(--text-dim); letter-spacing:3px; margin-bottom:10px;">▼ YOUR VOID_STRIDE LINK</div>
-            <div style="font-family:'VT323',monospace; font-size:clamp(22px,4.5vw,32px); color:var(--neon); text-shadow:0 0 15px var(--neon-glow); letter-spacing:1px; word-break:break-all; padding:0 4px;">links.dissoverse.com/<span id="output-shortname"></span></div>
+            <!-- F1: Click-to-copy link display -->
+            <div id="f1-copy-link-btn" onclick="f1CopyOutputLink(this)" title="Click to copy"
+              style="font-family:'VT323',monospace; font-size:clamp(22px,4.5vw,32px); color:var(--neon); text-shadow:0 0 15px var(--neon-glow); letter-spacing:1px; word-break:break-all; padding:6px 12px; cursor:pointer; display:inline-block; border:1px solid transparent; transition:all 0.2s; position:relative;"
+              onmouseover="this.style.borderColor='var(--border-mid)'; this.style.background='rgba(var(--neon-rgb),0.04)';"
+              onmouseout="this.style.borderColor='transparent'; this.style.background='transparent';">
+              links.dissoverse.com/<span id="output-shortname"></span>
+              <span style="font-size:12px; color:var(--text-dim); position:absolute; top:2px; right:4px; font-family:'Share Tech Mono',monospace; letter-spacing:1px;" title="Click to copy">⎘</span>
+            </div>
+            <div id="f1-copied-flash" style="display:none; font-size:11px; color:var(--neon); letter-spacing:3px; margin-top:4px; text-shadow:0 0 8px var(--neon-glow);">[COPIED]</div>
+            <!-- F2: Hit counter display -->
+            <div id="f2-hit-counter" style="display:none; font-size:10px; color:var(--text-dim); letter-spacing:2px; margin-top:6px;">HITS: 0</div>
             <div id="deploy-status-badge" style="display:none; margin-top:8px; font-size:11px; letter-spacing:4px; color:var(--neon); text-shadow:0 0 10px var(--neon-glow);">■ LIVE</div>
           </div>
 
@@ -1731,6 +1754,20 @@ body.dv-glitching #diss0linkz-auth-gate {
 
           <div id="no-token-note" style="display:none;"></div>
           <div id="deploy-instructions" style="display:none;"><span id="deploy-filename"></span></div>
+
+          <!-- F5: QR Code Generator -->
+          <div style="margin-top:4px;">
+            <button class="btn-neon" onclick="f5GenerateQR()" style="width:100%; font-size:12px; padding:9px; letter-spacing:3px;">
+              ▣ GENERATE QR
+            </button>
+          </div>
+          <div id="f5-qr-panel" style="display:none; margin-top:12px; padding:16px; background:rgba(0,0,0,0.7); border:1px solid var(--neon); text-align:center; box-shadow:0 0 18px var(--neon-glow);">
+            <div style="font-size:10px; color:var(--text-dim); letter-spacing:2px; margin-bottom:10px;">QR // VOID_STRIDE LINK</div>
+            <div id="f5-qr-container" style="display:inline-block; padding:10px; background:#fff;"></div>
+            <div style="margin-top:12px;">
+              <button class="btn-neon" onclick="f5DownloadQR()" style="font-size:11px; padding:7px 18px; letter-spacing:2px;">↓ DOWNLOAD QR</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1782,12 +1819,14 @@ body.dv-glitching #diss0linkz-auth-gate {
       </div>
     </div>
 
-    <!-- Active Links<!-- Active Links Dashboard -->
+    <!-- Active Links Dashboard -->
     <div class="glass-panel" style="overflow:hidden;">
       <div class="p-3 flex items-center gap-2 border-b" style="border-color: var(--border-dim); background: rgba(0,0,0,0.3);">
         <span style="color:var(--neon);">●</span>
         <span style="font-size:11px; color:var(--text-dim); margin-left:8px;">terminal://dissoverse/active-links</span>
-        <button onclick="loadActiveLinks()" style="margin-left:auto; background:transparent; border:1px solid var(--border-dim); color:var(--text-dim); font-family:'Share Tech Mono',monospace; font-size:10px; padding:3px 10px; cursor:pointer; letter-spacing:1px; transition:all 0.3s;" onmouseover="this.style.borderColor='var(--neon)';this.style.color='var(--neon)'" onmouseout="this.style.borderColor='var(--border-dim)';this.style.color='var(--text-dim)'">↻ REFRESH</button>
+        <!-- F6: SWEEP LINKS health check button -->
+        <button onclick="f6SweepLinks()" style="margin-left:auto; background:transparent; border:1px solid var(--border-dim); color:var(--text-dim); font-family:'Share Tech Mono',monospace; font-size:10px; padding:3px 10px; cursor:pointer; letter-spacing:1px; transition:all 0.3s;" onmouseover="this.style.borderColor='var(--neon)';this.style.color='var(--neon)'" onmouseout="this.style.borderColor='var(--border-dim)';this.style.color='var(--text-dim)'" title="Check health of all links">⬡ SWEEP LINKS</button>
+        <button onclick="loadActiveLinks()" style="background:transparent; border:1px solid var(--border-dim); color:var(--text-dim); font-family:'Share Tech Mono',monospace; font-size:10px; padding:3px 10px; cursor:pointer; letter-spacing:1px; transition:all 0.3s;" onmouseover="this.style.borderColor='var(--neon)';this.style.color='var(--neon)'" onmouseout="this.style.borderColor='var(--border-dim)';this.style.color='var(--text-dim)'">↻ REFRESH</button>
       </div>
       <div id="active-links-panel" class="p-4" style="min-height:72px; background: rgba(0,0,0,0.4); font-size:12px;">
         <div style="color:var(--text-dim);">No active links yet.</div>
@@ -2843,6 +2882,17 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
 <div id="dv-veritas-badge" style="position:fixed;bottom:8px;left:0;right:0;text-align:center;font-size:10px;font-family:'Share Tech Mono',monospace;letter-spacing:0.1em;color:var(--neon);opacity:0.35;pointer-events:none;z-index:9998;">
   PROTECTED BY VERITAS_ENGINE // DISSOVERSE NEURAL NETWORK
 </div>
+
+<!-- F7: Session timeout overlay -->
+<div id="f7-timeout-overlay" style="display:none; position:fixed; inset:0; z-index:8000; background:rgba(0,0,0,0.88); backdrop-filter:blur(8px); align-items:center; justify-content:center; cursor:pointer;" onclick="f7ResumeSession()">
+  <div style="text-align:center; padding:32px; border:1px solid var(--neon); background:rgba(0,4,0,0.92); box-shadow:0 0 40px var(--neon-glow); max-width:420px; width:90%; font-family:'Share Tech Mono',monospace;">
+    <div style="font-size:11px; color:var(--text-dim); letter-spacing:3px; margin-bottom:12px;">⚠ SESSION TIMEOUT</div>
+    <div style="font-family:'VT323',monospace; font-size:clamp(22px,5vw,36px); color:var(--neon); text-shadow:0 0 20px var(--neon-glow); letter-spacing:2px; margin-bottom:14px;">SESSION TIMEOUT</div>
+    <div style="font-size:12px; color:var(--text-dim); letter-spacing:2px; margin-bottom:20px; line-height:1.7;">INACTIVITY DETECTED // 30 MINUTES ELAPSED</div>
+    <div style="font-size:14px; color:var(--neon); letter-spacing:3px; animation:manifest-glow 2s ease-in-out infinite;">— CLICK TO RESUME —</div>
+  </div>
+</div>
+
 </div><!-- end #diss0linkz-app -->
 
 <script>
@@ -4101,6 +4151,495 @@ document.addEventListener('DOMContentLoaded', function() {
   window._vaultClearSession = vaultClearSession;
 
 })();
+</script>
+
+<script>
+/* ================================================================
+   FEATURES 1–7 // CRUCIBLE-II BUILD AGENT // DISSOVERSE LLC 2026
+   F1: Click-to-copy + [COPIED] flash
+   F2: Link analytics hit counter
+   F3: Quick-deploy presets
+   F4: Extinction SEQ — expiry TTL storage + countdown/EXTINCT
+   F5: QR code generator + download
+   F6: Link health monitor + SWEEP LINKS
+   F7: Session timer + 30-min inactivity auto-lock
+   ================================================================ */
+
+/* ── F1: CLICK-TO-COPY + [COPIED] FLASH ─────────────────────── */
+function f1CopyOutputLink(btn) {
+  if (!generatedLink) return;
+  navigator.clipboard.writeText(generatedLink).catch(function() {
+    var ta = document.createElement('textarea');
+    ta.value = generatedLink;
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+  });
+  // [COPIED] flash
+  var flash = document.getElementById('f1-copied-flash');
+  if (flash) {
+    flash.style.display = 'block';
+    setTimeout(function() { flash.style.display = 'none'; }, 1800);
+  }
+  // Ripple the button
+  if (btn) {
+    var origColor = btn.style.borderColor;
+    btn.style.borderColor = 'var(--neon)';
+    btn.style.boxShadow = '0 0 18px var(--neon-glow)';
+    setTimeout(function() {
+      btn.style.borderColor = origColor || 'transparent';
+      btn.style.boxShadow = '';
+    }, 1200);
+  }
+  addLog('COPY', 'VOID_STRIDE link copied via click: ' + generatedLink, 'neon');
+  f7ResetActivity();
+}
+
+/* ── F2: LINK ANALYTICS — HIT COUNTER ───────────────────────── */
+function f2IncrementHit(slug) {
+  if (!slug) return;
+  var key = 'dv_hits_' + slug;
+  var hits = parseInt(localStorage.getItem(key) || '0', 10) + 1;
+  localStorage.setItem(key, hits);
+  return hits;
+}
+
+function f2GetHits(slug) {
+  if (!slug) return 0;
+  return parseInt(localStorage.getItem('dv_hits_' + slug) || '0', 10);
+}
+
+function f2UpdateHitDisplay(slug) {
+  var el = document.getElementById('f2-hit-counter');
+  if (!el) return;
+  var hits = f2GetHits(slug);
+  el.textContent = 'HITS: ' + hits;
+  el.style.display = 'block';
+}
+
+/* ── F3: QUICK-DEPLOY PRESETS ────────────────────────────────── */
+function f3GetPresets() {
+  try { return JSON.parse(localStorage.getItem('dv_presets') || '[]'); } catch(e) { return []; }
+}
+function f3SavePresets(arr) {
+  localStorage.setItem('dv_presets', JSON.stringify(arr));
+}
+
+function f3SavePreset() {
+  var urlEl = document.getElementById('target-url');
+  if (!urlEl || !urlEl.value.trim()) {
+    addLog('PRESET', 'Enter a target URL before saving a preset.', 'dim');
+    return;
+  }
+  var url = urlEl.value.trim();
+  var label = window.prompt('PRESET LABEL (max 20 chars):', url.replace(/^https?:\/\//,'').substring(0,30));
+  if (!label) return;
+  label = label.substring(0,20).toUpperCase();
+  var presets = f3GetPresets();
+  if (presets.length >= 5) {
+    addLog('PRESET', 'Max 5 presets. Delete one first.', 'dim');
+    return;
+  }
+  // Avoid duplicate urls
+  if (presets.find(function(p) { return p.url === url; })) {
+    addLog('PRESET', 'URL already saved as a preset.', 'dim');
+    return;
+  }
+  presets.push({ label: label, url: url });
+  f3SavePresets(presets);
+  f3RenderPresets();
+  addLog('PRESET', 'Saved preset: ' + label, 'neon');
+  f7ResetActivity();
+}
+
+function f3DeletePreset(idx) {
+  var presets = f3GetPresets();
+  presets.splice(idx, 1);
+  f3SavePresets(presets);
+  f3RenderPresets();
+  addLog('PRESET', 'Preset removed.', 'dim');
+}
+
+function f3ApplyPreset(url) {
+  var urlEl = document.getElementById('target-url');
+  if (urlEl) {
+    urlEl.value = url;
+    // Trigger url-type indicator
+    urlEl.dispatchEvent(new Event('input'));
+  }
+  addLog('PRESET', 'Preset loaded: ' + url, 'neon');
+  f7ResetActivity();
+}
+
+function f3RenderPresets() {
+  var container = document.getElementById('f3-preset-chips');
+  if (!container) return;
+  var presets = f3GetPresets();
+  if (presets.length === 0) {
+    container.innerHTML = '<span style="font-size:10px; color:var(--text-dim); letter-spacing:1px;">NO PRESETS SAVED</span>';
+    return;
+  }
+  container.innerHTML = '';
+  presets.forEach(function(p, i) {
+    var chip = document.createElement('div');
+    chip.style.cssText = 'display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border:1px solid var(--neon); cursor:pointer; font-size:10px; font-family:"Share Tech Mono",monospace; color:var(--neon); letter-spacing:1.5px; background:rgba(var(--neon-rgb),0.04); transition:all 0.2s; flex-shrink:0;';
+    chip.onmouseover = function() { this.style.background='rgba(var(--neon-rgb),0.1)'; this.style.boxShadow='0 0 10px var(--neon-glow)'; };
+    chip.onmouseout  = function() { this.style.background='rgba(var(--neon-rgb),0.04)'; this.style.boxShadow=''; };
+
+    var labelSpan = document.createElement('span');
+    labelSpan.textContent = p.label;
+    labelSpan.onclick = function() { f3ApplyPreset(p.url); };
+    labelSpan.title = p.url;
+
+    var delBtn = document.createElement('span');
+    delBtn.textContent = '✕';
+    delBtn.style.cssText = 'color:var(--text-dim); cursor:pointer; font-size:10px; padding-left:4px;';
+    delBtn.title = 'Delete preset';
+    delBtn.onclick = function(e) { e.stopPropagation(); f3DeletePreset(i); };
+    delBtn.onmouseover = function() { this.style.color='var(--red-warn)'; };
+    delBtn.onmouseout  = function() { this.style.color='var(--text-dim)'; };
+
+    chip.appendChild(labelSpan);
+    chip.appendChild(delBtn);
+    container.appendChild(chip);
+  });
+}
+
+/* ── F4: EXTINCTION SEQ — EXPIRY TTL STORAGE ────────────────── */
+function f4StoreExpiry(slug, expiryDays) {
+  if (!slug) return;
+  if (!expiryDays || expiryDays === 0) {
+    localStorage.setItem('dv_expiry_' + slug, 'NEVER');
+  } else {
+    var expTs = Date.now() + expiryDays * 24 * 60 * 60 * 1000;
+    localStorage.setItem('dv_expiry_' + slug, String(expTs));
+  }
+}
+
+function f4GetExpiryStatus(slug) {
+  var val = localStorage.getItem('dv_expiry_' + slug);
+  if (!val || val === 'NEVER') return { status: 'permanent', label: 'PERMANENT' };
+  var ts = parseInt(val, 10);
+  var now = Date.now();
+  if (isNaN(ts)) return { status: 'permanent', label: 'PERMANENT' };
+  if (now > ts) return { status: 'extinct', label: 'EXTINCT' };
+  var diff = ts - now;
+  var days  = Math.floor(diff / (1000 * 60 * 60 * 24));
+  var hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  return { status: 'live', label: 'EXPIRES IN: ' + days + 'd ' + hours + 'h' };
+}
+
+/* ── F5: QR CODE GENERATOR ───────────────────────────────────── */
+var _f5QRInstance = null;
+
+function f5GenerateQR() {
+  if (!generatedLink) {
+    addLog('QR', 'No link generated. Generate a link first.', 'red');
+    return;
+  }
+  var panel = document.getElementById('f5-qr-panel');
+  var container = document.getElementById('f5-qr-container');
+  if (!panel || !container) return;
+
+  // Clear previous QR
+  container.innerHTML = '';
+  _f5QRInstance = null;
+
+  panel.style.display = 'block';
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  if (typeof QRCode === 'undefined') {
+    container.innerHTML = '<div style="color:var(--red-warn); font-size:11px; padding:10px;">QR LIBRARY NOT LOADED</div>';
+    addLog('QR', 'QRCode library unavailable.', 'red');
+    return;
+  }
+
+  try {
+    _f5QRInstance = new QRCode(container, {
+      text: generatedLink,
+      width: 180,
+      height: 180,
+      colorDark: '#000000',
+      colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.H
+    });
+    addLog('QR', 'QR code generated for: ' + generatedLink, 'neon');
+  } catch(e) {
+    container.innerHTML = '<div style="color:var(--red-warn); font-size:11px; padding:10px;">QR GENERATION FAILED: ' + e.message + '</div>';
+    addLog('QR', 'QR generation error: ' + e.message, 'red');
+  }
+  f7ResetActivity();
+}
+
+function f5DownloadQR() {
+  var container = document.getElementById('f5-qr-container');
+  if (!container) return;
+  var canvas = container.querySelector('canvas');
+  var img    = container.querySelector('img');
+  var slug = (document.getElementById('short-name') || {}).value || 'qr';
+
+  if (canvas) {
+    var link = document.createElement('a');
+    link.download = 'QR_' + slug + '.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    addLog('QR', 'QR PNG downloaded.', 'neon');
+  } else if (img) {
+    // Fallback: draw img on canvas then download
+    var c = document.createElement('canvas');
+    c.width = 180; c.height = 180;
+    var ctx = c.getContext('2d');
+    ctx.drawImage(img, 0, 0, 180, 180);
+    var link2 = document.createElement('a');
+    link2.download = 'QR_' + slug + '.png';
+    link2.href = c.toDataURL('image/png');
+    link2.click();
+    addLog('QR', 'QR PNG downloaded (img fallback).', 'neon');
+  } else {
+    addLog('QR', 'No QR code to download. Generate first.', 'red');
+  }
+  f7ResetActivity();
+}
+
+/* ── F6: LINK HEALTH MONITOR ─────────────────────────────────── */
+function f6CheckLinkHealth(url, slug, dotEl, labelEl) {
+  if (dotEl) {
+    dotEl.style.background = '#ffcc00';
+    dotEl.style.boxShadow = '0 0 6px #ffcc00';
+    dotEl.title = 'Checking...';
+  }
+  fetch(url, { method: 'HEAD', mode: 'no-cors', cache: 'no-cache' })
+    .then(function() {
+      // opaque response = no-cors success = LIVE
+      localStorage.setItem('dv_health_check_' + slug, JSON.stringify({ ts: Date.now(), status: 'live' }));
+      if (dotEl) {
+        dotEl.style.background = 'var(--neon)';
+        dotEl.style.boxShadow  = '0 0 6px var(--neon)';
+        dotEl.title = 'LIVE — last checked ' + new Date().toLocaleTimeString();
+      }
+      if (labelEl) { labelEl.textContent = 'LIVE'; labelEl.style.color = 'var(--neon)'; }
+    })
+    .catch(function() {
+      localStorage.setItem('dv_health_check_' + slug, JSON.stringify({ ts: Date.now(), status: 'dead' }));
+      if (dotEl) {
+        dotEl.style.background = '#ff3333';
+        dotEl.style.boxShadow  = '0 0 6px #ff3333';
+        dotEl.title = 'DEAD — last checked ' + new Date().toLocaleTimeString();
+      }
+      if (labelEl) { labelEl.textContent = 'DEAD'; labelEl.style.color = '#ff3333'; }
+    });
+}
+
+function f6SweepLinks() {
+  addLog('SWEEP', 'Sweeping all links for health status...', 'neon');
+  // Find all link cards in active-links-panel and sweep each
+  var panel = document.getElementById('active-links-panel');
+  if (!panel) return;
+  var cards = panel.querySelectorAll('[data-f6-slug]');
+  if (cards.length === 0) {
+    addLog('SWEEP', 'No links found in panel. Refresh first.', 'dim');
+    return;
+  }
+  cards.forEach(function(card) {
+    var slug = card.getAttribute('data-f6-slug');
+    var url  = 'https://links.dissoverse.com/' + slug;
+    var dot  = card.querySelector('[data-f6-dot]');
+    var lbl  = card.querySelector('[data-f6-label]');
+    f6CheckLinkHealth(url, slug, dot, lbl);
+  });
+  addLog('SWEEP', cards.length + ' link(s) queued for health check.', 'neon');
+  f7ResetActivity();
+}
+
+/* ── F7: SESSION TIMER + AUTO-LOCK ───────────────────────────── */
+var _f7SessionStart   = Date.now();
+var _f7LastActivity   = Date.now();
+var _f7TimerInterval  = null;
+var _f7LockTimeout    = null;
+var _f7Locked         = false;
+var _f7INACTIVITY_MS  = 30 * 60 * 1000; // 30 minutes
+
+function f7FormatElapsed(ms) {
+  var s = Math.floor(ms / 1000);
+  var h = Math.floor(s / 3600);
+  var m = Math.floor((s % 3600) / 60);
+  var sec = s % 60;
+  return (h < 10 ? '0' : '') + h + ':' +
+         (m < 10 ? '0' : '') + m + ':' +
+         (sec < 10 ? '0' : '') + sec;
+}
+
+function f7TickTimer() {
+  var el = document.getElementById('f7-session-timer');
+  if (el) {
+    el.textContent = 'SESSION: ' + f7FormatElapsed(Date.now() - _f7SessionStart);
+  }
+}
+
+function f7ResetActivity() {
+  _f7LastActivity = Date.now();
+  if (_f7Locked) f7ResumeSession();
+  if (_f7LockTimeout) clearTimeout(_f7LockTimeout);
+  _f7LockTimeout = setTimeout(f7SoftLock, _f7INACTIVITY_MS);
+}
+
+function f7SoftLock() {
+  if (_f7Locked) return;
+  _f7Locked = true;
+  var overlay  = document.getElementById('f7-timeout-overlay');
+  var mainApp  = document.getElementById('main-app');
+  if (overlay) overlay.style.display = 'flex';
+  if (mainApp) mainApp.style.filter = 'blur(4px)';
+  addLog('SESSION', 'INACTIVITY TIMEOUT — session soft-locked.', 'dim');
+}
+
+function f7ResumeSession() {
+  _f7Locked = false;
+  _f7LastActivity = Date.now();
+  var overlay = document.getElementById('f7-timeout-overlay');
+  var mainApp = document.getElementById('main-app');
+  if (overlay) overlay.style.display = 'none';
+  if (mainApp) mainApp.style.filter = '';
+  addLog('SESSION', 'Session resumed.', 'neon');
+  // Reset inactivity timer
+  if (_f7LockTimeout) clearTimeout(_f7LockTimeout);
+  _f7LockTimeout = setTimeout(f7SoftLock, _f7INACTIVITY_MS);
+}
+
+// Start session timer and inactivity tracking
+(function() {
+  // Tick every second
+  _f7TimerInterval = setInterval(f7TickTimer, 1000);
+  f7TickTimer();
+
+  // Activity tracking
+  ['mousemove', 'keydown', 'click', 'touchstart', 'scroll'].forEach(function(ev) {
+    document.addEventListener(ev, f7ResetActivity, { passive: true });
+  });
+
+  // Set initial lock timeout
+  _f7LockTimeout = setTimeout(f7SoftLock, _f7INACTIVITY_MS);
+})();
+
+/* ── HOOK: finishGeneration override to trigger F2 + F4 ──────── */
+var _origFinishGeneration = window.finishGeneration;
+// Patch finishGeneration to also store expiry + increment hits + update display
+var _patchedFinishGeneration = function(targetUrl, label, mode, ageGate, shortName, expiryDays) {
+  // Call original
+  _origFinishGeneration(targetUrl, label, mode, ageGate, shortName, expiryDays);
+  // F2: increment hit counter for this slug
+  f2IncrementHit(shortName);
+  f2UpdateHitDisplay(shortName);
+  // F4: store expiry
+  f4StoreExpiry(shortName, expiryDays || 0);
+  addLog('TTL', 'Expiry stored for slug: ' + shortName + ' (' + (expiryDays === 0 ? 'NEVER' : expiryDays + 'd') + ')', 'dim');
+  // F3: update preset chips in case newly loaded
+  f3RenderPresets();
+};
+window.finishGeneration = _patchedFinishGeneration;
+
+/* ── HOOK: loadActiveLinks override to inject F4 + F6 UI ─────── */
+var _origLoadActiveLinks = window.loadActiveLinks;
+window.loadActiveLinks = async function() {
+  await _origLoadActiveLinks.apply(this, arguments);
+  // After loading, enhance cards with F4 expiry + F6 health dots
+  setTimeout(f4F6EnhanceCards, 100);
+};
+
+function f4F6EnhanceCards() {
+  var panel = document.getElementById('active-links-panel');
+  if (!panel) return;
+  var cards = panel.querySelectorAll('.dv-link-card');
+  cards.forEach(function(card) {
+    // Extract slug from the link name element
+    var nameEl = card.querySelector('.dv-link-name');
+    if (!nameEl) return;
+    var text = nameEl.textContent.trim();
+    // text format: "links.dissoverse.com/slug"
+    var slug = text.replace('links.dissoverse.com/', '').trim();
+    if (!slug) return;
+
+    // Skip if already enhanced
+    if (card.getAttribute('data-f6-slug')) return;
+    card.setAttribute('data-f6-slug', slug);
+
+    // F6: Replace static dot with health-aware dot
+    var staticDot = card.querySelector('.dv-link-live-dot');
+    if (staticDot) {
+      staticDot.setAttribute('data-f6-dot', '1');
+      staticDot.style.cursor = 'help';
+      staticDot.title = 'Click SWEEP LINKS to check health';
+      // Check cached health
+      var cached = null;
+      try { cached = JSON.parse(localStorage.getItem('dv_health_check_' + slug) || 'null'); } catch(e) {}
+      if (cached) {
+        if (cached.status === 'live') {
+          staticDot.style.background = 'var(--neon)';
+          staticDot.style.boxShadow  = '0 0 6px var(--neon)';
+          staticDot.title = 'LIVE — last checked ' + new Date(cached.ts).toLocaleTimeString();
+        } else {
+          staticDot.style.background = '#ff3333';
+          staticDot.style.boxShadow  = '0 0 6px #ff3333';
+          staticDot.title = 'DEAD — last checked ' + new Date(cached.ts).toLocaleTimeString();
+        }
+      }
+    }
+
+    // F6: Health label
+    var healthLbl = document.createElement('span');
+    healthLbl.setAttribute('data-f6-label', '1');
+    healthLbl.style.cssText = 'font-size:9px; letter-spacing:1.5px; color:var(--text-dim); flex-shrink:0;';
+    var cached2 = null;
+    try { cached2 = JSON.parse(localStorage.getItem('dv_health_check_' + slug) || 'null'); } catch(e) {}
+    if (cached2) {
+      healthLbl.textContent = cached2.status === 'live' ? 'LIVE' : 'DEAD';
+      healthLbl.style.color = cached2.status === 'live' ? 'var(--neon)' : '#ff3333';
+    } else {
+      healthLbl.textContent = '—';
+    }
+
+    // F4: Expiry countdown
+    var expiryInfo = f4GetExpiryStatus(slug);
+    var expiryLbl = document.createElement('span');
+    expiryLbl.style.cssText = 'font-size:9px; letter-spacing:1px; flex-shrink:0;';
+    if (expiryInfo.status === 'extinct') {
+      expiryLbl.textContent = 'EXTINCT';
+      expiryLbl.style.color = 'rgba(255,50,50,0.6)';
+      // Dim entire card for extinct links
+      card.style.opacity = '0.45';
+      // Replace pulse dot with red
+      if (staticDot) {
+        staticDot.style.background = '#ff3333';
+        staticDot.style.boxShadow  = '0 0 4px #ff3333';
+        staticDot.style.animationName = 'none';
+      }
+    } else if (expiryInfo.status === 'permanent') {
+      expiryLbl.textContent = 'PERMANENT';
+      expiryLbl.style.color = 'var(--text-dim)';
+    } else {
+      expiryLbl.textContent = expiryInfo.label;
+      expiryLbl.style.color = 'var(--text-dim)';
+    }
+
+    // F2: Hits
+    var hitsLbl = document.createElement('span');
+    hitsLbl.style.cssText = 'font-size:9px; letter-spacing:1px; color:var(--text-dim); flex-shrink:0;';
+    hitsLbl.textContent = 'HITS: ' + f2GetHits(slug);
+
+    // Insert meta before the copy button (insert after name + existing meta)
+    var copyBtn = card.querySelector('button');
+    card.insertBefore(hitsLbl, copyBtn);
+    card.insertBefore(expiryLbl, copyBtn);
+    card.insertBefore(healthLbl, copyBtn);
+  });
+}
+
+/* ── INIT: render presets on load ────────────────────────────── */
+document.addEventListener('DOMContentLoaded', function() {
+  f3RenderPresets();
+  // Sweep links health on initial load (after links load)
+  setTimeout(function() {
+    f4F6EnhanceCards();
+  }, 2000);
+});
 </script>
 </body>
 </html>
