@@ -5943,10 +5943,23 @@ var dvAudio = (function() {
     setTimeout(function() { boot(); }, 500);
   });
 
-  /* ── HOOK: MECHANICAL CLICK on EVERY click — full interactivity ── */
+  /* ── HOOK: BLEEP only on BUTTONS + INTERACTIVE elements ── */
   document.addEventListener('click', function(e) {
-    click();
-  }, true); /* capture phase — fires on every single click, everywhere */
+    var el = e.target;
+    var depth = 0;
+    while (el && depth < 4) {
+      if (el.tagName === 'BUTTON' || el.tagName === 'A' ||
+          el.tagName === 'SELECT' ||
+          (el.hasAttribute && el.hasAttribute('onclick')) ||
+          (el.classList && el.classList.contains('btn-neon')) ||
+          (el.classList && el.classList.contains('ncp-theme-btn'))) {
+        click();
+        return;
+      }
+      el = el.parentElement;
+      depth++;
+    }
+  }, true);
 
   /* ── HOOK: SOFT CONFIRM on f1CopyOutputLink ([COPIED] flash) ─── */
   (function() {
