@@ -550,6 +550,22 @@
   66% { opacity: 0.8; filter: hue-rotate(-20deg); letter-spacing: 1px; }
   100% { opacity: 1; filter: none; }
 }
+
+  /* ── FOCUS-VISIBLE: Accessibility ────────────────────────────── */
+  *:focus-visible { outline: 2px solid var(--neon); outline-offset: 2px; }
+  input:focus-visible, button:focus-visible, select:focus-visible { outline: 2px solid var(--neon); outline-offset: 2px; box-shadow: 0 0 8px rgba(var(--neon-rgb), 0.3); }
+
+  /* ── iOS AUTO-ZOOM PREVENTION ────────────────────────────────── */
+  @media (max-width: 768px) {
+    input, textarea, select { font-size: 16px !important; }
+  }
+
+  /* ── SAFE-AREA INSET: Notch phones ──────────────────────────── */
+  @supports (padding: env(safe-area-inset-bottom)) {
+    body { padding-bottom: env(safe-area-inset-bottom); }
+    #dv-veritas-badge { bottom: calc(8px + env(safe-area-inset-bottom)); }
+  }
+
 </style>
 <style>
 /* ================================================================
@@ -559,7 +575,7 @@
    Auth: PBKDF2-SHA256 | 200k iterations
    ================================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=VT323&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
 
 /* ── BODY LOCK ───────────────────────────────────────────────── */
 body.dv-gate-active {
@@ -2596,9 +2612,11 @@ function ncpExportLinks() {
   }, null, 2);
   var blob = new Blob([payload], { type: 'application/json' });
   var a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
+  var blobUrl = URL.createObjectURL(blob);
+  a.href = blobUrl;
   a.download = 'diss0linkz_export_' + Date.now() + '.json';
   a.click();
+  URL.revokeObjectURL(blobUrl);
   var fb = document.getElementById('ncp-export-feedback');
   if (fb) { fb.textContent = '✓ EXPORT DISPATCHED'; setTimeout(function() { fb.textContent = ''; }, 2500); }
 }
@@ -2680,12 +2698,7 @@ function clearToken() {
 
 function updateTokenStatus() {
   var hasToken = !!sessionStorage.getItem('gh_pat');
-  var el = document.getElementById('token-status');
-  if (el) {
-    el.textContent = hasToken ? 'CONNECTED' : 'DISCONNECTED';
-    el.style.color  = hasToken ? 'var(--neon)' : 'var(--text-dim)';
-    el.style.textShadow = hasToken ? '0 0 6px var(--neon-glow)' : 'none';
-  }
+  // NOTE: #token-status element removed from DOM; reference cleaned up
   updateDeployButtonVisibility();
   loadActiveLinks();
 }
@@ -2708,56 +2721,7 @@ function updateDeployButtonVisibility() {
 }
 
 // ==================== ACTIVE LINKS DASHBOARD ====================
-async function loadActiveLinks() {
-  const token = sessionStorage.getItem('gh_pat');
-  const panel = document.getElementById('active-links-panel');
-  if (!panel) return;
-
-  if (!token) {
-    panel.innerHTML = '<div style="color:var(--text-dim);">No active links yet.</div>';
-    return;
-  }
-
-  panel.innerHTML = '<div style="color:var(--text-dim);">SCANNING REPO...</div>';
-
-  try {
-    const resp = await fetch('https://api.github.com/repos/analogflowers-coder/dissolinks/contents/', {
-      headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json' }
-    });
-
-    if (resp.status === 401 || resp.status === 403) {
-      const errData = await resp.json().catch(() => ({}));
-      panel.innerHTML = '<div style="color:var(--red-warn);">[ERROR] Auth failed (' + resp.status + '): ' + (errData.message || 'Check your PAT.') + '</div>';
-      return;
-    }
-    if (!resp.ok) {
-      panel.innerHTML = '<div style="color:var(--red-warn);">[ERROR] Failed to fetch repo contents (' + resp.status + ').</div>';
-      return;
-    }
-
-    const items = await resp.json();
-    const dirs = items.filter(item => item.type === 'dir');
-
-    if (dirs.length === 0) {
-      panel.innerHTML = '<div style="color:var(--text-dim);">No active links yet. Generate your first link above.</div>';
-      return;
-    }
-
-    let html = '<div style="display:flex;flex-direction:column;gap:0;">';
-    dirs.forEach(dir => {
-      const cleanUrl = 'https://links.dissoverse.com/' + dir.name;
-      html += `<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:7px 0;border-bottom:1px solid var(--border-dim);">
-        <span style="flex:1;min-width:0;color:var(--neon);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;">links.dissoverse.com/${dir.name}</span>
-        <button onclick="copyToClipboard('${cleanUrl}')" class="btn-neon" style="font-size:10px;padding:3px 10px;letter-spacing:1px;flex-shrink:0;">COPY</button>
-        <button onclick="deleteLink('${dir.name}')" class="btn-neon btn-red" style="font-size:10px;padding:3px 10px;letter-spacing:1px;flex-shrink:0;">DELETE</button>
-      </div>`;
-    });
-    html += '</div>';
-    panel.innerHTML = html;
-  } catch (e) {
-    panel.innerHTML = '<div style="color:var(--red-warn);">[ERROR] Network error loading links.</div>';
-  }
-}
+// NOTE: Primary loadActiveLinks() is defined in ENHANCED ACTIVE LINKS DASHBOARD section below.
 
 async function deleteLink(name) {
   const token = sessionStorage.getItem('gh_pat');
@@ -3040,7 +3004,17 @@ function addLog(tag, message, color) {
   if (color === 'dim') tagColor = 'var(--text-dim)';
   if (color === 'neon') tagColor = 'var(--neon)';
 
-  entry.innerHTML = `<span style="color:var(--text-dim);">${ts}</span> <span style="color:${tagColor};">[${tag}]</span> ${message}`;
+  var tsSpan = document.createElement('span');
+  tsSpan.style.color = 'var(--text-dim)';
+  tsSpan.textContent = ts;
+  var tagSpan = document.createElement('span');
+  tagSpan.style.color = tagColor;
+  tagSpan.textContent = ' [' + tag + '] ';
+  var msgSpan = document.createElement('span');
+  msgSpan.textContent = message;
+  entry.appendChild(tsSpan);
+  entry.appendChild(tagSpan);
+  entry.appendChild(msgSpan);
   log.appendChild(entry);
   log.scrollTop = log.scrollHeight;
   logCount++;
@@ -3048,39 +3022,6 @@ function addLog(tag, message, color) {
 }
 
 // ==================== SOCIAL MEDIA ESCAPE LOGIC ====================
-
-/**
- * Detects if the current browser is an in-app browser (IAB).
- * Returns the platform name or null.
- */
-function detectIAB(ua) {
-  ua = ua || navigator.userAgent || '';
-  const patterns = [
-    { name: 'Instagram',  regex: /Instagram/i },
-    { name: 'TikTok',     regex: /musical_ly|BytedanceWebview|TikTok/i },
-    { name: 'Facebook',   regex: /FBAN|FBAV|FB_IAB/i },
-    { name: 'Twitter',    regex: /Twitter/i },
-    { name: 'Snapchat',   regex: /Snapchat/i },
-    { name: 'LinkedIn',   regex: /LinkedInApp/i },
-    { name: 'Pinterest',  regex: /Pinterest/i },
-    { name: 'Line',       regex: /\bLine\b/i },
-    { name: 'WeChat',     regex: /MicroMessenger/i },
-  ];
-  for (const p of patterns) {
-    if (p.regex.test(ua)) return p.name;
-  }
-  return null;
-}
-
-/**
- * Detects OS from user-agent.
- */
-function detectOS(ua) {
-  ua = ua || navigator.userAgent || '';
-  if (/iPhone|iPad|iPod/i.test(ua)) return 'ios';
-  if (/Android/i.test(ua)) return 'android';
-  return 'desktop';
-}
 
 /**
  * Generates the escape page HTML via string concatenation.
@@ -4428,7 +4369,11 @@ async function loadActiveLinks() {
   }
 
   var linksPath = 'accounts/' + vaultUser + '/links.json';
-  panel.innerHTML = '<div style="color:var(--text-dim); font-size:11px; letter-spacing:2px;">&#9632; LOADING LINKS FOR ' + vaultUser + '...</div>';
+  panel.textContent = '';
+  var loadingDiv = document.createElement('div');
+  loadingDiv.style.cssText = 'color:var(--text-dim); font-size:11px; letter-spacing:2px;';
+  loadingDiv.textContent = '\u25A0 LOADING LINKS FOR ' + vaultUser + '...';
+  panel.appendChild(loadingDiv);
 
   try {
     var resp = await fetch('https://api.github.com/repos/analogflowers-coder/dissolinks/contents/' + linksPath, {
@@ -4441,12 +4386,20 @@ async function loadActiveLinks() {
     }
     if (resp.status === 401 || resp.status === 403) {
       var errData = await resp.json().catch(function() { return {}; });
-      panel.innerHTML = '<div style="color:var(--red-warn); font-size:11px;">[ERROR] AUTH FAILED (' + resp.status + '): ' + (errData.message || 'CHECK TOKEN') + '</div>';
+      panel.textContent = '';
+      var authErr = document.createElement('div');
+      authErr.style.cssText = 'color:var(--red-warn); font-size:11px;';
+      authErr.textContent = '[ERROR] AUTH FAILED (' + resp.status + '): ' + (errData.message || 'CHECK TOKEN');
+      panel.appendChild(authErr);
       showErrorPopup('0x' + resp.status.toString(16).toUpperCase(), 'AUTHENTICATION FAILURE', 'GitHub API rejected the operator token (' + resp.status + '). Navigate to Settings &#9881; > Export tab and reconnect your deploy token.', null);
       return;
     }
     if (!resp.ok) {
-      panel.innerHTML = '<div style="color:var(--red-warn); font-size:11px;">[ERROR] FAILED TO LOAD LINKS (' + resp.status + ').</div>';
+      panel.textContent = '';
+      var loadErr = document.createElement('div');
+      loadErr.style.cssText = 'color:var(--red-warn); font-size:11px;';
+      loadErr.textContent = '[ERROR] FAILED TO LOAD LINKS (' + resp.status + ').';
+      panel.appendChild(loadErr);
       return;
     }
 
@@ -4460,22 +4413,48 @@ async function loadActiveLinks() {
       return;
     }
 
-    var html2 = '<div style="display:flex; flex-direction:column;">';
+    panel.textContent = '';
+    var listWrap2 = document.createElement('div');
+    listWrap2.style.cssText = 'display:flex; flex-direction:column;';
     links.forEach(function(link) {
-      var slug = (link && link.slug) ? link.slug : String(link);
+      var slug = String((link && link.slug) ? link.slug : link).replace(/[^a-zA-Z0-9_\-\.]/g, '');
       var cleanUrl = 'https://links.dissoverse.com/' + slug;
-      html2 += '<div class="dv-link-card">' +
-        '<span class="dv-link-live-dot"></span>' +
-        '<span class="dv-link-name">links.dissoverse.com/' + slug + '</span>' +
-        (link.created ? '<span class="dv-link-meta">' + new Date(link.created).toLocaleDateString() + '</span>' : '') +
-        '<button onclick="dvCopyLink(\'' + cleanUrl + '\', this)" class="btn-neon" style="font-size:10px;padding:3px 10px;letter-spacing:1px;flex-shrink:0;">COPY</button>' +
-        '<button onclick="deleteLink(\'' + slug + '\')" class="btn-neon btn-red" style="font-size:10px;padding:3px 10px;letter-spacing:1px;flex-shrink:0;">DELETE</button>' +
-        '</div>';
+      var card = document.createElement('div');
+      card.className = 'dv-link-card';
+      var dot = document.createElement('span');
+      dot.className = 'dv-link-live-dot';
+      var nameSpan = document.createElement('span');
+      nameSpan.className = 'dv-link-name';
+      nameSpan.textContent = 'links.dissoverse.com/' + slug;
+      card.appendChild(dot);
+      card.appendChild(nameSpan);
+      if (link.created) {
+        var metaSpan = document.createElement('span');
+        metaSpan.className = 'dv-link-meta';
+        metaSpan.textContent = new Date(link.created).toLocaleDateString();
+        card.appendChild(metaSpan);
+      }
+      var copyBtn2 = document.createElement('button');
+      copyBtn2.className = 'btn-neon';
+      copyBtn2.style.cssText = 'font-size:10px;padding:3px 10px;letter-spacing:1px;flex-shrink:0;';
+      copyBtn2.textContent = 'COPY';
+      copyBtn2.addEventListener('click', (function(u, b) { return function() { dvCopyLink(u, b); }; })(cleanUrl, copyBtn2));
+      var delBtn2 = document.createElement('button');
+      delBtn2.className = 'btn-neon btn-red';
+      delBtn2.style.cssText = 'font-size:10px;padding:3px 10px;letter-spacing:1px;flex-shrink:0;';
+      delBtn2.textContent = 'DELETE';
+      delBtn2.addEventListener('click', (function(s) { return function() { deleteLink(s); }; })(slug));
+      card.appendChild(copyBtn2);
+      card.appendChild(delBtn2);
+      listWrap2.appendChild(card);
     });
-    html2 += '</div>';
-    panel.innerHTML = html2;
+    panel.appendChild(listWrap2);
   } catch (e) {
-    panel.innerHTML = '<div style="color:var(--red-warn); font-size:11px;">[ERROR] NETWORK FAILURE. CHECK CONNECTION.</div>';
+    panel.textContent = '';
+    var netErr2 = document.createElement('div');
+    netErr2.style.cssText = 'color:var(--red-warn); font-size:11px;';
+    netErr2.textContent = '[ERROR] NETWORK FAILURE. CHECK CONNECTION.';
+    panel.appendChild(netErr2);
     showErrorPopup('0xNET1', 'NETWORK ERROR', 'Failed to reach GitHub API. Check your connection and try again.', null);
   }
 }
@@ -4969,7 +4948,11 @@ function f5GenerateQR() {
     });
     addLog('QR', 'QR code generated for: ' + generatedLink, 'neon');
   } catch(e) {
-    container.innerHTML = '<div style="color:var(--red-warn); font-size:11px; padding:10px;">QR GENERATION FAILED: ' + e.message + '</div>';
+    container.textContent = '';
+    var qrErr = document.createElement('div');
+    qrErr.style.cssText = 'color:var(--red-warn); font-size:11px; padding:10px;';
+    qrErr.textContent = 'QR GENERATION FAILED: ' + e.message;
+    container.appendChild(qrErr);
     addLog('QR', 'QR generation error: ' + e.message, 'red');
   }
   f7ResetActivity();
