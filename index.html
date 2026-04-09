@@ -13,15 +13,22 @@
   :root {
     --neon: #00ff41;
     --neon-dim: #00cc33;
-    --neon-glow: #00ff4180;
+    --neon-glow: rgba(0,255,65,0.5);
+    --neon-rgb: 0,255,65;
     --red-warn: #ff0033;
     --red-glow: #ff003380;
     --bg-deep: #0a0a0a;
     --bg-panel: #0d0d0d;
-    --bg-glass: rgba(0, 255, 65, 0.03);
-    --border-dim: rgba(0, 255, 65, 0.12);
-    --border-mid: rgba(0, 255, 65, 0.25);
-    --text-dim: rgba(0, 255, 65, 0.5);
+    --bg-glass: rgba(var(--neon-rgb), 0.03);
+    --border-dim: rgba(var(--neon-rgb), 0.12);
+    --border-mid: rgba(var(--neon-rgb), 0.25);
+    --text-dim: rgba(var(--neon-rgb), 0.5);
+    --text-bright: rgba(var(--neon-rgb), 0.85);
+    --border-glow: rgba(var(--neon-rgb), 0.55);
+    --matrix-color: #00ff41;
+    --matrix-head: #ffffff;
+    --matrix-fade: rgba(var(--neon-rgb), 0.4);
+    --glow-color: rgba(var(--neon-rgb), 0.6);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -55,22 +62,22 @@
     content: '';
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 255, 65, 0.01);
+    background: rgba(var(--neon-rgb), 0.01);
     pointer-events: none;
     z-index: 9998;
     animation: flicker 0.15s infinite;
   }
 
   @keyframes manifest-glow {
-    0%   { text-shadow: 0 0 4px rgba(0,255,65,0.3),  0 0 8px rgba(0,255,65,0.1);  opacity: 0.75; }
-    50%  { text-shadow: 0 0 10px rgba(0,255,65,0.7), 0 0 22px rgba(0,255,65,0.3); opacity: 1;    }
-    100% { text-shadow: 0 0 4px rgba(0,255,65,0.3),  0 0 8px rgba(0,255,65,0.1);  opacity: 0.75; }
+    0%   { text-shadow: 0 0 4px rgba(var(--neon-rgb),0.3),  0 0 8px rgba(var(--neon-rgb),0.1);  opacity: 0.75; }
+    50%  { text-shadow: 0 0 10px rgba(var(--neon-rgb),0.7), 0 0 22px rgba(var(--neon-rgb),0.3); opacity: 1;    }
+    100% { text-shadow: 0 0 4px rgba(var(--neon-rgb),0.3),  0 0 8px rgba(var(--neon-rgb),0.1);  opacity: 0.75; }
   }
 
   @keyframes exit-portal-glow {
-    0%   { box-shadow: 0 0 4px rgba(0,255,65,0.10); border-color: rgba(0,255,65,0.25); }
-    50%  { box-shadow: 0 0 10px rgba(0,255,65,0.28); border-color: rgba(0,255,65,0.55); }
-    100% { box-shadow: 0 0 4px rgba(0,255,65,0.10); border-color: rgba(0,255,65,0.25); }
+    0%   { box-shadow: 0 0 4px rgba(var(--neon-rgb),0.10); border-color: rgba(var(--neon-rgb),0.25); }
+    50%  { box-shadow: 0 0 10px rgba(var(--neon-rgb),0.28); border-color: rgba(var(--neon-rgb),0.55); }
+    100% { box-shadow: 0 0 4px rgba(var(--neon-rgb),0.10); border-color: rgba(var(--neon-rgb),0.25); }
   }
 
   /* STATUS BAR — responsive */
@@ -152,8 +159,8 @@
   }
 
   @keyframes pulseGlow {
-    0%, 100% { box-shadow: 0 0 5px var(--neon-glow), inset 0 0 5px rgba(0,255,65,0.05); }
-    50% { box-shadow: 0 0 20px var(--neon-glow), inset 0 0 10px rgba(0,255,65,0.08); }
+    0%, 100% { box-shadow: 0 0 5px var(--neon-glow), inset 0 0 5px rgba(var(--neon-rgb),0.05); }
+    50% { box-shadow: 0 0 20px var(--neon-glow), inset 0 0 10px rgba(var(--neon-rgb),0.08); }
   }
 
   @keyframes matrixRain {
@@ -183,7 +190,7 @@
 
   .neon-border {
     border: 1px solid var(--neon);
-    box-shadow: 0 0 10px var(--neon-glow), inset 0 0 10px rgba(0,255,65,0.05);
+    box-shadow: 0 0 10px var(--neon-glow), inset 0 0 10px rgba(var(--neon-rgb),0.05);
   }
 
   .terminal-input {
@@ -223,7 +230,7 @@
   }
 
   .btn-neon:hover {
-    background: rgba(0, 255, 65, 0.1);
+    background: rgba(var(--neon-rgb), 0.1);
     box-shadow: 0 0 20px var(--neon-glow);
     text-shadow: 0 0 10px var(--neon);
   }
@@ -292,7 +299,7 @@
   .toggle-switch { position: relative; width: 44px; height: 22px; flex-shrink: 0; }
   .toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
   .toggle-track { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); border: 1px solid var(--border-mid); transition: all 0.3s; }
-  .toggle-switch input:checked + .toggle-track { border-color: var(--neon); box-shadow: 0 0 8px var(--neon-glow); background: rgba(0,255,65,0.08); }
+  .toggle-switch input:checked + .toggle-track { border-color: var(--neon); box-shadow: 0 0 8px var(--neon-glow); background: rgba(var(--neon-rgb),0.08); }
   .toggle-thumb { position: absolute; top: 3px; left: 3px; width: 14px; height: 14px; background: var(--text-dim); transition: all 0.3s; }
   .toggle-switch input:checked ~ .toggle-thumb { left: 25px; background: var(--neon); box-shadow: 0 0 6px var(--neon-glow); }
 
@@ -311,12 +318,12 @@
     width: 100%; max-width: 480px;
   }
   .btn-deploy {
-    background: rgba(0,255,65,0.1);
+    background: rgba(var(--neon-rgb), 0.1);
     box-shadow: 0 0 12px var(--neon-glow);
     text-shadow: 0 0 8px var(--neon);
   }
   .btn-deploy:hover {
-    background: rgba(0,255,65,0.22);
+    background: rgba(var(--neon-rgb), 0.22);
     box-shadow: 0 0 28px var(--neon-glow);
   }
   .deploy-status-live {
@@ -326,7 +333,7 @@
     padding: 8px 12px;
     border: 1px solid var(--border-mid);
     letter-spacing: 2px;
-    background: rgba(0,255,65,0.04);
+    background: rgba(var(--neon-rgb), 0.04);
   }
   #gear-btn:hover { border-color: var(--neon); color: var(--neon); box-shadow: 0 0 10px var(--neon-glow); }
 
@@ -374,22 +381,22 @@
 
 /* === DISS0LINKZ LOGO === */
 @keyframes dv-logo-glow-pulse {
-  0%, 100% { filter: drop-shadow(0 0 6px rgba(0,255,65,0.45)) drop-shadow(0 0 12px rgba(0,255,65,0.2)); }
-  50%       { filter: drop-shadow(0 0 18px rgba(0,255,65,0.85)) drop-shadow(0 0 36px rgba(0,255,65,0.35)); }
+  0%, 100% { filter: drop-shadow(0 0 6px rgba(var(--neon-rgb),0.45)) drop-shadow(0 0 12px rgba(var(--neon-rgb),0.2)); }
+  50%       { filter: drop-shadow(0 0 18px rgba(var(--neon-rgb),0.85)) drop-shadow(0 0 36px rgba(var(--neon-rgb),0.35)); }
 }
 
 @keyframes dv-logo-glitch {
-  0%   { transform: translate(0) skewX(0deg);      filter: drop-shadow(0 0 8px rgba(0,255,65,0.6)); }
-  10%  { transform: translate(-4px, 2px) skewX(-3deg); filter: drop-shadow(0 0 28px rgba(0,255,65,1)) hue-rotate(20deg) brightness(1.4); }
-  20%  { transform: translate(4px, -2px) skewX(3deg);  filter: drop-shadow(0 0 32px rgba(0,255,65,0.9)) hue-rotate(-20deg) brightness(1.3); }
-  30%  { transform: translate(-3px, -1px) skewX(-1deg); filter: drop-shadow(0 0 20px rgba(0,255,65,0.8)) brightness(1.2); }
-  40%  { transform: translate(3px, 1px) skewX(2deg);   filter: drop-shadow(0 0 36px rgba(0,255,65,1)) brightness(1.5); }
-  50%  { transform: translate(-1px, 2px) skewX(0deg);  filter: drop-shadow(0 0 14px rgba(0,255,65,0.7)); }
-  60%  { transform: translate(2px, -1px);               filter: drop-shadow(0 0 10px rgba(0,255,65,0.6)) brightness(1.1); }
-  70%  { transform: translate(-2px, 1px) skewX(-1deg); filter: drop-shadow(0 0 22px rgba(0,255,65,0.9)) hue-rotate(10deg); }
-  80%  { transform: translate(1px, -2px);               filter: drop-shadow(0 0 18px rgba(0,255,65,0.8)); }
-  90%  { transform: translate(-1px, 1px);               filter: drop-shadow(0 0 12px rgba(0,255,65,0.65)); }
-  100% { transform: translate(0) skewX(0deg);      filter: drop-shadow(0 0 8px rgba(0,255,65,0.6)); }
+  0%   { transform: translate(0) skewX(0deg);      filter: drop-shadow(0 0 8px rgba(var(--neon-rgb),0.6)); }
+  10%  { transform: translate(-4px, 2px) skewX(-3deg); filter: drop-shadow(0 0 28px rgba(var(--neon-rgb),1)) hue-rotate(20deg) brightness(1.4); }
+  20%  { transform: translate(4px, -2px) skewX(3deg);  filter: drop-shadow(0 0 32px rgba(var(--neon-rgb),0.9)) hue-rotate(-20deg) brightness(1.3); }
+  30%  { transform: translate(-3px, -1px) skewX(-1deg); filter: drop-shadow(0 0 20px rgba(var(--neon-rgb),0.8)) brightness(1.2); }
+  40%  { transform: translate(3px, 1px) skewX(2deg);   filter: drop-shadow(0 0 36px rgba(var(--neon-rgb),1)) brightness(1.5); }
+  50%  { transform: translate(-1px, 2px) skewX(0deg);  filter: drop-shadow(0 0 14px rgba(var(--neon-rgb),0.7)); }
+  60%  { transform: translate(2px, -1px);               filter: drop-shadow(0 0 10px rgba(var(--neon-rgb),0.6)) brightness(1.1); }
+  70%  { transform: translate(-2px, 1px) skewX(-1deg); filter: drop-shadow(0 0 22px rgba(var(--neon-rgb),0.9)) hue-rotate(10deg); }
+  80%  { transform: translate(1px, -2px);               filter: drop-shadow(0 0 18px rgba(var(--neon-rgb),0.8)); }
+  90%  { transform: translate(-1px, 1px);               filter: drop-shadow(0 0 12px rgba(var(--neon-rgb),0.65)); }
+  100% { transform: translate(0) skewX(0deg);      filter: drop-shadow(0 0 8px rgba(var(--neon-rgb),0.6)); }
 }
 
 .diss0linkz-logo-wrap {
@@ -457,7 +464,7 @@ body.dv-gate-active * { cursor: none !important; }
 .dv-logo-img {
   width: min(340px, 80vw);
   height: auto;
-  filter: drop-shadow(0 0 18px rgba(0,255,65,0.6)) drop-shadow(0 0 40px rgba(0,255,65,0.25));
+  filter: drop-shadow(0 0 18px rgba(var(--neon-rgb),0.6)) drop-shadow(0 0 40px rgba(var(--neon-rgb),0.25));
   animation: dv-logo-glow 2.5s ease-in-out infinite;
 }
 @keyframes dv-logo-float {
@@ -465,8 +472,8 @@ body.dv-gate-active * { cursor: none !important; }
   50%      { transform: translateY(-6px); }
 }
 @keyframes dv-logo-glow {
-  0%,100% { filter: drop-shadow(0 0 14px rgba(0,255,65,0.5)) drop-shadow(0 0 30px rgba(0,255,65,0.2)); }
-  50%     { filter: drop-shadow(0 0 28px rgba(0,255,65,0.9)) drop-shadow(0 0 60px rgba(0,255,65,0.4)); }
+  0%,100% { filter: drop-shadow(0 0 14px rgba(var(--neon-rgb),0.5)) drop-shadow(0 0 30px rgba(var(--neon-rgb),0.2)); }
+  50%     { filter: drop-shadow(0 0 28px rgba(var(--neon-rgb),0.9)) drop-shadow(0 0 60px rgba(var(--neon-rgb),0.4)); }
 }
 
 /* ── TERMINAL BOX ───────────────────────────────────────────── */
@@ -474,12 +481,12 @@ body.dv-gate-active * { cursor: none !important; }
   position: relative;
   width: min(520px, 92vw);
   background: rgba(0, 4, 0, 0.92);
-  border: 1px solid rgba(0,255,65,0.55);
+  border: 1px solid rgba(var(--neon-rgb),0.55);
   box-shadow:
-    0 0 0 1px rgba(0,255,65,0.1),
-    0 0 20px rgba(0,255,65,0.25),
-    0 0 60px rgba(0,255,65,0.1),
-    inset 0 0 30px rgba(0,255,65,0.03);
+    0 0 0 1px rgba(var(--neon-rgb),0.1),
+    0 0 20px rgba(var(--neon-rgb),0.25),
+    0 0 60px rgba(var(--neon-rgb),0.1),
+    inset 0 0 30px rgba(var(--neon-rgb),0.03);
   padding: 24px 22px 18px;
   font-family: 'JetBrains Mono', 'Share Tech Mono', monospace;
   overflow: hidden;
@@ -506,7 +513,7 @@ body.dv-gate-active * { cursor: none !important; }
   position: absolute;
   font-family: 'JetBrains Mono', monospace;
   font-size: 11px;
-  color: rgba(0,255,65,0.4);
+  color: rgba(var(--neon-rgb),0.4);
   line-height: 1;
 }
 .dv-corner.tl { top: 6px; left: 8px; }
@@ -517,7 +524,7 @@ body.dv-gate-active * { cursor: none !important; }
 /* Boot output */
 #dv-boot-output {
   font-size: clamp(11px, 2.2vw, 13px);
-  color: rgba(0,255,65,0.85);
+  color: rgba(var(--neon-rgb),0.85);
   line-height: 1.65;
   min-height: 120px;
   margin-bottom: 12px;
@@ -525,13 +532,13 @@ body.dv-gate-active * { cursor: none !important; }
   white-space: pre-wrap;
 }
 #dv-boot-output .dv-line { display: block; }
-#dv-boot-output .dv-line.dv-bright { color: #00ff41; }
-#dv-boot-output .dv-line.dv-dim    { color: rgba(0,255,65,0.45); }
+#dv-boot-output .dv-line.dv-bright { color: var(--neon); }
+#dv-boot-output .dv-line.dv-dim    { color: rgba(var(--neon-rgb),0.45); }
 #dv-boot-output .dv-line.dv-warn   { color: #ffcc00; }
 
 /* Separator */
 .dv-separator {
-  color: rgba(0,255,65,0.2);
+  color: rgba(var(--neon-rgb),0.2);
   font-size: 12px;
   letter-spacing: 0.04em;
   margin-bottom: 14px;
@@ -544,11 +551,11 @@ body.dv-gate-active * { cursor: none !important; }
   align-items: center;
   gap: 8px;
   margin-bottom: 10px;
-  border-bottom: 1px solid rgba(0,255,65,0.2);
+  border-bottom: 1px solid rgba(var(--neon-rgb),0.2);
   padding-bottom: 10px;
 }
 .dv-prompt {
-  color: #00ff41;
+  color: var(--neon);
   font-size: 14px;
   user-select: none;
   flex-shrink: 0;
@@ -558,18 +565,18 @@ body.dv-gate-active * { cursor: none !important; }
   background: transparent;
   border: none;
   outline: none;
-  color: #00ff41;
+  color: var(--neon);
   font-family: 'JetBrains Mono', monospace;
   font-size: clamp(14px, 3vw, 17px);
   letter-spacing: 0.25em;
-  caret-color: #00ff41;
+  caret-color: var(--neon);
   min-width: 0;
 }
-#dv-passphrase-input::placeholder { color: rgba(0,255,65,0.2); }
+#dv-passphrase-input::placeholder { color: rgba(var(--neon-rgb),0.2); }
 #dv-submit-btn {
   background: transparent;
-  border: 1px solid rgba(0,255,65,0.6);
-  color: #00ff41;
+  border: 1px solid rgba(var(--neon-rgb),0.6);
+  color: var(--neon);
   font-family: 'JetBrains Mono', monospace;
   font-size: 11px;
   letter-spacing: 0.15em;
@@ -580,15 +587,15 @@ body.dv-gate-active * { cursor: none !important; }
   text-transform: uppercase;
 }
 #dv-submit-btn:hover, #dv-submit-btn:focus {
-  background: rgba(0,255,65,0.12);
-  border-color: #00ff41;
-  box-shadow: 0 0 10px rgba(0,255,65,0.3);
+  background: rgba(var(--neon-rgb),0.12);
+  border-color: var(--neon);
+  box-shadow: 0 0 10px rgba(var(--neon-rgb),0.3);
 }
 
 /* Status / lockout */
 #dv-status-line {
   font-size: 11px;
-  color: rgba(0,255,65,0.55);
+  color: rgba(var(--neon-rgb),0.55);
   letter-spacing: 0.08em;
   min-height: 16px;
   margin-bottom: 10px;
@@ -617,7 +624,7 @@ body.dv-gate-active * { cursor: none !important; }
   font-family: 'JetBrains Mono', monospace;
   font-size: 9px;
   letter-spacing: 0.12em;
-  color: rgba(0,255,65,0.25);
+  color: rgba(var(--neon-rgb),0.25);
   text-align: center;
 }
 
@@ -1113,7 +1120,7 @@ body.dv-glitching #diss0linkz-auth-gate {
     <div class="dv-hack-dot" style="background:#ff3333;"></div>
     <div class="dv-hack-dot" style="background:#ffcc00;"></div>
     <div class="dv-hack-dot" style="background:#00ff41;"></div>
-    <span style="font-size:11px; color:var(--text-dim); letter-spacing:2px; margin-left:8px;">terminal://dissoverse/force-op-compiler</span>
+    <span style="font-size:11px; color:var(--text-dim); letter-spacing:2px; margin-left:8px;">terminal://dissoverse/void_stride-compiler</span>
     <span id="dv-hack-timer" style="margin-left:auto; font-size:11px; color:var(--text-dim); letter-spacing:2px;"></span>
   </div>
   <div class="dv-hack-ascii" id="dv-hack-ascii"></div>
@@ -1361,7 +1368,7 @@ body.dv-glitching #diss0linkz-auth-gate {
       <div class="flex gap-4 flex-wrap">
         <span>NODE: <span style="color:var(--neon);">PRPL TWR</span></span>
         <span>ENCRYPTION: <span style="color:var(--neon);">AES-256</span></span>
-        <span>PROTOCOL: <span style="color:var(--neon);">FORCE-OP</span></span>
+        <span>PROTOCOL: <span style="color:var(--neon);">VOID_STRIDE</span></span>
       </div>
       <div style="color:var(--text-dim);">
         ZERO-LOG // SERVERLESS // SOVEREIGN
@@ -1395,7 +1402,7 @@ body.dv-glitching #diss0linkz-auth-gate {
             margin-bottom:10px;
             text-align:center;
             animation: manifest-glow 4s ease-in-out infinite;
-          ">FORCE-OP // MATRIX EXTRACTION PROTOCOL</div>
+          ">VOID_STRIDE // MATRIX EXTRACTION PROTOCOL</div>
 
           <!-- 01 -->
           <div style="margin-bottom:8px;">
@@ -1522,7 +1529,7 @@ body.dv-glitching #diss0linkz-auth-gate {
         <!-- Generate Button -->
         <div class="flex gap-3 flex-wrap">
           <button class="btn-neon flex-1" onclick="generateLink()">
-            ⚡ GENERATE FORCE-OP LINK
+            ⚡ GENERATE VOID_STRIDE LINK
           </button>
           <button class="btn-neon btn-red" onclick="clearAll()" style="flex:0 0 auto;">
             ✕ CLEAR
@@ -1534,7 +1541,7 @@ body.dv-glitching #diss0linkz-auth-gate {
 
           <!-- Link display -->
           <div style="text-align:center; padding: 8px 0 4px;">
-            <div style="font-size:10px; color:var(--text-dim); letter-spacing:3px; margin-bottom:10px;">▼ YOUR FORCE-OP LINK</div>
+            <div style="font-size:10px; color:var(--text-dim); letter-spacing:3px; margin-bottom:10px;">▼ YOUR VOID_STRIDE LINK</div>
             <div style="font-family:'VT323',monospace; font-size:clamp(22px,4.5vw,32px); color:var(--neon); text-shadow:0 0 15px var(--neon-glow); letter-spacing:1px; word-break:break-all; padding:0 4px;">links.dissoverse.com/<span id="output-shortname"></span></div>
             <div id="deploy-status-badge" style="display:none; margin-top:8px; font-size:11px; letter-spacing:4px; color:var(--neon); text-shadow:0 0 10px var(--neon-glow);">■ LIVE</div>
           </div>
@@ -1609,7 +1616,7 @@ body.dv-glitching #diss0linkz-auth-gate {
     <!-- How It Works -->
     <div class="glass-panel p-4 sm:p-6 space-y-4">
       <div style="font-size:13px; letter-spacing:2px; border-bottom: 1px solid var(--border-dim); padding-bottom:8px;">
-        HOW THE FORCE-OP WORKS
+        HOW VOID_STRIDE WORKS
       </div>
       <div class="grid sm:grid-cols-3 gap-4" style="font-size:12px;">
         <div class="p-3" style="border-left: 2px solid var(--neon);">
@@ -2152,7 +2159,7 @@ function openDeployedLink() {
 window.addEventListener('DOMContentLoaded', function() {
   updateTokenStatus();
   loadActiveLinks();
-  addLog('SYSTEM', 'Diss0LinkZ Force-Op Generator v1.0 loaded.', 'neon');
+  addLog('SYSTEM', 'Diss0LinkZ VOID_STRIDE Generator v1.0 loaded.', 'neon');
   addLog('SYSTEM', 'All operations execute client-side. Zero data transmitted.', 'dim');
 });
 
@@ -2373,12 +2380,12 @@ function generateLink() {
 function doGenerate(urlInput, shortNameInput, labelInput, modeSelect, targetUrl, shortName, label, mode, ageGate, expiryDays) {
 
   // Boot sequence logs
-  addLog('INIT', 'Force-Op sequence initiated...', 'neon');
+  addLog('INIT', 'VOID_STRIDE sequence initiated...', 'neon');
 
   // Show hacker overlay, generate inside it
   showHackOverlay(targetUrl, shortName, mode, function() {
     finishGeneration(targetUrl, label, mode, ageGate, shortName, expiryDays);
-    addLog('COMPLETE', 'Force-Op link ready: links.dissoverse.com/' + shortName, 'neon');
+    addLog('COMPLETE', 'VOID_STRIDE link ready: links.dissoverse.com/' + shortName, 'neon');
   });
 }  // end doGenerate
 
@@ -3209,7 +3216,7 @@ function showNeuralLoadScreen(onComplete) {
     'LOADING DISSOVERSE NODE...',
     'DECRYPTING NEURAL PATHWAYS...',
     'MOUNTING LINK ARCHITECTURE...',
-    'CALIBRATING FORCE-OP ENGINE...',
+    'CALIBRATING VOID_STRIDE ENGINE...',
     'ACTIVATING IAB BYPASS MATRIX...',
     'SYNCHRONIZING GHOST PROTOCOL...',
     'VERITAS ENGINE ONLINE...',
@@ -3346,7 +3353,7 @@ var ASCII_LOGO = [
 ' ██   ██ ██      ██      ██ ██    ██ ',
 ' ██████  ██ ███████ ███████  ██████  ',
 '                                     ',
-' FORCE-OP COMPILER v1.0 // IRONWIRE  ',
+' VOID_STRIDE COMPILER v1.1.1 // IRONWIRE  ',
 ];
 
 function _dvFakeHex() {
@@ -3407,7 +3414,7 @@ function showHackOverlay(targetUrl, shortName, mode, onComplete) {
 
   // Sequence of timed events
   var SEQ = [
-    [0,    function() { setStatus('INITIALIZING FORCE-OP COMPILER...'); setProgress(0); addHackLine('INIT: Force-Op compiler v1.0 loaded', '#00ff41'); }],
+    [0,    function() { setStatus('INITIALIZING VOID_STRIDE COMPILER...'); setProgress(0); addHackLine('INIT: VOID_STRIDE compiler v1.0 loaded', '#00ff41'); }],
     [120,  function() { addHackLine('SCAN: Target identified >> ' + domain, '#00ff41'); setProgress(8); }],
     [240,  function() { addHackLine('MEM:  ' + _dvFakeAddr() + ' [RESERVED]', 'rgba(0,255,65,0.4)'); setProgress(14); }],
     [360,  function() { addHackLine('SCAN: User-agent matrix loading...', '#00ff41'); setProgress(20); setStatus('LOADING IAB DETECTION MATRIX...'); }],
@@ -3426,7 +3433,7 @@ function showHackOverlay(targetUrl, shortName, mode, onComplete) {
     [1540, function() { addHackLine('BUILD:  Embedding noscript fallback layer', 'rgba(0,255,65,0.5)'); setProgress(82); }],
     [1640, function() { addHackLine('LINK:   Short slug: links.dissoverse.com/' + shortName, '#00ff41'); setStatus('ARMING DEEP LINK...'); setProgress(88); }],
     [1760, function() { addHackLine('SIGN:   VERITAS_ENGINE signature applied', '#E91885'); setProgress(94); }],
-    [1880, function() { addHackLine('DONE:   Force-Op package sealed. Link armed.', '#00ff41'); setProgress(100); setStatus('\\u2713 LINK ARMED // DEPLOYING TO NETWORK', '#00ff41'); }],
+    [1880, function() { addHackLine('DONE:   VOID_STRIDE package sealed. Link armed.', '#00ff41'); setProgress(100); setStatus('\\u2713 LINK ARMED // DEPLOYING TO NETWORK', '#00ff41'); }],
     [2100, function() {
       clearInterval(timerInt);
       done = true;
