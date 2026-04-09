@@ -423,6 +423,17 @@
 .diss0linkz-logo-wrap.glitching {
   animation: dv-logo-glitch 0.55s steps(3) forwards;
 }
+/* UX MODE: subtle glitch — more pulse, less chaos */
+@keyframes dv-logo-subtle-glitch {
+  0%   { transform: translate(0); filter: drop-shadow(0 0 8px rgba(var(--neon-rgb),0.6)); }
+  30%  { transform: translate(-1px, 0.5px); filter: drop-shadow(0 0 16px rgba(var(--neon-rgb),0.9)) brightness(1.1); }
+  50%  { transform: translate(1px, -0.5px); filter: drop-shadow(0 0 20px rgba(var(--neon-rgb),1)) brightness(1.15); }
+  70%  { transform: translate(-0.5px, 0); filter: drop-shadow(0 0 12px rgba(var(--neon-rgb),0.7)); }
+  100% { transform: translate(0); filter: drop-shadow(0 0 8px rgba(var(--neon-rgb),0.6)); }
+}
+.diss0linkz-logo-wrap.subtle-glitching {
+  animation: dv-logo-subtle-glitch 0.35s ease forwards;
+}
 
 /* LUXURY OVERLAY // VANTABLACK x CHROMATIC_VOID */
 .dv-luxury-grain {
@@ -3396,18 +3407,34 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
 </script>
 
 <script>
-/* === DISS0LINKZ LOGO GLITCH TRIGGER === */
+/* === DISS0LINKZ LOGO — DUAL PROTOCOL === */
+/* Auth gate: aggressive glitch every 3s (unchanged)
+   UX mode: pulse-dominant with subtle glitch every 6s */
 (function() {
   var wrap = document.getElementById('diss0linkz-logo-wrap');
   if (!wrap) return;
   setInterval(function() {
-    wrap.classList.add('glitching');
-    setTimeout(function() {
-      wrap.classList.remove('glitching');
-      wrap.style.animation = '';
-      void wrap.offsetWidth; /* force reflow */
-      wrap.style.animation = null;
-    }, 600);
+    var isUX = document.getElementById('diss0linkz-app') &&
+               document.getElementById('diss0linkz-app').classList.contains('app-visible');
+    if (isUX) {
+      /* UX MODE: subtle glitch, half speed */
+      wrap.classList.add('subtle-glitching');
+      setTimeout(function() {
+        wrap.classList.remove('subtle-glitching');
+        wrap.style.animation = '';
+        void wrap.offsetWidth;
+        wrap.style.animation = null;
+      }, 400);
+    } else {
+      /* AUTH GATE MODE: aggressive glitch */
+      wrap.classList.add('glitching');
+      setTimeout(function() {
+        wrap.classList.remove('glitching');
+        wrap.style.animation = '';
+        void wrap.offsetWidth;
+        wrap.style.animation = null;
+      }, 600);
+    }
   }, 3000);
 })();
 </script>
