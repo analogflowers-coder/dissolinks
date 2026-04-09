@@ -93,18 +93,28 @@
     justify-content: flex-end;
     gap: 8px;
   }
-  @media (max-width: 520px) {
+  @media (max-width: 600px) {
     .header-status-row {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
+    }
+    .header-status-spacer {
+      display: none;
     }
     .header-status-center {
-      white-space: normal;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
       text-align: center;
       font-size: 9px;
-      letter-spacing: 0.5px;
+      letter-spacing: 1.5px;
+    }
+    .header-status-center .status-sep {
+      display: none;
     }
     .header-status-right {
       justify-content: center;
@@ -1302,9 +1312,9 @@ body.dv-glitching #diss0linkz-auth-gate {
         <!-- Center: status text -->
         <div class="header-status-center">
           <span>STATUS: <span style="color:var(--neon);">■</span> ONLINE</span>
-          <span style="margin:0 10px; opacity:0.4;">|</span>
+          <span class="status-sep" style="margin:0 10px; opacity:0.4;">|</span>
           <span id="clock"></span>
-          <span style="margin:0 10px; opacity:0.4;">|</span>
+          <span class="status-sep" style="margin:0 10px; opacity:0.4;">|</span>
           <span>NODE: <span style="color:var(--neon);">PRPL TWR</span></span>
         </div>
 
