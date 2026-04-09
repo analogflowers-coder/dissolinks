@@ -1620,6 +1620,11 @@ body.dv-glitching #diss0linkz-auth-gate {
         <span>REGISTERED OPERATIVES</span>
         <span id="ncp-operative-count" style="color:var(--text-dim);">—</span>
       </div>
+      <!-- REACTIVE-SOUL // THEME ENERGY LEVEL -->
+      <div class="ncp-stat-row" style="margin-top:8px;">
+        <span>ENERGY</span>
+        <span id="ncp-energy-level" style="color:var(--neon);">1.0x</span>
+      </div>
       <!-- SONIC_PHANTOM // AMBIENT HUM CONTROL IN SYSTEM PANEL -->
       <div class="ncp-stat-row" style="margin-top:12px; border-top:1px solid var(--border-dim); padding-top:10px;">
         <span>AUDIO HUM</span>
@@ -2340,20 +2345,66 @@ function ncpSetTheme(name) {
   var theme = _ncpThemes[name];
   if (!theme) return;
   var root = document.documentElement;
+  // REACTIVE-SOUL: read energy level for this theme
+  var energy = theme.energy || 1.0;
+  window.dvCurrentEnergy = energy;
+
+  // REACTIVE-SOUL #5: fast body transition at high energy, slow at low energy
+  document.body.style.transition = 'all ' + (0.3 / energy).toFixed(3) + 's ease';
+
   Object.keys(theme).forEach(function(k) {
     if (k.startsWith('--')) root.style.setProperty(k, theme[k]);
   });
+
+  // REACTIVE-SOUL #4: set CSS animation speed multiplier vars
+  root.style.setProperty('--dv-energy-speed', String(1 / energy));
+  root.style.setProperty('--dv-anim-speed', (1 / energy).toFixed(4) + 's');
+
+  // REACTIVE-SOUL #2: update manifest-glow / exit-portal-glow durations
+  root.style.setProperty('--dv-anim-duration-manifold', (2.5 / energy).toFixed(3) + 's');
+  root.style.setProperty('--dv-anim-duration-portal',   (1.8 / energy).toFixed(3) + 's');
+
   // Update matrix rain color flags
   window.dvMatrixColor = theme['--matrix-color'];
   window.dvMatrixHead  = theme['--matrix-head'];
   window.dvMatrixFade  = theme['--matrix-fade'];
   window.dvMatrixPink  = theme.matrixPink;
+
+  // REACTIVE-SOUL #1: restart matrix rain at energy-scaled speed
+  var matrixDelay = Math.round(45 / energy);
+  if (window.dvRestartMatrix) {
+    window.dvRestartMatrix(matrixDelay);
+  }
+
+  // REACTIVE-SOUL #3: entropy glitch interval — restart if entropy stage 2 active
+  if (window.dvEntropyStage2Active && window.dvEntropyStage2Interval) {
+    clearInterval(window.dvEntropyStage2Interval);
+    var entropyBaseRate = 3200;
+    window.dvEntropyStage2Interval = setInterval(function() {
+      var targets = document.querySelectorAll('.dv-entropy-target');
+      if (!targets.length) return;
+      window._dvEntropyIdx = window._dvEntropyIdx || 0;
+      dvEntropyGlitch(targets[window._dvEntropyIdx % targets.length]);
+      window._dvEntropyIdx++;
+    }, Math.round(entropyBaseRate / energy));
+  }
+
+  // REACTIVE-SOUL: restore body transition to normal after paint
+  setTimeout(function() {
+    document.body.style.transition = '';
+  }, Math.round(300 / energy) + 150);
+
   // Update all canvas-based systems that read from JS vars
   // Particle color is read live from CSS vars — no action needed
   ['matrix','pink','void','ice','exorcism','covenant','void_bloom','architect_sight'].forEach(function(t) {
     var btn = document.getElementById('theme-btn-' + t);
     if (btn) btn.classList.toggle('active', t === name);
   });
+
+  // REACTIVE-SOUL: update ENERGY LEVEL stat in NCP STATUS panel
+  var energyEl = document.getElementById('ncp-energy-level');
+  if (energyEl) energyEl.textContent = energy.toFixed(1) + 'x';
+
   var fb = document.getElementById('ncp-theme-feedback');
   if (fb) {
     fb.textContent = '\u2713 THEME: ' + name.toUpperCase() + ' LOADED';
@@ -3311,6 +3362,15 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
     }
     var _dvMatrixInterval = _dvMatrixIsMobile ? 90 : 45; // 90ms on mobile, 45ms desktop
     var _dvMatrixTimer = setInterval(drawMatrix, _dvMatrixInterval);
+    // REACTIVE-SOUL: expose globals so ncpSetTheme can restart interval with energy-based speed
+    window.dvMatrixInterval    = _dvMatrixInterval;
+    window.dvMatrixIntervalFn  = drawMatrix;
+    window.dvMatrixTimerRef    = _dvMatrixTimer;
+    window.dvRestartMatrix = function(newDelay) {
+      clearInterval(window.dvMatrixTimerRef);
+      window.dvMatrixInterval = newDelay;
+      window.dvMatrixTimerRef = setInterval(window.dvMatrixIntervalFn, newDelay);
+    };
 
     // GHOST-SCRIPT: pause matrix rain when tab is hidden, resume on visibility
     document.addEventListener('visibilitychange', function() {
@@ -5221,13 +5281,19 @@ function dvEntropyStage1() {
 
 function dvEntropyStage2() {
   // Stage 2 (10 min): all targets cycle through corrupted versions every 2-4s
+  // REACTIVE-SOUL: store interval ID and expose active flag for energy-rate updates
   var targets = document.querySelectorAll('.dv-entropy-target');
   if (!targets.length) return;
-  var idx = 0;
-  setInterval(function() {
-    dvEntropyGlitch(targets[idx % targets.length]);
-    idx++;
-  }, 2200 + Math.random() * 2000);
+  window._dvEntropyIdx = 0;
+  window.dvEntropyStage2Active = true;
+  var baseRate = 3200;
+  var energy = window.dvCurrentEnergy || 1.0;
+  window.dvEntropyStage2Interval = setInterval(function() {
+    var tgts = document.querySelectorAll('.dv-entropy-target');
+    if (!tgts.length) return;
+    dvEntropyGlitch(tgts[window._dvEntropyIdx % tgts.length]);
+    window._dvEntropyIdx++;
+  }, Math.round(baseRate / energy));
 }
 
 function dvEntropyStage3() {
