@@ -755,6 +755,272 @@ body.dv-glitching #diss0linkz-auth-gate {
 .ncp-theme-btn:hover { border-color: var(--neon); color: var(--neon); background: rgba(0,255,65,0.06); }
 .ncp-theme-btn.active { border-color: var(--neon); background: rgba(0,255,65,0.08); color: var(--neon); }
 
+/* ════════════════════════════════════════════════════════
+   NEURAL TRANSITION LOADING SCREEN
+════════════════════════════════════════════════════════ */
+#dv-neural-load {
+  position: fixed; inset: 0; z-index: 1000;
+  background: #000;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.3s;
+}
+#dv-neural-load.active { opacity: 1; pointer-events: all; }
+#dv-neural-load.fade-out { opacity: 0; pointer-events: none; }
+#dv-neural-load canvas {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+}
+.dv-nl-content {
+  position: relative; z-index: 2;
+  text-align: center;
+  font-family: 'VT323', 'JetBrains Mono', monospace;
+}
+.dv-nl-title {
+  font-size: clamp(20px, 5vw, 36px);
+  color: #00ff41;
+  letter-spacing: 0.15em;
+  text-shadow: 0 0 20px #00ff41, 0 0 40px rgba(0,255,65,0.4);
+  margin-bottom: 24px;
+}
+.dv-nl-bar-wrap {
+  width: clamp(220px, 50vw, 400px);
+  height: 4px;
+  background: rgba(0,255,65,0.1);
+  border: 1px solid rgba(0,255,65,0.2);
+  margin: 0 auto 14px;
+  overflow: hidden;
+}
+.dv-nl-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00ff41, #00cc33);
+  box-shadow: 0 0 8px #00ff41;
+  width: 0%;
+  transition: width 0.08s linear;
+}
+.dv-nl-pct {
+  font-size: 14px;
+  color: rgba(0,255,65,0.6);
+  letter-spacing: 3px;
+  margin-bottom: 12px;
+}
+.dv-nl-status {
+  font-size: 12px;
+  color: rgba(0,255,65,0.5);
+  letter-spacing: 2px;
+  min-height: 18px;
+}
+
+/* ════════════════════════════════════════════════════════
+   1996 HACKER GENERATION OVERLAY
+════════════════════════════════════════════════════════ */
+#dv-hack-overlay {
+  position: fixed; inset: 0; z-index: 900;
+  background: #000;
+  display: none;
+  flex-direction: column;
+}
+#dv-hack-overlay.active { display: flex; }
+.dv-hack-header {
+  padding: 12px 20px;
+  border-bottom: 1px solid rgba(0,255,65,0.2);
+  display: flex; align-items: center; gap: 12px;
+  background: rgba(0,255,65,0.03);
+  flex-shrink: 0;
+}
+.dv-hack-dot { width: 8px; height: 8px; border-radius: 50%; }
+.dv-hack-stream {
+  flex: 1; overflow: hidden; padding: 12px 20px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px; line-height: 1.7;
+  position: relative;
+}
+.dv-hack-line { animation: dv-hack-appear 0.08s ease forwards; }
+@keyframes dv-hack-appear {
+  from { opacity: 0; transform: translateX(-4px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.dv-hack-footer {
+  padding: 16px 20px;
+  border-top: 1px solid rgba(0,255,65,0.15);
+  flex-shrink: 0;
+}
+.dv-hack-progress-wrap {
+  height: 3px; background: rgba(0,255,65,0.08);
+  border: 1px solid rgba(0,255,65,0.15);
+  overflow: hidden; margin-bottom: 10px;
+}
+.dv-hack-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00ff41, #E91885);
+  box-shadow: 0 0 8px #00ff41;
+  width: 0%; transition: width 0.12s ease;
+}
+.dv-hack-status-line {
+  font-family: 'VT323', monospace;
+  font-size: 18px; color: var(--neon);
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px var(--neon);
+}
+.dv-hack-ascii {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: clamp(6px, 1.5vw, 10px);
+  color: rgba(0,255,65,0.25);
+  line-height: 1.1;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+
+/* ════════════════════════════════════════════════════════
+   FAILURE / ERROR POPUP
+════════════════════════════════════════════════════════ */
+#dv-error-popup {
+  position: fixed; inset: 0; z-index: 950;
+  display: none; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(3px);
+}
+#dv-error-popup.active { display: flex; }
+.dv-err-box {
+  max-width: 440px; width: 90%;
+  border: 2px solid #ff3333;
+  background: #0a0000;
+  box-shadow: 0 0 40px rgba(255,0,0,0.3), 0 0 80px rgba(255,0,0,0.1);
+  animation: dv-err-in 0.2s cubic-bezier(0.175,0.885,0.32,1.275);
+}
+@keyframes dv-err-in {
+  from { transform: scale(0.8); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+.dv-err-header {
+  padding: 10px 16px;
+  background: #ff3333;
+  display: flex; align-items: center; gap: 10px;
+}
+.dv-err-header-text {
+  font-family: 'VT323', monospace;
+  font-size: 18px; color: #000;
+  letter-spacing: 2px; font-weight: bold;
+}
+.dv-err-code {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px; color: rgba(255,0,0,0.5);
+  padding: 10px 16px 4px;
+  letter-spacing: 3px;
+}
+.dv-err-title {
+  font-family: 'VT323', monospace;
+  font-size: 22px; color: #ff3333;
+  padding: 0 16px 6px;
+  text-shadow: 0 0 10px #ff3333;
+  letter-spacing: 2px;
+}
+.dv-err-msg {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px; color: rgba(255,100,100,0.8);
+  padding: 0 16px 16px;
+  line-height: 1.7;
+  border-bottom: 1px solid rgba(255,0,0,0.2);
+}
+.dv-err-footer {
+  padding: 12px 16px;
+  display: flex; gap: 8px; justify-content: flex-end;
+}
+.dv-err-btn {
+  padding: 8px 20px;
+  background: transparent;
+  border: 1px solid #ff3333;
+  color: #ff3333;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px; letter-spacing: 2px;
+  cursor: pointer; transition: all 0.2s;
+}
+.dv-err-btn:hover { background: #ff3333; color: #000; }
+.dv-err-btn.proceed { border-color: rgba(0,255,65,0.5); color: rgba(0,255,65,0.7); }
+.dv-err-btn.proceed:hover { background: rgba(0,255,65,0.1); color: var(--neon); }
+
+/* ════════════════════════════════════════════════════════
+   URL SCAN INDICATOR
+════════════════════════════════════════════════════════ */
+#dv-scan-bar {
+  margin-top: 8px;
+  font-size: 11px;
+  letter-spacing: 2px;
+  min-height: 20px;
+  display: flex; align-items: center; gap: 8px;
+  transition: all 0.3s;
+}
+.dv-scan-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  flex-shrink: 0;
+}
+.dv-scan-dot.scanning {
+  background: #ffcc00;
+  box-shadow: 0 0 8px #ffcc00;
+  animation: dv-pulse-dot 0.6s ease-in-out infinite;
+}
+@keyframes dv-pulse-dot {
+  0%,100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.6; }
+}
+.dv-scan-dot.live { background: #00ff41; box-shadow: 0 0 8px #00ff41; }
+.dv-scan-dot.dead { background: #ff3333; box-shadow: 0 0 8px #ff3333; }
+.dv-scan-dot.warn { background: #ff9900; box-shadow: 0 0 8px #ff9900; }
+
+/* ════════════════════════════════════════════════════════
+   ENHANCED LINK CARDS
+════════════════════════════════════════════════════════ */
+.dv-link-card {
+  display: flex; align-items: center; gap: 8px;
+  flex-wrap: wrap; padding: 10px 0;
+  border-bottom: 1px solid rgba(0,255,65,0.06);
+  transition: background 0.2s;
+  border-radius: 2px;
+}
+.dv-link-card:hover { background: rgba(0,255,65,0.03); }
+.dv-link-live-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #00ff41;
+  box-shadow: 0 0 6px #00ff41;
+  flex-shrink: 0;
+  animation: dv-link-pulse 2s ease-in-out infinite;
+}
+@keyframes dv-link-pulse {
+  0%,100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+.dv-link-name {
+  flex: 1; min-width: 0;
+  color: var(--neon); overflow: hidden;
+  text-overflow: ellipsis; white-space: nowrap;
+  font-size: 12px;
+}
+.dv-link-meta { font-size: 10px; color: var(--text-dim); letter-spacing: 1px; }
+
+/* ════════════════════════════════════════════════════════
+   COPY RIPPLE
+════════════════════════════════════════════════════════ */
+@keyframes dv-copy-ripple {
+  0%   { transform: scale(1); box-shadow: 0 0 0 0 rgba(0,255,65,0.4); }
+  70%  { transform: scale(1.01); box-shadow: 0 0 0 12px rgba(0,255,65,0); }
+  100% { transform: scale(1); }
+}
+.dv-copy-rippling { animation: dv-copy-ripple 0.5s ease; }
+
+/* ════════════════════════════════════════════════════════
+   DENIED SHAKE (gate)
+════════════════════════════════════════════════════════ */
+@keyframes dv-denied-shake {
+  0%,100% { transform: translateX(0); }
+  15%  { transform: translateX(-8px); }
+  30%  { transform: translateX(8px); }
+  45%  { transform: translateX(-6px); }
+  60%  { transform: translateX(6px); }
+  75%  { transform: translateX(-3px); }
+  90%  { transform: translateX(3px); }
+}
+.dv-denied-shake { animation: dv-denied-shake 0.5s cubic-bezier(0.36,0.07,0.19,0.97); }
+
 </style>
 </head>
 <body>
@@ -769,6 +1035,51 @@ body.dv-glitching #diss0linkz-auth-gate {
 
 <!-- SCREEN CRACK OVERLAY -->
 <div id="dv-crack-overlay"></div>
+
+<!-- NEURAL MATRIX LOADING SCREEN -->
+<div id="dv-neural-load">
+  <canvas id="dv-nl-canvas"></canvas>
+  <div class="dv-nl-content">
+    <div class="dv-nl-title">NEURAL INTERFACE<br>INITIALIZING</div>
+    <div class="dv-nl-bar-wrap"><div class="dv-nl-bar-fill" id="dv-nl-bar"></div></div>
+    <div class="dv-nl-pct" id="dv-nl-pct">0%</div>
+    <div class="dv-nl-status" id="dv-nl-status">LOADING DISSOVERSE NODE...</div>
+  </div>
+</div>
+
+<!-- 1996 HACKER GENERATION OVERLAY -->
+<div id="dv-hack-overlay">
+  <div class="dv-hack-header">
+    <div class="dv-hack-dot" style="background:#ff3333;"></div>
+    <div class="dv-hack-dot" style="background:#ffcc00;"></div>
+    <div class="dv-hack-dot" style="background:#00ff41;"></div>
+    <span style="font-size:11px; color:var(--text-dim); letter-spacing:2px; margin-left:8px;">terminal://dissoverse/force-op-compiler</span>
+    <span id="dv-hack-timer" style="margin-left:auto; font-size:11px; color:var(--text-dim); letter-spacing:2px;"></span>
+  </div>
+  <div class="dv-hack-ascii" id="dv-hack-ascii"></div>
+  <div class="dv-hack-stream" id="dv-hack-stream"></div>
+  <div class="dv-hack-footer">
+    <div class="dv-hack-progress-wrap"><div class="dv-hack-progress-fill" id="dv-hack-bar"></div></div>
+    <div class="dv-hack-status-line" id="dv-hack-status">STANDBY</div>
+  </div>
+</div>
+
+<!-- FAILURE / ERROR POPUP -->
+<div id="dv-error-popup">
+  <div class="dv-err-box">
+    <div class="dv-err-header">
+      <span style="font-size:16px;">⚠</span>
+      <span class="dv-err-header-text">SYSTEM ALERT // DISSOVERSE</span>
+    </div>
+    <div class="dv-err-code" id="dv-err-code">ERROR CODE 0x0000</div>
+    <div class="dv-err-title" id="dv-err-title">UNKNOWN ERROR</div>
+    <div class="dv-err-msg" id="dv-err-msg">An unknown error occurred.</div>
+    <div class="dv-err-footer">
+      <button class="dv-err-btn proceed" id="dv-err-proceed-btn" style="display:none;" onclick="dvErrProceed()">▶ PROCEED ANYWAY</button>
+      <button class="dv-err-btn" onclick="dvErrDismiss()">✕ DISMISS</button>
+    </div>
+  </div>
+</div>
 
 <!-- MATRIX RAIN CANVAS -->
 <canvas id="dv-matrix-canvas"></canvas>
@@ -883,7 +1194,16 @@ body.dv-glitching #diss0linkz-auth-gate {
     <div id="ncp-panel-export" class="p-5" style="display:none; min-height:220px;">
       <div style="font-size:11px; color:var(--text-dim); letter-spacing:2px; margin-bottom:14px;">root@dissoverse:~$ <span style="color:var(--neon);">export --links</span></div>
       <div style="font-size:10px; color:var(--text-dim); line-height:1.9; margin-bottom:14px;">Dump all Diss0LinkZ as a JSON payload. Back up your link architecture or port to another node.</div>
-      <button class="btn-neon" style="width:100%; margin-bottom:8px;" onclick="ncpExportLinks()">▶ EXPORT AS JSON</button>
+      <div style="margin-bottom:14px;">
+        <label style="font-size:10px; color:var(--text-dim); letter-spacing:2px; display:block; margin-bottom:6px;">OPERATOR DEPLOY TOKEN</label>
+        <input type="password" id="pat-input" class="terminal-input" placeholder="Paste deploy token here" autocomplete="off" spellcheck="false" style="margin-bottom:6px;">
+        <div style="display:flex; gap:6px;">
+          <button class="btn-neon" style="flex:1; font-size:10px; padding:7px;" onclick="saveToken()">▶ CONNECT</button>
+          <button class="btn-neon btn-red" style="flex:0 0 auto; font-size:10px; padding:7px;" onclick="clearToken()">✕</button>
+        </div>
+        <div style="font-size:9px; color:var(--text-dim); margin-top:4px; letter-spacing:1px; line-height:1.6;">Required for DEPLOY LIVE + Active Links Dashboard. Stored in session only.</div>
+      </div>
+      <button class="btn-neon" style="width:100%; margin-bottom:8px;" onclick="ncpExportLinks()">▶ EXPORT LINKS AS JSON</button>
       <button class="btn-neon" style="width:100%; margin-bottom:8px;" onclick="ncpCopySession()">▶ COPY SESSION TOKEN</button>
       <div id="ncp-export-feedback" style="font-size:10px; color:var(--neon); text-align:center; letter-spacing:2px; min-height:16px;"></div>
     </div>
@@ -981,6 +1301,7 @@ body.dv-glitching #diss0linkz-auth-gate {
             spellcheck="false"
           >
           <div id="url-type-indicator" style="margin-top:6px; font-size:11px; letter-spacing:1.5px; color:var(--text-dim); min-height:16px;"></div>
+          <div id="dv-scan-bar" style="display:none;"></div>
         </div>
 
         <!-- Short Link Name -->
@@ -1351,12 +1672,40 @@ function ncpPanic() {
   }, 600);
 }
 
-// Legacy stubs (keep so existing code references don't throw)
-function saveToken() {}
-function clearToken() {}
+// ── TOKEN MANAGEMENT (restored for deploy) ───────────────────────────────
+function saveToken() {
+  var val = (document.getElementById('pat-input') || {}).value;
+  if (val) val = val.trim(); else val = '';
+  var fb = document.getElementById('ncp-export-feedback');
+  if (!val) {
+    if (fb) { fb.style.color = 'var(--red-warn)'; fb.textContent = 'NO TOKEN ENTERED'; }
+    return;
+  }
+  sessionStorage.setItem('gh_pat', val);
+  updateTokenStatus();
+  if (fb) { fb.style.color = 'var(--neon)'; fb.textContent = '\u2713 OPERATOR TOKEN CONNECTED'; }
+  setTimeout(function() { if (fb) fb.textContent = ''; }, 2000);
+}
+
+function clearToken() {
+  sessionStorage.removeItem('gh_pat');
+  var inp = document.getElementById('pat-input');
+  if (inp) inp.value = '';
+  updateTokenStatus();
+  var fb = document.getElementById('ncp-export-feedback');
+  if (fb) { fb.style.color = 'var(--text-dim)'; fb.textContent = 'TOKEN CLEARED'; setTimeout(function() { fb.textContent = ''; }, 1500); }
+}
+
 function updateTokenStatus() {
+  var hasToken = !!sessionStorage.getItem('gh_pat');
   var el = document.getElementById('token-status');
-  if (el) el.textContent = 'CONNECTED';
+  if (el) {
+    el.textContent = hasToken ? 'CONNECTED' : 'DISCONNECTED';
+    el.style.color  = hasToken ? 'var(--neon)' : 'var(--text-dim)';
+    el.style.textShadow = hasToken ? '0 0 6px var(--neon-glow)' : 'none';
+  }
+  updateDeployButtonVisibility();
+  loadActiveLinks();
 }
 
 
@@ -1825,6 +2174,7 @@ function generateLink() {
   if (!shortName) {
     addLog('ERROR', 'Short link name required. Operation aborted.', 'red');
     shortNameInput.focus();
+    showErrorPopup('0xSN01', 'MISSING SLUG', 'Short link name is required. Enter a URL slug (e.g. "mainframe") before generating.', null);
     return;
   }
 
@@ -1846,37 +2196,39 @@ function generateLink() {
   } catch (e) {
     addLog('ERROR', 'Invalid URL format. Must include protocol (https://).', 'red');
     urlInput.focus();
+    showErrorPopup('0xURL1', 'INVALID TARGET URL', 'URL format rejected. Ensure the target is a valid URL (e.g. https://example.com). Protocol is required.', null);
     return;
   }
+
+  // Warn on dead endpoint but allow proceed
+  if (_dvScanResult === 'dead') {
+    addLog('WARN', 'Dead endpoint detected. Proceed with caution.', 'red');
+    showErrorPopup(
+      '0xDEAD',
+      'DEAD ENDPOINT DETECTED',
+      'Scanner returned NO SIGNAL for: ' + targetUrl + '\n\nThis URL may be offline, private, or blocking head requests. Generating a dead link will create a broken redirect. Proceed only if you are certain this URL is live.',
+      function() {
+        // User chose to proceed anyway
+        doGenerate(urlInput, shortNameInput, labelInput, modeSelect, targetUrl, shortName, label, mode, ageGate, expiryDays);
+      }
+    );
+    return;
+  }
+
+  doGenerate(urlInput, shortNameInput, labelInput, modeSelect, targetUrl, shortName, label, mode, ageGate, expiryDays);
+}
+
+function doGenerate(urlInput, shortNameInput, labelInput, modeSelect, targetUrl, shortName, label, mode, ageGate, expiryDays) {
 
   // Boot sequence logs
   addLog('INIT', 'Force-Op sequence initiated...', 'neon');
 
-  const bootMessages = [
-    ['SCAN', 'Analyzing target: ' + targetUrl.substring(0, 50) + (targetUrl.length > 50 ? '...' : '')],
-    ['LINK', 'Short link: links.dissoverse.com/' + shortName],
-    ['BUILD', 'Compiling IAB detection matrix...'],
-    ['BUILD', 'Injecting Android Intent URI handler...'],
-    ['BUILD', 'Injecting Safari force-open bypass...'],
-    ['BUILD', 'Embedding Facebook/TikTok/IG user-agent patterns...'],
-    ['SECURE', 'Stripping tracking parameters...'],
-    ['DEPLOY', 'Bypass mode: ' + mode.toUpperCase()],
-    ['COMPLETE', 'Force-Op link ready: links.dissoverse.com/' + shortName],
-  ];
-
-  let delay = 200;
-  bootMessages.forEach((msg, i) => {
-    setTimeout(() => {
-      addLog(msg[0], msg[1], i === bootMessages.length - 1 ? 'neon' : 'dim');
-
-      // On last message, show output
-      if (i === bootMessages.length - 1) {
-        finishGeneration(targetUrl, label, mode, ageGate, shortName, expiryDays);
-      }
-    }, delay);
-    delay += 150 + Math.random() * 200;
+  // Show hacker overlay, generate inside it
+  showHackOverlay(targetUrl, shortName, mode, function() {
+    finishGeneration(targetUrl, label, mode, ageGate, shortName, expiryDays);
+    addLog('COMPLETE', 'Force-Op link ready: links.dissoverse.com/' + shortName, 'neon');
   });
-}
+}  // end doGenerate
 
 function finishGeneration(targetUrl, label, mode, ageGate, shortName, expiryDays) {
   // Build the escape page HTML
@@ -2393,9 +2745,6 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
           window.dvMatrixSpeed = 0.7;
         }
 
-        document.body.classList.remove('dv-gate-active');
-        if (app) app.classList.add('app-visible');
-
         // Fade + stop music
         var btn = document.getElementById('dv-music-btn');
         if (btn) btn.style.display = 'none';
@@ -2408,6 +2757,12 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
             if (vol <= 0) { clearInterval(fade); music.pause(); }
           }, 70);
         }
+
+        // Show neural loading screen, THEN reveal app
+        showNeuralLoadScreen(function() {
+          document.body.classList.remove('dv-gate-active');
+          if (app) app.classList.add('app-visible');
+        });
       }, 800);
     }, 2000);
   }
@@ -2661,6 +3016,374 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
       trail = trail.filter(function(p) { return p.age < 22; });
     })();
   })();
+
+
+// ════════════════════════════════════════════════════════════════
+//  NEURAL MATRIX LOADING SCREEN
+// ════════════════════════════════════════════════════════════════
+function showNeuralLoadScreen(onComplete) {
+  var screen  = document.getElementById('dv-neural-load');
+  var canvas  = document.getElementById('dv-nl-canvas');
+  var bar     = document.getElementById('dv-nl-bar');
+  var pctEl   = document.getElementById('dv-nl-pct');
+  var statusEl= document.getElementById('dv-nl-status');
+  if (!screen || !canvas) { if (onComplete) onComplete(); return; }
+
+  var ctx = canvas.getContext('2d');
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  var cols = Math.floor(canvas.width / 16);
+  var drops = [];
+  for (var i = 0; i < cols; i++) drops[i] = Math.random() * -canvas.height / 16;
+  var chars = '01ABCDEF0110100111001010101110101001011010110';
+  var animFrame;
+
+  function drawNLMatrix() {
+    ctx.fillStyle = 'rgba(0,0,0,0.08)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    for (var i = 0; i < cols; i++) {
+      var ch = chars[Math.floor(Math.random() * chars.length)];
+      var y  = drops[i] * 16;
+      ctx.fillStyle = drops[i] < 2 ? '#ffffff' : (Math.random() > 0.15 ? '#00ff41' : 'rgba(0,255,65,0.3)');
+      ctx.font = '13px "Share Tech Mono", monospace';
+      ctx.fillText(ch, i * 16, y);
+      if (y > canvas.height && Math.random() > 0.96) drops[i] = 0;
+      drops[i] += 1.8 + Math.random() * 1.2;
+    }
+    animFrame = requestAnimationFrame(drawNLMatrix);
+  }
+
+  var NL_STEPS = [
+    'LOADING DISSOVERSE NODE...',
+    'DECRYPTING NEURAL PATHWAYS...',
+    'MOUNTING LINK ARCHITECTURE...',
+    'CALIBRATING FORCE-OP ENGINE...',
+    'ACTIVATING IAB BYPASS MATRIX...',
+    'SYNCHRONIZING GHOST PROTOCOL...',
+    'VERITAS ENGINE ONLINE...',
+    'NETWORK ACCESS GRANTED...',
+  ];
+  var pct = 0;
+  var stepIdx = 0;
+  var totalDuration = 2800;
+  var stepInterval = totalDuration / NL_STEPS.length;
+
+  screen.classList.add('active');
+  drawNLMatrix();
+
+  var pctTimer = setInterval(function() {
+    pct = Math.min(100, pct + (100 / (totalDuration / 30)));
+    if (bar)     bar.style.width = pct.toFixed(1) + '%';
+    if (pctEl)   pctEl.textContent = Math.floor(pct) + '%';
+  }, 30);
+
+  var stepTimer = setInterval(function() {
+    if (stepIdx < NL_STEPS.length) {
+      if (statusEl) statusEl.textContent = NL_STEPS[stepIdx];
+      stepIdx++;
+    }
+  }, stepInterval);
+
+  setTimeout(function() {
+    clearInterval(pctTimer);
+    clearInterval(stepTimer);
+    cancelAnimationFrame(animFrame);
+    if (bar)     bar.style.width = '100%';
+    if (pctEl)   pctEl.textContent = '100%';
+    if (statusEl) statusEl.textContent = 'ACCESS AUTHORIZED // ENTERING NETWORK';
+    screen.classList.add('fade-out');
+    setTimeout(function() {
+      screen.classList.remove('active');
+      screen.classList.remove('fade-out');
+      if (onComplete) onComplete();
+    }, 400);
+  }, totalDuration);
+}
+
+// ════════════════════════════════════════════════════════════════
+//  URL LIVE SCANNER
+// ════════════════════════════════════════════════════════════════
+var _dvScanAbort = null;
+var _dvLastScannedUrl = '';
+var _dvScanResult = null;
+
+function dvShowScanBar(state, text) {
+  var bar = document.getElementById('dv-scan-bar');
+  if (!bar) return;
+  var dotClass = { scanning: 'scanning', live: 'live', dead: 'dead', warn: 'warn' }[state] || 'warn';
+  var color = { scanning: '#ffcc00', live: '#00ff41', dead: '#ff3333', warn: '#ff9900' }[state] || '#ff9900';
+  bar.style.display = 'flex';
+  bar.innerHTML = '<span class="dv-scan-dot ' + dotClass + '"></span>' +
+    '<span style="color:' + color + '; letter-spacing:2px; font-size:10px;">' + text + '</span>';
+}
+
+function dvScanUrl(url) {
+  if (!url || url.length < 4) {
+    var b = document.getElementById('dv-scan-bar');
+    if (b) b.style.display = 'none';
+    _dvScanResult = null;
+    return;
+  }
+
+  // Normalize
+  var checkUrl = url;
+  if (!checkUrl.startsWith('http://') && !checkUrl.startsWith('https://')) checkUrl = 'https://' + checkUrl;
+
+  if (checkUrl === _dvLastScannedUrl) return;
+  _dvLastScannedUrl = checkUrl;
+  _dvScanResult = null;
+
+  dvShowScanBar('scanning', 'SCANNING TARGET // ' + (new URL(checkUrl)).hostname.toUpperCase() + '...');
+
+  var controller = new AbortController();
+  if (_dvScanAbort) _dvScanAbort.abort();
+  _dvScanAbort = controller;
+
+  var timeout = setTimeout(function() { controller.abort(); }, 8000);
+
+  fetch(checkUrl, { method: 'HEAD', mode: 'no-cors', signal: controller.signal, cache: 'no-cache' })
+    .then(function() {
+      clearTimeout(timeout);
+      _dvScanResult = 'live';
+      dvShowScanBar('live', 'TARGET CONFIRMED // SIGNAL DETECTED // LIVE');
+    })
+    .catch(function(e) {
+      clearTimeout(timeout);
+      if (e.name === 'AbortError') return;
+      _dvScanResult = 'dead';
+      dvShowScanBar('dead', 'TARGET UNREACHABLE // DEAD ENDPOINT DETECTED');
+    });
+}
+
+// ════════════════════════════════════════════════════════════════
+//  FAILURE / ERROR POPUP
+// ════════════════════════════════════════════════════════════════
+var _dvErrProceedCallback = null;
+
+function showErrorPopup(code, title, msg, proceedCallback) {
+  document.getElementById('dv-err-code').textContent   = 'ERROR CODE ' + (code || '0x0000');
+  document.getElementById('dv-err-title').textContent  = title || 'UNKNOWN ERROR';
+  document.getElementById('dv-err-msg').textContent    = msg   || '';
+  var proceedBtn = document.getElementById('dv-err-proceed-btn');
+  _dvErrProceedCallback = proceedCallback || null;
+  if (proceedBtn) proceedBtn.style.display = proceedCallback ? 'block' : 'none';
+  document.getElementById('dv-error-popup').classList.add('active');
+}
+
+function dvErrDismiss() {
+  document.getElementById('dv-error-popup').classList.remove('active');
+  _dvErrProceedCallback = null;
+}
+
+function dvErrProceed() {
+  document.getElementById('dv-error-popup').classList.remove('active');
+  if (_dvErrProceedCallback) {
+    var cb = _dvErrProceedCallback;
+    _dvErrProceedCallback = null;
+    cb();
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+//  1996 HACKER GENERATION OVERLAY
+// ════════════════════════════════════════════════════════════════
+var ASCII_LOGO = [
+' ██████  ██ ███████ ███████  ██████  ',
+' ██   ██ ██ ██      ██      ██    ██ ',
+' ██   ██ ██ ███████ ███████ ██    ██ ',
+' ██   ██ ██      ██      ██ ██    ██ ',
+' ██████  ██ ███████ ███████  ██████  ',
+'                                     ',
+' FORCE-OP COMPILER v1.0 // IRONWIRE  ',
+];
+
+function _dvFakeHex() {
+  var r = function() { return Math.floor(Math.random()*0xffff).toString(16).toUpperCase().padStart(4,'0'); };
+  return '0x' + r() + ':' + r() + ' | ' + r() + ' ' + r() + ' ' + r() + ' ' + r();
+}
+function _dvFakeAddr() {
+  return '0x' + Math.floor(Math.random()*0xFFFFFFFF).toString(16).toUpperCase().padStart(8,'0');
+}
+
+function showHackOverlay(targetUrl, shortName, mode, onComplete) {
+  var overlay  = document.getElementById('dv-hack-overlay');
+  var stream   = document.getElementById('dv-hack-stream');
+  var asciiEl  = document.getElementById('dv-hack-ascii');
+  var statusEl = document.getElementById('dv-hack-status');
+  var barEl    = document.getElementById('dv-hack-bar');
+  var timerEl  = document.getElementById('dv-hack-timer');
+  if (!overlay) { if (onComplete) onComplete(); return; }
+
+  overlay.classList.add('active');
+  stream.innerHTML = '';
+  if (asciiEl) asciiEl.textContent = ASCII_LOGO.join('\n');
+
+  var progress = 0;
+  var lineCount = 0;
+  var startTime = Date.now();
+  var done = false;
+
+  // Timer tick
+  var timerInt = setInterval(function() {
+    var s = ((Date.now() - startTime) / 1000).toFixed(2);
+    if (timerEl) timerEl.textContent = s + 's';
+  }, 100);
+
+  function addHackLine(text, color) {
+    var ts = ((Date.now() - startTime) / 1000).toFixed(3);
+    var div = document.createElement('div');
+    div.className = 'dv-hack-line';
+    div.style.color = color || 'rgba(0,255,65,0.7)';
+    div.textContent = '[' + ts + '] ' + text;
+    stream.appendChild(div);
+    stream.scrollTop = stream.scrollHeight;
+    lineCount++;
+    if (lineCount > 60) stream.removeChild(stream.firstChild);
+  }
+
+  function setStatus(txt, color) {
+    if (statusEl) { statusEl.textContent = txt; statusEl.style.color = color || 'var(--neon)'; }
+  }
+
+  function setProgress(p) {
+    progress = Math.min(100, p);
+    if (barEl) barEl.style.width = progress + '%';
+  }
+
+  var domain = '';
+  try { domain = new URL(targetUrl.startsWith('http') ? targetUrl : 'https://' + targetUrl).hostname; } catch(e) { domain = targetUrl; }
+
+  // Sequence of timed events
+  var SEQ = [
+    [0,    function() { setStatus('INITIALIZING FORCE-OP COMPILER...'); setProgress(0); addHackLine('INIT: Force-Op compiler v1.0 loaded', '#00ff41'); }],
+    [120,  function() { addHackLine('SCAN: Target identified >> ' + domain, '#00ff41'); setProgress(8); }],
+    [240,  function() { addHackLine('MEM:  ' + _dvFakeAddr() + ' [RESERVED]', 'rgba(0,255,65,0.4)'); setProgress(14); }],
+    [360,  function() { addHackLine('SCAN: User-agent matrix loading...', '#00ff41'); setProgress(20); setStatus('LOADING IAB DETECTION MATRIX...'); }],
+    [480,  function() { addHackLine('IAB+  Instagram  [/Instagram/i] LOADED', 'rgba(0,255,65,0.6)'); setProgress(25); }],
+    [560,  function() { addHackLine('IAB+  TikTok     [/BytedanceWebview/i] LOADED', 'rgba(0,255,65,0.6)'); }],
+    [620,  function() { addHackLine('IAB+  Facebook   [/FBAN|FBAV/i] LOADED', 'rgba(0,255,65,0.6)'); }],
+    [680,  function() { addHackLine('IAB+  Snapchat   [/Snapchat/i] LOADED', 'rgba(0,255,65,0.6)'); setProgress(32); }],
+    [740,  function() { addHackLine('IAB+  WeChat     [/MicroMessenger/i] LOADED', 'rgba(0,255,65,0.6)'); }],
+    [800,  function() { addHackLine('MEM:  ' + _dvFakeHex(), 'rgba(0,255,65,0.3)'); setProgress(38); }],
+    [900,  function() { setStatus('INJECTING ANDROID INTENT URI...'); addHackLine('INJECT: android.intent.action.VIEW payload compiled', '#ffcc00'); setProgress(44); }],
+    [1020, function() { addHackLine('INJECT: Safari window.open() bypass injected', '#ffcc00'); setProgress(50); }],
+    [1140, function() { addHackLine('SECURE: Stripping UTM tracking parameters', 'rgba(0,255,65,0.5)'); setStatus('STRIPPING TRACKERS...'); setProgress(56); }],
+    [1240, function() { addHackLine('SECURE: Removing fbclid / gclid / mc_eid', 'rgba(0,255,65,0.5)'); setProgress(62); }],
+    [1340, function() { addHackLine('BUILD:  Compiling escape page HTML...', '#00ff41'); setStatus('COMPILING ESCAPE PAGE...'); setProgress(70); }],
+    [1440, function() { addHackLine('MEM:  ' + _dvFakeHex(), 'rgba(0,255,65,0.3)'); setProgress(76); }],
+    [1540, function() { addHackLine('BUILD:  Embedding noscript fallback layer', 'rgba(0,255,65,0.5)'); setProgress(82); }],
+    [1640, function() { addHackLine('LINK:   Short slug: links.dissoverse.com/' + shortName, '#00ff41'); setStatus('ARMING DEEP LINK...'); setProgress(88); }],
+    [1760, function() { addHackLine('SIGN:   VERITAS_ENGINE signature applied', '#E91885'); setProgress(94); }],
+    [1880, function() { addHackLine('DONE:   Force-Op package sealed. Link armed.', '#00ff41'); setProgress(100); setStatus('\\u2713 LINK ARMED // DEPLOYING TO NETWORK', '#00ff41'); }],
+    [2100, function() {
+      clearInterval(timerInt);
+      done = true;
+      overlay.classList.remove('active');
+      if (onComplete) onComplete();
+    }],
+  ];
+
+  SEQ.forEach(function(step) {
+    setTimeout(step[1], step[0]);
+  });
+
+  // Background hex noise while running
+  var noiseInt = setInterval(function() {
+    if (done) { clearInterval(noiseInt); return; }
+    if (Math.random() > 0.6) addHackLine(_dvFakeHex(), 'rgba(0,255,65,0.18)');
+  }, 80);
+}
+
+// ════════════════════════════════════════════════════════════════
+//  ENHANCED ACTIVE LINKS DASHBOARD
+// ════════════════════════════════════════════════════════════════
+async function loadActiveLinks() {
+  var token = sessionStorage.getItem('gh_pat');
+  var panel = document.getElementById('active-links-panel');
+  if (!panel) return;
+
+  if (!token) {
+    panel.innerHTML = '<div style="color:var(--text-dim); font-size:11px; letter-spacing:1px;">[ OPERATOR TOKEN REQUIRED // CONNECT IN SETTINGS ⚙ ]</div>';
+    return;
+  }
+
+  panel.innerHTML = '<div style="color:var(--text-dim); font-size:11px; letter-spacing:2px; animation: dv-pulse-dot 0.8s infinite;">■ SCANNING REPO...</div>';
+
+  try {
+    var resp = await fetch('https://api.github.com/repos/analogflowers-coder/dissolinks/contents/', {
+      headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json' }
+    });
+
+    if (resp.status === 401 || resp.status === 403) {
+      var errData = await resp.json().catch(function() { return {}; });
+      panel.innerHTML = '<div style="color:var(--red-warn); font-size:11px;">[ERROR] AUTH FAILED (' + resp.status + '): ' + (errData.message || 'CHECK TOKEN') + '</div>';
+      showErrorPopup('0x' + resp.status.toString(16).toUpperCase(), 'AUTHENTICATION FAILURE', 'GitHub API rejected the operator token (' + resp.status + '). Navigate to Settings ⚙ > Export tab and reconnect your deploy token.', null);
+      return;
+    }
+
+    var items = await resp.json();
+    var dirs = items.filter(function(item) { return item.type === 'dir'; });
+
+    if (dirs.length === 0) {
+      panel.innerHTML = '<div style="color:var(--text-dim); font-size:11px; letter-spacing:1px;">NO ACTIVE LINKS. GENERATE YOUR FIRST LINK ABOVE.</div>';
+      return;
+    }
+
+    var html2 = '<div style="display:flex; flex-direction:column;">';
+    dirs.forEach(function(dir) {
+      var cleanUrl = 'https://links.dissoverse.com/' + dir.name;
+      html2 += '<div class="dv-link-card">' +
+        '<span class="dv-link-live-dot"></span>' +
+        '<span class="dv-link-name">links.dissoverse.com/' + dir.name + '</span>' +
+        '<button onclick="dvCopyLink(\'' + cleanUrl + '\', this)" class="btn-neon" style="font-size:10px;padding:3px 10px;letter-spacing:1px;flex-shrink:0;">COPY</button>' +
+        '<button onclick="deleteLink(\'' + dir.name + '\')" class="btn-neon btn-red" style="font-size:10px;padding:3px 10px;letter-spacing:1px;flex-shrink:0;">DELETE</button>' +
+        '</div>';
+    });
+    html2 += '</div>';
+    panel.innerHTML = html2;
+  } catch (e) {
+    panel.innerHTML = '<div style="color:var(--red-warn); font-size:11px;">[ERROR] NETWORK FAILURE. CHECK CONNECTION.</div>';
+    showErrorPopup('0xNET1', 'NETWORK ERROR', 'Failed to reach GitHub API. Check your connection and try again.', null);
+  }
+}
+
+function dvCopyLink(url, btn) {
+  navigator.clipboard.writeText(url).catch(function() {
+    var ta = document.createElement('textarea');
+    ta.value = url;
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+  });
+  addLog('COPY', 'Copied: ' + url, 'neon');
+  if (btn) {
+    var orig = btn.textContent;
+    btn.textContent = '\\u2713 COPIED';
+    btn.classList.add('dv-copy-rippling');
+    setTimeout(function() { btn.textContent = orig; btn.classList.remove('dv-copy-rippling'); }, 1400);
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+//  URL SCAN TRIGGER (input event listener -- runs on blur)
+// ════════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', function() {
+  var urlInput = document.getElementById('target-url');
+  if (urlInput) {
+    urlInput.addEventListener('blur', function() {
+      var v = this.value.trim();
+      if (v) dvScanUrl(v);
+    });
+    urlInput.addEventListener('input', function() {
+      var v = this.value.trim();
+      if (!v) {
+        var b = document.getElementById('dv-scan-bar');
+        if (b) b.style.display = 'none';
+        _dvScanResult = null;
+        _dvLastScannedUrl = '';
+      }
+    });
+  }
+}, false);
 
 })();
 </script>
