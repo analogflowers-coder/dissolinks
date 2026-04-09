@@ -606,6 +606,35 @@ body.dv-gate-active * { cursor: none !important; }
   50%     { filter: drop-shadow(0 0 28px rgba(var(--neon-rgb),0.9)) drop-shadow(0 0 60px rgba(var(--neon-rgb),0.4)); }
 }
 
+/* ── "THE MATRIX HAS YOU..." PRE-OPEN TEXT ──────────────────── */
+@keyframes dv-matrix-text-glitch {
+  0%   { opacity:0; transform: translate(-50%,-50%) scale(1); filter: none; }
+  4%   { opacity:1; color: #ffffff; text-shadow: 0 0 8px rgba(255,255,255,0.6); }
+  10%  { transform: translate(-53%,-49%) scale(1) skewX(-2deg); filter: hue-rotate(40deg) brightness(1.8); color: #00ff41; }
+  14%  { transform: translate(-48%,-51%) scale(1) skewX(3deg); filter: brightness(2); color: #ffffff; }
+  18%  { transform: translate(-50%,-50%) scale(1); filter: none; color: #ffffff; text-shadow: 0 0 12px rgba(255,255,255,0.8); }
+  50%  { opacity:1; transform: translate(-50%,-50%) scale(1); color: #ffffff; text-shadow: 0 0 15px rgba(255,255,255,0.9), 0 0 30px rgba(0,255,65,0.3); }
+  /* Terminal starts opening — text glitches hard + fades */
+  70%  { opacity:0.9; transform: translate(-50%,-50%) scale(1); color: #ffffff; }
+  75%  { opacity:0.8; transform: translate(-55%,-45%) scale(1.15) skewX(-6deg); filter: brightness(3) hue-rotate(60deg); color: #00ff41; }
+  80%  { opacity:0.5; transform: translate(-46%,-55%) scale(1.25) skewX(8deg); filter: brightness(4); color: #ff00ff; }
+  85%  { opacity:0.3; transform: translate(-50%,-50%) scale(1.4) skewX(-10deg); filter: brightness(2) hue-rotate(-40deg); color: #00ff41; text-shadow: 0 0 30px rgba(0,255,65,0.8); }
+  90%  { opacity:0.15; transform: translate(-52%,-48%) scale(1.6); filter: brightness(5); color: #ffffff; }
+  100% { opacity:0; transform: translate(-50%,-50%) scale(2); filter: blur(4px); }
+}
+#dv-matrix-has-you {
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  letter-spacing: 4px;
+  color: #ffffff;
+  z-index: 9999;
+  pointer-events: none;
+  animation: dv-matrix-text-glitch 2.8s ease-out forwards;
+  white-space: nowrap;
+}
 /* ── TERMINAL CINEMATIC OPEN ────────────────────────────────── */
 @keyframes dv-terminal-open {
   0%   { transform: scaleY(0.015) scaleX(0.3); opacity:0; border-color: rgba(var(--neon-rgb),0); box-shadow: none; }
@@ -628,13 +657,13 @@ body.dv-gate-active * { cursor: none !important; }
   content: '';
   position: absolute;
   top: 0; left: -10%;
-  width: 3px; height: 100%;
-  background: linear-gradient(180deg, transparent, rgba(var(--neon-rgb),0.9), rgba(var(--neon-rgb),0.4), transparent);
-  box-shadow: 0 0 15px rgba(var(--neon-rgb),0.8), 0 0 40px rgba(var(--neon-rgb),0.4);
+  width: 8px; height: 100%;
+  background: linear-gradient(180deg, transparent 5%, rgba(var(--neon-rgb),0.95) 30%, rgba(var(--neon-rgb),0.6) 50%, rgba(var(--neon-rgb),0.95) 70%, transparent 95%);
+  box-shadow: 0 0 20px rgba(var(--neon-rgb),0.9), 0 0 50px rgba(var(--neon-rgb),0.5), 0 0 80px rgba(var(--neon-rgb),0.2);
   z-index: 10;
   pointer-events: none;
-  animation: dv-scanbar-sweep 1.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-  animation-delay: 0.3s;
+  animation: dv-scanbar-sweep 3.5s linear forwards;
+  animation-delay: 0.2s;
 }
 /* ── TERMINAL BOX ───────────────────────────────────────────── */
 .dv-terminal-wrap {
@@ -1531,7 +1560,10 @@ body.dv-glitching #diss0linkz-auth-gate {
          draggable="false">
   </div>
 
-  <div class="dv-terminal-wrap" id="dv-terminal-box">
+  <!-- "THE MATRIX HAS YOU..." pre-open glitch text — shows BEFORE terminal opens -->
+  <div id="dv-matrix-has-you">the matrix has you...</div>
+
+  <div class="dv-terminal-wrap" id="dv-terminal-box" style="animation-delay: 2.2s; opacity:0;">
     <span class="dv-corner tl">[+]</span>
     <span class="dv-corner tr">[+]</span>
     <span class="dv-corner bl">[+]</span>
@@ -3917,11 +3949,11 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
     }
 
     document.body.classList.add('dv-gate-active');
-    // Wait for terminal cinematic open (1.8s) + scan bar (1.4s) then start boot text
+    // Wait for "the matrix has you" text (2.2s) + terminal open (1.8s) then boot text
     setTimeout(function() {
       runBootSequence();
       scheduleGlitch();
-    }, 2000);
+    }, 4200);
 
     // Keyboard handler
     var inputEl = document.getElementById('dv-passphrase-input');
