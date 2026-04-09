@@ -551,6 +551,174 @@
   100% { opacity: 1; filter: none; }
 }
 
+  /* ════════════════════════════════════════════════════════
+     BLACKWIRE 11 FX — CSS DECLARATIONS
+     BLACKWIRE-GITHUB | DISSOVERSE LLC | 2026
+  ════════════════════════════════════════════════════════ */
+
+  /* ── FX 2: REDACT / CENSORED ────────────────────────────────── */
+  .dv-redacted {
+    background: var(--neon);
+    color: transparent;
+    padding: 0 4px;
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+  .dv-redacted:hover {
+    background: transparent;
+    color: var(--neon);
+  }
+  .dv-censored {
+    filter: blur(5px);
+    transition: filter 0.3s;
+    cursor: pointer;
+  }
+  .dv-censored:hover {
+    filter: blur(0);
+  }
+
+  /* ── FX 4: HOLOGRAPHIC MATERIAL ─────────────────────────────── */
+  @keyframes dv-holo-shift {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  .dv-holographic {
+    background: linear-gradient(135deg,
+      rgba(255,0,0,0.08),
+      rgba(0,255,0,0.08),
+      rgba(0,0,255,0.08),
+      rgba(255,0,255,0.08)
+    ) !important;
+    background-size: 400% 400% !important;
+    animation: dv-holo-shift 3s ease infinite !important;
+  }
+
+  /* ── FX 5: VHS TRACKING ─────────────────────────────────────── */
+  @keyframes dv-vhs-track {
+    0%   { transform: translateX(0); text-shadow: none; }
+    10%  { transform: translateX(3px); text-shadow: -2px 0 #ff0000, 2px 0 #00ffff; }
+    20%  { transform: translateX(-2px); text-shadow: 1px 0 #ff0000, -1px 0 #00ffff; }
+    30%  { transform: translateX(0); text-shadow: none; }
+    40%  { transform: translateX(4px); text-shadow: -3px 0 #ff0000, 3px 0 #00ffff; }
+    50%  { transform: translateX(-3px); text-shadow: 2px 0 #ff0000, -2px 0 #00ffff; }
+    60%  { transform: translateX(0); text-shadow: none; }
+    70%  { transform: translateX(2px); text-shadow: -1px 0 #ff0000, 1px 0 #00ffff; }
+    80%  { transform: translateX(-4px); text-shadow: 3px 0 #ff0000, -3px 0 #00ffff; }
+    90%  { transform: translateX(0); text-shadow: none; }
+    100% { transform: translateX(0); text-shadow: none; }
+  }
+  .dv-vhs-track {
+    animation: dv-vhs-track 0.4s steps(2) forwards;
+  }
+
+  /* ── FX 6: NEON SIGN EFFECT ─────────────────────────────────── */
+  @keyframes dv-neon-flicker {
+    0%   { opacity: 1; text-shadow: 0 0 10px var(--neon), 0 0 20px var(--neon), 0 0 40px var(--neon-glow); }
+    2%   { opacity: 0.1; text-shadow: none; }
+    4%   { opacity: 1; text-shadow: 0 0 10px var(--neon), 0 0 20px var(--neon), 0 0 40px var(--neon-glow); }
+    8%   { opacity: 0.6; text-shadow: 0 0 4px var(--neon); }
+    9%   { opacity: 1; text-shadow: 0 0 10px var(--neon), 0 0 20px var(--neon), 0 0 40px var(--neon-glow); }
+    50%  { opacity: 1; text-shadow: 0 0 10px var(--neon), 0 0 20px var(--neon), 0 0 40px var(--neon-glow); }
+    52%  { opacity: 0.4; text-shadow: 0 0 2px var(--neon); }
+    53%  { opacity: 1; text-shadow: 0 0 10px var(--neon), 0 0 20px var(--neon), 0 0 40px var(--neon-glow); }
+    100% { opacity: 1; text-shadow: 0 0 10px var(--neon), 0 0 20px var(--neon), 0 0 40px var(--neon-glow); }
+  }
+  .dv-neon-sign {
+    animation: dv-neon-flicker 4s ease-in-out infinite;
+  }
+
+  /* ── FX 7: DATAMOSH (CSS-only fallback) ─────────────────────── */
+  @keyframes dv-datamosh-burst {
+    0%   { filter: saturate(1) contrast(1) hue-rotate(0deg); }
+    15%  { filter: saturate(3) contrast(2) hue-rotate(90deg); }
+    30%  { filter: saturate(4) contrast(2.5) hue-rotate(200deg); }
+    50%  { filter: saturate(2) contrast(3) hue-rotate(45deg); }
+    70%  { filter: saturate(5) contrast(1.5) hue-rotate(300deg); }
+    85%  { filter: saturate(2) contrast(2) hue-rotate(120deg); }
+    100% { filter: saturate(1) contrast(1) hue-rotate(0deg); }
+  }
+  .dv-datamosh-active {
+    animation: dv-datamosh-burst 0.4s steps(3) forwards;
+  }
+
+  /* ── FX 9: DNA HELIX LOADER ─────────────────────────────────── */
+  .dv-dna-loader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    height: 48px;
+    perspective: 200px;
+  }
+  .dv-dna-loader .dv-dna-pair {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0px;
+    animation: dv-dna-twist 1.5s ease-in-out infinite;
+  }
+  .dv-dna-loader .dv-dna-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--neon);
+    box-shadow: 0 0 4px var(--neon-glow);
+  }
+  .dv-dna-loader .dv-dna-strand {
+    width: 1px;
+    height: 14px;
+    background: rgba(var(--neon-rgb), 0.2);
+  }
+  @keyframes dv-dna-twist {
+    0%   { transform: rotateX(0deg) scaleY(1); }
+    25%  { transform: rotateX(90deg) scaleY(0.3); }
+    50%  { transform: rotateX(180deg) scaleY(1); }
+    75%  { transform: rotateX(270deg) scaleY(0.3); }
+    100% { transform: rotateX(360deg) scaleY(1); }
+  }
+
+  /* ── FX 10: PIXEL SORT ──────────────────────────────────────── */
+  @keyframes dv-pixel-sort-bands {
+    0%   { clip-path: inset(0 0 0 0); filter: contrast(1) saturate(1); }
+    20%  { clip-path: inset(10% 0 60% 0); filter: contrast(2) saturate(0); }
+    40%  { clip-path: inset(30% 0 20% 0); filter: contrast(2.5) saturate(0); }
+    60%  { clip-path: inset(50% 0 10% 0); filter: contrast(2) saturate(0); }
+    80%  { clip-path: inset(5% 0 70% 0); filter: contrast(1.5) saturate(0); }
+    100% { clip-path: inset(0 0 0 0); filter: contrast(1) saturate(1); }
+  }
+  .dv-pixel-sort {
+    animation: dv-pixel-sort-bands 0.6s steps(4) forwards;
+  }
+
+  /* ── FX 11: NIGHT VISION / GREEN MONO ───────────────────────── */
+  .dv-night-vision {
+    filter: saturate(0) brightness(0.8);
+  }
+  .dv-night-vision::after {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 255, 0, 0.05);
+    pointer-events: none;
+    z-index: 9996;
+    mix-blend-mode: overlay;
+  }
+  .dv-night-vision .dv-luxury-grain {
+    opacity: 0.08 !important;
+  }
+
+  /* ── FX 8: HEX CODE RAIN (drawer-scoped canvas) ────────────── */
+  .dv-hex-rain-canvas {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.08;
+  }
+
   /* ── FOCUS-VISIBLE: Accessibility ────────────────────────────── */
   *:focus-visible { outline: 2px solid var(--neon); outline-offset: 2px; }
   input:focus-visible, button:focus-visible, select:focus-visible { outline: 2px solid var(--neon); outline-offset: 2px; box-shadow: 0 0 8px rgba(var(--neon-rgb), 0.3); }
@@ -933,24 +1101,21 @@ body.dv-glitching #diss0linkz-auth-gate {
   animation: dv-glitch-body 0.4s steps(2) forwards;
 }
 
-/* ── MUSIC BUTTON ───────────────────────────────────────────── */
+/* ── MUSIC ICON GLOW STROBE ─────────────────────────────────── */
+@keyframes dv-music-glow-strobe {
+  0%   { filter: drop-shadow(0 0 3px rgba(var(--neon-rgb),0.3)); opacity: 0.6; }
+  15%  { filter: drop-shadow(0 0 10px rgba(var(--neon-rgb),0.8)) drop-shadow(0 0 20px rgba(var(--neon-rgb),0.3)); opacity: 1; }
+  20%  { filter: drop-shadow(0 0 3px rgba(var(--neon-rgb),0.2)); opacity: 0.5; }
+  30%  { filter: drop-shadow(0 0 12px rgba(var(--neon-rgb),0.9)) drop-shadow(0 0 25px rgba(var(--neon-rgb),0.4)); opacity: 1; }
+  50%  { filter: drop-shadow(0 0 4px rgba(var(--neon-rgb),0.3)); opacity: 0.7; }
+  100% { filter: drop-shadow(0 0 3px rgba(var(--neon-rgb),0.3)); opacity: 0.6; }
+}
+.dv-music-icon-glow {
+  animation: dv-music-glow-strobe 2.5s ease-in-out infinite;
+}
+/* ── MUSIC BUTTON (legacy fixed position — now unused, kept for JS refs) ── */
 #dv-music-btn {
-  position: fixed;
-  top: 14px;
-  right: 14px;
-  z-index: 200;
-  background: rgba(0,4,0,0.85);
-  border: 1px solid rgba(var(--neon-rgb),0.3);
-  color: rgba(var(--neon-rgb),0.7);
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 7px;
-  letter-spacing: 1.5px;
-  padding: 6px 10px;
-  cursor: pointer;
   display: none;
-  transition: all 0.3s;
-  text-align: center;
-  line-height: 1.4;
 }
 #dv-music-btn img {
   width: 22px;
@@ -1644,11 +1809,10 @@ body.dv-glitching #diss0linkz-auth-gate {
     <span class="dv-corner bl">[+]</span>
     <span class="dv-corner br">[+]</span>
 
-    <!-- MUSIC CONTROL — system initiation element -->
+    <!-- MUSIC CONTROL — icon only, glow strobe -->
     <div id="dv-music-init" style="text-align:center; margin-bottom:12px; display:none;">
-      <button id="dv-music-btn-terminal" onclick="dvToggleMusic()" style="background:transparent; border:1px solid rgba(var(--neon-rgb),0.25); padding:8px 16px; cursor:pointer; text-align:center; transition:all 0.3s;">
-        <img src="https://cdn.shopify.com/s/files/1/0897/5686/0735/files/GREEN_Cart-Drawer-Close-V2.png?v=1775772113" alt="AUDIO" draggable="false" style="width:24px; height:24px; display:block; margin:0 auto 4px; opacity:0.75;">
-        <span style="font-family:'Share Tech Mono',monospace; font-size:7px; letter-spacing:2px; color:rgba(var(--neon-rgb),0.6);">MUTE</span>
+      <button id="dv-music-btn-terminal" onclick="dvToggleMusic()" style="background:transparent; border:none; padding:8px; cursor:pointer; transition:all 0.3s; outline:none;">
+        <img src="https://cdn.shopify.com/s/files/1/0897/5686/0735/files/GREEN_Cart-Drawer-Close-V2.png?v=1775772113" alt="AUDIO" draggable="false" class="dv-music-icon-glow" style="width:28px; height:28px; display:block; margin:0 auto;">
       </button>
     </div>
 
@@ -1884,7 +2048,7 @@ body.dv-glitching #diss0linkz-auth-gate {
             height="auto"
           >
         </div>
-        <div style="font-size:10px; color:var(--text-dim); letter-spacing:3px; margin-top:8px;">
+        <div id="dv-subtitle-scramble" style="font-size:10px; color:var(--text-dim); letter-spacing:3px; margin-top:8px;">
           LINK GENERATOR v.1.1.1
         </div>
       </div>
@@ -1983,21 +2147,22 @@ body.dv-glitching #diss0linkz-auth-gate {
       <div class="p-4 sm:p-6 space-y-4">
         <!-- DRAWER: VOID_STRIDE PROTOCOL -->
         <div style="border-bottom:1px solid var(--border-dim); margin-bottom:8px; font-family:'Share Tech Mono',monospace; text-transform:uppercase;">
-          <button onclick="toggleDrawer('drawer-protocol')" style="width:100%; background:transparent; border:none; cursor:pointer; display:flex; align-items:center; justify-content:space-between; padding:6px 0 8px 0; font-family:'Share Tech Mono',monospace; font-size:11px; letter-spacing:3px; text-transform:uppercase; color:var(--neon); animation:manifest-glow 4s ease-in-out infinite;">
-            <span class="dv-entropy-target">VOID_STRIDE // MATRIX EXTRACTION PROTOCOL</span>
+          <button id="drawer-protocol-header" onclick="toggleDrawer('drawer-protocol')" style="width:100%; background:transparent; border:none; cursor:pointer; display:flex; align-items:center; justify-content:space-between; padding:6px 0 8px 0; font-family:'Share Tech Mono',monospace; font-size:11px; letter-spacing:3px; text-transform:uppercase; color:var(--neon); animation:manifest-glow 4s ease-in-out infinite;">
+            <span class="dv-entropy-target dv-section-header">VOID_STRIDE // MATRIX EXTRACTION PROTOCOL</span>
             <span id="drawer-protocol-icon" style="font-size:12px; transition:transform 0.3s; flex-shrink:0; margin-left:10px;">&#9658;</span>
           </button>
-          <div id="drawer-protocol" style="overflow:hidden; max-height:0; transition:max-height 0.45s ease, opacity 0.35s ease; opacity:0; font-size:10px; letter-spacing:1.8px;">
-            <div style="padding-bottom:12px;">
+          <div id="drawer-protocol" style="overflow:hidden; max-height:0; transition:max-height 0.45s ease, opacity 0.35s ease; opacity:0; font-size:10px; letter-spacing:1.8px; position:relative;">
+            <canvas id="dv-hex-rain-canvas" class="dv-hex-rain-canvas"></canvas>
+            <div style="padding-bottom:12px; position:relative; z-index:1;">
               <div style="margin-bottom:8px;">
                 <span style="color:var(--neon); opacity:0.5;">01 //</span>
                 <span style="color:var(--neon); margin-left:6px; animation:manifest-glow 4s ease-in-out infinite;">EXTIRPATION</span>
-                <div style="color:var(--text-dim); font-size:9px; margin-top:4px; line-height:1.7; letter-spacing:1.2px;">MYRAVYRA ontological-shredding atomizes the X, META, TIKTOK, SNAPCHAT, or any in_app browser Beast-System sub-realities upon initial contact. The digital veil is torn.</div>
+                <div class="dv-censored" style="color:var(--text-dim); font-size:9px; margin-top:4px; line-height:1.7; letter-spacing:1.2px;">MYRAVYRA ontological-shredding atomizes the X, META, TIKTOK, SNAPCHAT, or any in_app browser Beast-System sub-realities upon initial contact. The digital veil is torn.</div>
               </div>
               <div style="margin-bottom:8px;">
                 <span style="color:var(--neon); opacity:0.5;">02 //</span>
                 <span style="color:var(--neon); margin-left:6px; animation:manifest-glow 4s ease-in-out infinite;">TRANSCENSION</span>
-                <div style="color:var(--text-dim); font-size:9px; margin-top:4px; line-height:1.7; letter-spacing:1.2px;">PRPL TWR protocol transmutes a reality-warping hyper-protocol sequenced by the VERITAS_ENGINE, shattering the Panopticon prison-matrix, force-projecting your digital consciousness beyond the Harvesting-Grid.</div>
+                <div class="dv-censored" style="color:var(--text-dim); font-size:9px; margin-top:4px; line-height:1.7; letter-spacing:1.2px;">PRPL TWR protocol transmutes a reality-warping hyper-protocol sequenced by the VERITAS_ENGINE, shattering the Panopticon prison-matrix, force-projecting your digital consciousness beyond the Harvesting-Grid.</div>
               </div>
               <div style="margin-bottom:10px;">
                 <span style="color:var(--neon); opacity:0.5;">03 //</span>
@@ -2101,7 +2266,7 @@ body.dv-glitching #diss0linkz-auth-gate {
         <!-- Generate Button -->
         <div class="flex gap-3 flex-wrap">
           <button class="btn-neon flex-1" id="vault-generate-btn" onclick="vaultGuardedGenerate()">
-            ⚡ GENERATE Diss0LinK
+            <span class="dv-neon-sign">⚡ GENERATE Diss0LinK</span>
           </button>
           <button class="btn-neon btn-red" onclick="clearAll()" style="flex:0 0 auto;">
             ✕ VOID
@@ -2222,7 +2387,7 @@ body.dv-glitching #diss0linkz-auth-gate {
         color:var(--neon); border-bottom:0px solid var(--border-dim);
         transition:border-color 0.3s;
       " id="drawer-how-trigger">
-        <span>HOW Diss0LinKZ WORKS</span>
+        <span class="dv-section-header">HOW Diss0LinKZ WORKS</span>
         <span id="drawer-how-icon" style="font-size:12px; transition:transform 0.3s; flex-shrink:0;">&#9658;</span>
       </button>
       <div id="drawer-how" style="overflow:hidden; max-height:0; transition:max-height 0.45s ease, opacity 0.35s ease; opacity:0;">
@@ -3565,7 +3730,13 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
     if (!music) return;
     musicMuted = !musicMuted;
     music.muted = musicMuted;
-    if (btn) btn.textContent = musicMuted ? '\u266a PLAY' : '\u266a MUTE';
+    // Icon-only: toggle glow strobe vs dim when muted
+    var icon = btn ? btn.querySelector('img') : null;
+    if (icon) {
+      icon.style.opacity = musicMuted ? '0.2' : '';
+      icon.style.animation = musicMuted ? 'none' : '';
+      icon.classList.toggle('dv-music-icon-glow', !musicMuted);
+    }
   };
 
   function playTypingSound() {
