@@ -606,6 +606,13 @@ body.dv-gate-active * { cursor: none !important; }
   50%     { filter: drop-shadow(0 0 28px rgba(var(--neon-rgb),0.9)) drop-shadow(0 0 60px rgba(var(--neon-rgb),0.4)); }
 }
 
+/* ── TERMINAL CINEMATIC OPEN ────────────────────────────────── */
+@keyframes dv-terminal-open {
+  0%   { transform: scaleY(0.02) scaleX(0.4); opacity:0; border-color: rgba(var(--neon-rgb),0); box-shadow: none; }
+  15%  { transform: scaleY(0.02) scaleX(1); opacity:1; border-color: rgba(var(--neon-rgb),0.8); box-shadow: 0 0 40px rgba(var(--neon-rgb),0.6); }
+  30%  { transform: scaleY(0.02) scaleX(1); border-color: rgba(var(--neon-rgb),1); box-shadow: 0 0 60px rgba(var(--neon-rgb),0.8), inset 0 0 20px rgba(var(--neon-rgb),0.1); }
+  100% { transform: scaleY(1) scaleX(1); opacity:1; border-color: rgba(var(--neon-rgb),0.55); box-shadow: 0 0 0 1px rgba(var(--neon-rgb),0.1), 0 0 20px rgba(var(--neon-rgb),0.25), 0 0 60px rgba(var(--neon-rgb),0.1), inset 0 0 30px rgba(var(--neon-rgb),0.03); }
+}
 /* ── TERMINAL BOX ───────────────────────────────────────────── */
 .dv-terminal-wrap {
   position: relative;
@@ -620,6 +627,8 @@ body.dv-gate-active * { cursor: none !important; }
   padding: 24px 22px 18px;
   font-family: 'JetBrains Mono', 'Share Tech Mono', monospace;
   overflow: hidden;
+  animation: dv-terminal-open 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  transform-origin: center center;
 }
 
 /* CRT scanlines overlay */
@@ -3871,8 +3880,11 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
     }
 
     document.body.classList.add('dv-gate-active');
-    runBootSequence();
-    scheduleGlitch();
+    // Wait for terminal cinematic open (1.2s) then start boot text
+    setTimeout(function() {
+      runBootSequence();
+      scheduleGlitch();
+    }, 1300);
 
     // Keyboard handler
     var inputEl = document.getElementById('dv-passphrase-input');
