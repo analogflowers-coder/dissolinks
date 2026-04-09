@@ -1088,6 +1088,101 @@ body.dv-glitching #diss0linkz-auth-gate {
 }
 .dv-denied-shake { animation: dv-denied-shake 0.5s cubic-bezier(0.36,0.07,0.19,0.97); }
 
+/* ════════════════════════════════════════════════════════
+   VAULT — ACCOUNT GATE | IRONWIRE | DISSOVERSE LLC | 2026
+════════════════════════════════════════════════════════ */
+#vault-account-gate {
+  position: fixed; inset: 0; z-index: 90;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 20px 16px; background: transparent;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+#vault-account-gate.vault-visible { opacity: 1; pointer-events: auto; }
+#vault-account-gate.vault-exit {
+  opacity: 0; filter: blur(8px) brightness(2); pointer-events: none;
+}
+.vault-terminal-wrap {
+  position: relative; width: min(520px, 92vw);
+  background: rgba(0, 4, 0, 0.92);
+  border: 1px solid rgba(0,255,65,0.55);
+  box-shadow: 0 0 0 1px rgba(0,255,65,0.1), 0 0 20px rgba(0,255,65,0.25),
+    0 0 60px rgba(0,255,65,0.1), inset 0 0 30px rgba(0,255,65,0.03);
+  padding: 24px 22px 20px;
+  font-family: 'JetBrains Mono', 'Share Tech Mono', monospace;
+  overflow: hidden;
+}
+.vault-terminal-wrap::before {
+  content: ''; position: absolute; inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px,
+    rgba(0,0,0,0.18) 2px, rgba(0,0,0,0.18) 4px);
+  pointer-events: none; z-index: 10;
+}
+.vault-title {
+  font-size: 13px; color: #00ff41; letter-spacing: 3px; text-transform: uppercase;
+  text-shadow: 0 0 10px rgba(0,255,65,0.5); margin-bottom: 3px;
+}
+.vault-subtitle {
+  font-size: 10px; color: rgba(0,255,65,0.45); letter-spacing: 2px;
+  margin-bottom: 18px; border-bottom: 1px solid rgba(0,255,65,0.18); padding-bottom: 14px;
+}
+.vault-tab-row { display: flex; margin-bottom: 18px; border: 1px solid rgba(0,255,65,0.2); }
+.vault-tab {
+  flex: 1; padding: 9px 6px; background: transparent; border: none;
+  color: rgba(0,255,65,0.45); font-family: 'JetBrains Mono', 'Share Tech Mono', monospace;
+  font-size: 11px; letter-spacing: 2px; cursor: pointer; text-transform: uppercase; transition: all 0.2s;
+}
+.vault-tab:hover { color: rgba(0,255,65,0.8); background: rgba(0,255,65,0.04); }
+.vault-tab.active {
+  color: #00ff41; background: rgba(0,255,65,0.08);
+  border-bottom: 2px solid #00ff41; text-shadow: 0 0 8px rgba(0,255,65,0.4);
+}
+.vault-field { margin-bottom: 14px; }
+.vault-label {
+  display: block; font-size: 10px; color: rgba(0,255,65,0.5);
+  letter-spacing: 2px; margin-bottom: 5px; text-transform: uppercase;
+}
+.vault-input {
+  width: 100%; background: rgba(0,0,0,0.55); border: 1px solid rgba(0,255,65,0.25);
+  color: #00ff41; font-family: 'JetBrains Mono', 'Share Tech Mono', monospace;
+  font-size: 14px; padding: 10px 14px; outline: none; transition: all 0.2s; letter-spacing: 0.05em;
+}
+.vault-input:focus { border-color: rgba(0,255,65,0.7); box-shadow: 0 0 12px rgba(0,255,65,0.2); }
+.vault-input::placeholder { color: rgba(0,255,65,0.2); }
+.vault-btn-primary {
+  width: 100%; background: rgba(0,255,65,0.07); border: 1px solid rgba(0,255,65,0.6);
+  color: #00ff41; font-family: 'JetBrains Mono', 'Share Tech Mono', monospace;
+  font-size: 12px; letter-spacing: 3px; padding: 12px; cursor: pointer;
+  text-transform: uppercase; transition: all 0.2s; margin-top: 6px;
+}
+.vault-btn-primary:hover {
+  background: rgba(0,255,65,0.15); box-shadow: 0 0 16px rgba(0,255,65,0.3); border-color: #00ff41;
+}
+.vault-btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
+.vault-status {
+  margin-top: 10px; font-size: 11px; letter-spacing: 1.5px; min-height: 18px;
+  text-align: center; color: rgba(0,255,65,0.55); transition: color 0.2s;
+}
+.vault-status.vault-ok  { color: #00ff41; text-shadow: 0 0 6px rgba(0,255,65,0.4); }
+.vault-status.vault-err { color: #ff3333; }
+.vault-status.vault-wait { color: #ffcc00; }
+#vault-logged-in-badge {
+  display: none; align-items: center; gap: 6px; font-size: 10px; letter-spacing: 2px;
+  color: rgba(0,255,65,0.7); padding: 4px 10px; border: 1px solid rgba(0,255,65,0.25);
+  background: rgba(0,255,65,0.04); white-space: nowrap;
+  animation: exit-portal-glow 4s ease-in-out infinite;
+}
+#vault-logged-in-badge.badge-active { display: flex; }
+#vault-logged-in-badge .vault-badge-user {
+  color: #00ff41; font-weight: bold; text-shadow: 0 0 8px rgba(0,255,65,0.5);
+}
+.vault-locked-notice {
+  display: none; font-size: 11px; color: rgba(255,204,0,0.8); letter-spacing: 2px;
+  text-align: center; padding: 8px; border: 1px solid rgba(255,204,0,0.2);
+  background: rgba(255,204,0,0.03); margin-top: 6px;
+}
+
 </style>
 </head>
 <body>
@@ -1207,6 +1302,71 @@ body.dv-glitching #diss0linkz-auth-gate {
 
   <div class="dv-veritas-badge">PROTECTED BY VERITAS_ENGINE // DISSOVERSE NEURAL NETWORK</div>
 </div>
+
+<!-- ================================================================
+     VAULT ACCOUNT GATE | IRONWIRE | DISSOVERSE LLC
+     Appears after master passphrase passes, before app unlocks.
+     ================================================================ -->
+<div id="vault-account-gate">
+  <div class="vault-terminal-wrap">
+    <span class="dv-corner tl">[+]</span>
+    <span class="dv-corner tr">[+]</span>
+    <span class="dv-corner bl">[+]</span>
+    <span class="dv-corner br">[+]</span>
+
+    <div class="vault-title">VAULT // OPERATOR REGISTRY</div>
+    <div class="vault-subtitle">SIGN IN OR CREATE AN ACCOUNT TO CONTINUE</div>
+
+    <div class="vault-tab-row">
+      <button class="vault-tab active" id="vault-tab-signin" onclick="vaultShowTab('signin')">&#9658; SIGN IN</button>
+      <button class="vault-tab" id="vault-tab-create" onclick="vaultShowTab('create')">&#9658; CREATE ACCOUNT</button>
+    </div>
+
+    <!-- SIGN IN PANEL -->
+    <div id="vault-panel-signin">
+      <div class="vault-field">
+        <label class="vault-label" for="vault-signin-user">&#62; USERNAME</label>
+        <input type="text" id="vault-signin-user" class="vault-input" placeholder="OPERATOR_X"
+          autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" maxlength="30">
+      </div>
+      <div class="vault-field">
+        <label class="vault-label" for="vault-signin-pass">&#62; PASSWORD</label>
+        <input type="password" id="vault-signin-pass" class="vault-input" placeholder="&#95;&#95;&#95;&#95;&#95;&#95;&#95;&#95;"
+          autocomplete="off" spellcheck="false">
+      </div>
+      <button class="vault-btn-primary" id="vault-signin-btn" onclick="vaultSignIn()">&#9654; AUTHENTICATE</button>
+    </div>
+
+    <!-- CREATE ACCOUNT PANEL -->
+    <div id="vault-panel-create" style="display:none;">
+      <div class="vault-field">
+        <label class="vault-label" for="vault-create-user">&#62; USERNAME</label>
+        <input type="text" id="vault-create-user" class="vault-input" placeholder="OPERATOR_X"
+          autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" maxlength="30">
+        <div style="font-size:9px; color:rgba(0,255,65,0.35); margin-top:4px; letter-spacing:1.5px;">
+          LETTERS, NUMBERS, HYPHENS, UNDERSCORES ONLY
+        </div>
+      </div>
+      <div class="vault-field">
+        <label class="vault-label" for="vault-create-pass">&#62; PASSWORD</label>
+        <input type="password" id="vault-create-pass" class="vault-input" placeholder="&#95;&#95;&#95;&#95;&#95;&#95;&#95;&#95;"
+          autocomplete="off" spellcheck="false">
+      </div>
+      <div class="vault-field">
+        <label class="vault-label" for="vault-create-pass2">&#62; CONFIRM PASSWORD</label>
+        <input type="password" id="vault-create-pass2" class="vault-input" placeholder="&#95;&#95;&#95;&#95;&#95;&#95;&#95;&#95;"
+          autocomplete="off" spellcheck="false">
+      </div>
+      <button class="vault-btn-primary" id="vault-create-btn" onclick="vaultCreateAccount()">&#9654; REGISTER OPERATOR</button>
+    </div>
+
+    <div class="vault-status" id="vault-status-line"></div>
+    <div style="margin-top:14px; font-size:9px; color:rgba(0,255,65,0.2); text-align:center; letter-spacing:1.5px;">
+      VAULT v1.0 // PBKDF2-SHA256 // 200K ITERATIONS // DISSOVERSE NEURAL NETWORK
+    </div>
+  </div>
+</div>
+
 
 <div id="diss0linkz-app">
 
@@ -1332,6 +1492,11 @@ body.dv-glitching #diss0linkz-auth-gate {
             font-family:'Share Tech Mono',monospace; font-size:18px; width:36px; height:36px;
             cursor:pointer; display:flex; align-items:center; justify-content:center;
             transition:all 0.3s; flex-shrink:0;">⚙</button>
+
+          <!-- VAULT: Logged-in badge -->
+          <div id="vault-logged-in-badge">
+            LOGGED IN AS: <span class="vault-badge-user" id="vault-username-display">&#8212;</span>
+          </div>
 
           <button
             id="exit-portal-btn"
@@ -1496,12 +1661,15 @@ body.dv-glitching #diss0linkz-auth-gate {
 
         <!-- Generate Button -->
         <div class="flex gap-3 flex-wrap">
-          <button class="btn-neon flex-1" onclick="generateLink()">
+          <button class="btn-neon flex-1" id="vault-generate-btn" onclick="vaultGuardedGenerate()">
             ⚡ GENERATE VOID_STRIDE LINK
           </button>
           <button class="btn-neon btn-red" onclick="clearAll()" style="flex:0 0 auto;">
             ✕ CLEAR
           </button>
+        </div>
+        <div class="vault-locked-notice" id="vault-locked-notice">
+          ⚠ SIGN IN REQUIRED — AUTHENTICATE VIA VAULT TO GENERATE LINKS
         </div>
 
         <!-- Output -->
@@ -1890,6 +2058,9 @@ function toggleDrawer(id) {
 function ncpPanic() {
   var fb = document.getElementById('ncp-panic-feedback');
   if (fb) fb.textContent = '⚠ WIPING SESSION...';
+  // VAULT: clear account session + UI
+  if (window._vaultClearSession) window._vaultClearSession();
+  if (window._vaultUpdateUI) window._vaultUpdateUI(null);
   try { sessionStorage.clear(); } catch(e) {}
   try { localStorage.clear(); }  catch(e) {}
   // Expire auth cookie
@@ -2052,6 +2223,42 @@ function copyToClipboard(text) {
 }
 
 // ==================== GITHUB DEPLOY ====================
+async function vaultSaveLinkRecord(token, slug) {
+  var vaultUser = (window._vaultGetUsername && window._vaultGetUsername()) || null;
+  if (!vaultUser || !token) return;
+  var linksPath = 'accounts/' + vaultUser + '/links.json';
+  try {
+    var getResp = await fetch('https://api.github.com/repos/analogflowers-coder/dissolinks/contents/' + linksPath, {
+      headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json' }
+    });
+    var existingSha = null;
+    var linksData = { owner: vaultUser, links: [] };
+    if (getResp.status === 200) {
+      var gj = await getResp.json();
+      existingSha = gj.sha;
+      try { linksData = JSON.parse(atob(gj.content.replace(/\n/g,''))); } catch(e) {}
+    }
+    var existing = linksData.links || [];
+    if (!existing.find(function(l) { return (l.slug || l) === slug; })) {
+      existing.push({ slug: slug, created: new Date().toISOString() });
+    }
+    linksData.links = existing;
+    var putBody = {
+      message: 'vault: add link ' + slug + ' for ' + vaultUser,
+      content: btoa(unescape(encodeURIComponent(JSON.stringify(linksData, null, 2))))
+    };
+    if (existingSha) putBody.sha = existingSha;
+    await fetch('https://api.github.com/repos/analogflowers-coder/dissolinks/contents/' + linksPath, {
+      method: 'PUT',
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github+json' },
+      body: JSON.stringify(putBody)
+    });
+    addLog('VAULT', 'Link record saved to ' + linksPath, 'neon');
+  } catch(e) {
+    addLog('VAULT', 'Could not save link record: ' + e.message, 'dim');
+  }
+}
+
 async function deployToGitHub(shortName, htmlContent) {
   const token = sessionStorage.getItem('gh_pat');
   if (!token) return false;
@@ -2099,6 +2306,8 @@ async function deployToGitHub(shortName, htmlContent) {
       const sha7 = result.commit.sha.substring(0, 7);
       addLog('DEPLOY', 'Commit successful. SHA: ' + sha7, 'neon');
       addLog('LIVE', 'Link active at links.dissoverse.com/' + shortName, 'neon');
+      // VAULT: save link record to user namespace
+      await vaultSaveLinkRecord(token, shortName);
       return true;
     } else if (putResp.status === 401 || putResp.status === 403) {
       const putErr = await putResp.json().catch(() => ({}));
@@ -2988,7 +3197,18 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
         // Show neural loading screen, THEN reveal app
         showNeuralLoadScreen(function() {
           document.body.classList.remove('dv-gate-active');
-          if (app) app.classList.add('app-visible');
+          // VAULT: if account session exists skip vault gate
+          if (window._vaultGetUsername && window._vaultGetUsername()) {
+            if (app) app.classList.add('app-visible');
+            if (window._vaultUpdateUI) window._vaultUpdateUI(window._vaultGetUsername());
+          } else {
+            // Show vault account gate; app stays hidden until vault auth
+            var vaultGate = document.getElementById('vault-account-gate');
+            if (vaultGate) {
+              vaultGate.style.display = 'flex';
+              vaultGate.classList.add('vault-visible');
+            }
+          }
         });
       }, 800);
     }, 2000);
@@ -3541,40 +3761,60 @@ async function loadActiveLinks() {
   if (!panel) return;
 
   if (!token) {
-    panel.innerHTML = '<div style="color:var(--text-dim); font-size:11px; letter-spacing:1px;">[ OPERATOR TOKEN REQUIRED // CONNECT IN SETTINGS ⚙ ]</div>';
+    panel.innerHTML = '<div style="color:var(--text-dim); font-size:11px; letter-spacing:1px;">[ OPERATOR TOKEN REQUIRED // CONNECT IN SETTINGS &#9881; ]</div>';
     return;
   }
 
-  panel.innerHTML = '<div style="color:var(--text-dim); font-size:11px; letter-spacing:2px; animation: dv-pulse-dot 0.8s infinite;">■ SCANNING REPO...</div>';
+  // VAULT: load links from account namespace
+  var vaultUser = (window._vaultGetUsername && window._vaultGetUsername()) || null;
+  if (!vaultUser) {
+    panel.innerHTML = '<div style="color:rgba(255,204,0,0.7); font-size:11px; letter-spacing:1px;">[ SIGN IN TO VIEW YOUR LINKS ]</div>';
+    return;
+  }
+
+  var linksPath = 'accounts/' + vaultUser + '/links.json';
+  panel.innerHTML = '<div style="color:var(--text-dim); font-size:11px; letter-spacing:2px;">&#9632; LOADING LINKS FOR ' + vaultUser + '...</div>';
 
   try {
-    var resp = await fetch('https://api.github.com/repos/analogflowers-coder/dissolinks/contents/', {
+    var resp = await fetch('https://api.github.com/repos/analogflowers-coder/dissolinks/contents/' + linksPath, {
       headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json' }
     });
 
+    if (resp.status === 404) {
+      panel.innerHTML = '<div style="color:var(--text-dim); font-size:11px; letter-spacing:1px;">NO ACTIVE LINKS. GENERATE YOUR FIRST LINK ABOVE.</div>';
+      return;
+    }
     if (resp.status === 401 || resp.status === 403) {
       var errData = await resp.json().catch(function() { return {}; });
       panel.innerHTML = '<div style="color:var(--red-warn); font-size:11px;">[ERROR] AUTH FAILED (' + resp.status + '): ' + (errData.message || 'CHECK TOKEN') + '</div>';
-      showErrorPopup('0x' + resp.status.toString(16).toUpperCase(), 'AUTHENTICATION FAILURE', 'GitHub API rejected the operator token (' + resp.status + '). Navigate to Settings ⚙ > Export tab and reconnect your deploy token.', null);
+      showErrorPopup('0x' + resp.status.toString(16).toUpperCase(), 'AUTHENTICATION FAILURE', 'GitHub API rejected the operator token (' + resp.status + '). Navigate to Settings &#9881; > Export tab and reconnect your deploy token.', null);
+      return;
+    }
+    if (!resp.ok) {
+      panel.innerHTML = '<div style="color:var(--red-warn); font-size:11px;">[ERROR] FAILED TO LOAD LINKS (' + resp.status + ').</div>';
       return;
     }
 
-    var items = await resp.json();
-    var dirs = items.filter(function(item) { return item.type === 'dir'; });
+    var fileData = await resp.json();
+    var linksData;
+    try { linksData = JSON.parse(atob(fileData.content.replace(/\n/g,''))); } catch(e) { linksData = { links: [] }; }
+    var links = (linksData && linksData.links) ? linksData.links : [];
 
-    if (dirs.length === 0) {
+    if (links.length === 0) {
       panel.innerHTML = '<div style="color:var(--text-dim); font-size:11px; letter-spacing:1px;">NO ACTIVE LINKS. GENERATE YOUR FIRST LINK ABOVE.</div>';
       return;
     }
 
     var html2 = '<div style="display:flex; flex-direction:column;">';
-    dirs.forEach(function(dir) {
-      var cleanUrl = 'https://links.dissoverse.com/' + dir.name;
+    links.forEach(function(link) {
+      var slug = (link && link.slug) ? link.slug : String(link);
+      var cleanUrl = 'https://links.dissoverse.com/' + slug;
       html2 += '<div class="dv-link-card">' +
         '<span class="dv-link-live-dot"></span>' +
-        '<span class="dv-link-name">links.dissoverse.com/' + dir.name + '</span>' +
+        '<span class="dv-link-name">links.dissoverse.com/' + slug + '</span>' +
+        (link.created ? '<span class="dv-link-meta">' + new Date(link.created).toLocaleDateString() + '</span>' : '') +
         '<button onclick="dvCopyLink(\'' + cleanUrl + '\', this)" class="btn-neon" style="font-size:10px;padding:3px 10px;letter-spacing:1px;flex-shrink:0;">COPY</button>' +
-        '<button onclick="deleteLink(\'' + dir.name + '\')" class="btn-neon btn-red" style="font-size:10px;padding:3px 10px;letter-spacing:1px;flex-shrink:0;">DELETE</button>' +
+        '<button onclick="deleteLink(\'' + slug + '\')" class="btn-neon btn-red" style="font-size:10px;padding:3px 10px;letter-spacing:1px;flex-shrink:0;">DELETE</button>' +
         '</div>';
     });
     html2 += '</div>';
@@ -3625,5 +3865,242 @@ document.addEventListener('DOMContentLoaded', function() {
 })();
 </script>
 
+
+<script>
+/* ================================================================
+   VAULT — MULTI-USER ACCOUNT SYSTEM
+   IRONWIRE | Claude Code | DISSOVERSE LLC | 2026
+   PBKDF2-SHA256 | 200k iterations | GitHub API storage
+   accounts/registry.json — user registry
+   accounts/{USERNAME}/links.json — per-user link store
+   ================================================================ */
+(function() {
+  'use strict';
+
+  var VAULT_REPO = 'analogflowers-coder/dissolinks';
+  var VAULT_API  = 'https://api.github.com/repos/' + VAULT_REPO + '/contents/';
+  var VAULT_REG  = 'accounts/registry.json';
+
+  /* ── SESSION (sessionStorage — clears on tab close) ─────────── */
+  function vaultGetSession() {
+    try { return JSON.parse(sessionStorage.getItem('vault_session') || 'null'); } catch(e) { return null; }
+  }
+  function vaultSetSession(username) {
+    sessionStorage.setItem('vault_session', JSON.stringify({ username: username, ts: Date.now() }));
+  }
+  function vaultClearSession() { sessionStorage.removeItem('vault_session'); }
+  function vaultGetUsername() { var s = vaultGetSession(); return s ? s.username : null; }
+
+  /* ── PBKDF2-SHA256 200k iterations ──────────────────────────── */
+  async function vaultPBKDF2(password, salt) {
+    var enc = new TextEncoder();
+    var key = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']);
+    var bits = await crypto.subtle.deriveBits(
+      { name: 'PBKDF2', salt: enc.encode(salt), iterations: 200000, hash: 'SHA-256' }, key, 256
+    );
+    return Array.from(new Uint8Array(bits)).map(function(b) { return b.toString(16).padStart(2,'0'); }).join('');
+  }
+  function vaultGenSalt() {
+    var arr = new Uint8Array(16);
+    crypto.getRandomValues(arr);
+    return Array.from(arr).map(function(b) { return b.toString(16).padStart(2,'0'); }).join('');
+  }
+
+  /* ── GITHUB REGISTRY R/W ────────────────────────────────────── */
+  function vaultToken() { return sessionStorage.getItem('gh_pat') || ''; }
+
+  async function vaultReadRegistry() {
+    var resp = await fetch(VAULT_API + VAULT_REG, {
+      headers: { 'Authorization': 'Bearer ' + vaultToken(), 'Accept': 'application/vnd.github+json' }
+    });
+    if (resp.status === 404) return { data: { accounts: [] }, sha: null };
+    if (!resp.ok) throw new Error('Registry read failed: ' + resp.status);
+    var json = await resp.json();
+    var data = JSON.parse(atob(json.content.replace(/\n/g,'')));
+    return { data: data, sha: json.sha };
+  }
+
+  async function vaultWriteRegistry(data, sha) {
+    var body = {
+      message: 'vault: update account registry',
+      content: btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))))
+    };
+    if (sha) body.sha = sha;
+    var resp = await fetch(VAULT_API + VAULT_REG, {
+      method: 'PUT',
+      headers: {
+        'Authorization': 'Bearer ' + vaultToken(),
+        'Content-Type': 'application/json',
+        'Accept': 'application/vnd.github+json'
+      },
+      body: JSON.stringify(body)
+    });
+    if (resp.status !== 200 && resp.status !== 201) {
+      var err = await resp.json().catch(function() { return {}; });
+      throw new Error('Registry write failed: ' + resp.status + ' ' + (err.message || ''));
+    }
+  }
+
+  /* ── UI HELPERS ─────────────────────────────────────────────── */
+  window.vaultShowTab = function(tab) {
+    ['signin','create'].forEach(function(k) {
+      var panel = document.getElementById('vault-panel-' + k);
+      var btn   = document.getElementById('vault-tab-' + k);
+      if (panel) panel.style.display = (k === tab) ? 'block' : 'none';
+      if (btn)   btn.classList.toggle('active', k === tab);
+    });
+    vaultSetStatus('', '');
+  };
+
+  function vaultSetStatus(msg, type) {
+    var el = document.getElementById('vault-status-line');
+    if (!el) return;
+    el.textContent = msg;
+    el.className = 'vault-status' + (type ? ' vault-' + type : '');
+  }
+
+  function vaultUpdateUI(username) {
+    var badge  = document.getElementById('vault-logged-in-badge');
+    var dispEl = document.getElementById('vault-username-display');
+    var notice = document.getElementById('vault-locked-notice');
+    if (badge)  badge.classList.toggle('badge-active', !!username);
+    if (dispEl) dispEl.textContent = username || '\u2014';
+    if (notice) notice.style.display = 'none';
+    loadActiveLinks();
+  }
+
+  /* ── SIGN IN ────────────────────────────────────────────────── */
+  window.vaultSignIn = async function() {
+    var userInput = document.getElementById('vault-signin-user');
+    var passInput = document.getElementById('vault-signin-pass');
+    var btn       = document.getElementById('vault-signin-btn');
+    if (!userInput || !passInput) return;
+    var username = userInput.value.trim().toUpperCase();
+    var password = passInput.value;
+    if (!username || !password) { vaultSetStatus('> USERNAME AND PASSWORD REQUIRED.', 'err'); return; }
+    if (!vaultToken()) { vaultSetStatus('> OPERATOR TOKEN REQUIRED. CONNECT IN SETTINGS \u2699', 'err'); return; }
+    btn.disabled = true;
+    vaultSetStatus('> AUTHENTICATING...', 'wait');
+    try {
+      var reg = await vaultReadRegistry();
+      var accounts = (reg.data && reg.data.accounts) ? reg.data.accounts : [];
+      var account = accounts.find(function(a) { return a.username === username; });
+      if (!account) {
+        vaultSetStatus('> OPERATOR NOT FOUND. CREATE AN ACCOUNT FIRST.', 'err');
+        btn.disabled = false; return;
+      }
+      var hash = await vaultPBKDF2(password, account.salt);
+      if (hash !== account.hash) {
+        vaultSetStatus('> INVALID CREDENTIALS. ACCESS DENIED.', 'err');
+        btn.disabled = false; return;
+      }
+      vaultSetSession(username);
+      vaultSetStatus('> ACCESS GRANTED // WELCOME, ' + username, 'ok');
+      passInput.value = '';
+      setTimeout(function() { vaultRevealApp(username); }, 900);
+    } catch(e) {
+      vaultSetStatus('> ERROR: ' + e.message, 'err');
+      btn.disabled = false;
+    }
+  };
+
+  /* ── CREATE ACCOUNT ─────────────────────────────────────────── */
+  window.vaultCreateAccount = async function() {
+    var userInput  = document.getElementById('vault-create-user');
+    var passInput  = document.getElementById('vault-create-pass');
+    var pass2Input = document.getElementById('vault-create-pass2');
+    var btn        = document.getElementById('vault-create-btn');
+    if (!userInput || !passInput || !pass2Input) return;
+    var username = userInput.value.trim().toUpperCase().replace(/[^A-Z0-9_\-]/g, '');
+    var password = passInput.value;
+    var pass2    = pass2Input.value;
+    if (!username) { vaultSetStatus('> INVALID USERNAME. USE LETTERS/NUMBERS/UNDERSCORES/HYPHENS.', 'err'); return; }
+    if (!password) { vaultSetStatus('> PASSWORD REQUIRED.', 'err'); return; }
+    if (password !== pass2) { vaultSetStatus('> PASSWORDS DO NOT MATCH.', 'err'); return; }
+    if (password.length < 6) { vaultSetStatus('> PASSWORD TOO SHORT. MINIMUM 6 CHARACTERS.', 'err'); return; }
+    if (!vaultToken()) { vaultSetStatus('> OPERATOR TOKEN REQUIRED. CONNECT IN SETTINGS \u2699', 'err'); return; }
+    btn.disabled = true;
+    vaultSetStatus('> HASHING CREDENTIALS...', 'wait');
+    try {
+      var reg = await vaultReadRegistry();
+      var accounts = (reg.data && reg.data.accounts) ? reg.data.accounts : [];
+      if (accounts.find(function(a) { return a.username === username; })) {
+        vaultSetStatus('> USERNAME ALREADY EXISTS. CHOOSE ANOTHER.', 'err');
+        btn.disabled = false; return;
+      }
+      vaultSetStatus('> WRITING TO REGISTRY...', 'wait');
+      var salt = vaultGenSalt();
+      var hash = await vaultPBKDF2(password, salt);
+      accounts.push({
+        username: username, hash: hash, salt: salt,
+        created: new Date().toISOString(),
+        folder: 'accounts/' + username + '/'
+      });
+      await vaultWriteRegistry({ accounts: accounts }, reg.sha);
+      vaultSetSession(username);
+      vaultSetStatus('> OPERATOR REGISTERED // WELCOME, ' + username, 'ok');
+      passInput.value = ''; pass2Input.value = '';
+      setTimeout(function() { vaultRevealApp(username); }, 900);
+    } catch(e) {
+      vaultSetStatus('> ERROR: ' + e.message, 'err');
+      btn.disabled = false;
+    }
+  };
+
+  /* ── REVEAL APP POST-VAULT AUTH ─────────────────────────────── */
+  function vaultRevealApp(username) {
+    var gate = document.getElementById('vault-account-gate');
+    var app  = document.getElementById('diss0linkz-app');
+    if (gate) { gate.classList.remove('vault-visible'); gate.classList.add('vault-exit'); setTimeout(function() { gate.style.display = 'none'; }, 500); }
+    if (app)  app.classList.add('app-visible');
+    vaultUpdateUI(username);
+    // Brief ACCESS GRANTED stamp
+    var stamp = document.getElementById('dv-access-stamp');
+    if (stamp) { stamp.classList.add('active'); setTimeout(function() { stamp.classList.remove('active'); }, 1200); }
+    addLog('VAULT', 'Signed in as ' + username + '. Link namespace: accounts/' + username + '/', 'neon');
+  }
+
+  /* ── GUARDED GENERATE ───────────────────────────────────────── */
+  window.vaultGuardedGenerate = function() {
+    var username = vaultGetUsername();
+    if (!username) {
+      var notice = document.getElementById('vault-locked-notice');
+      if (notice) notice.style.display = 'block';
+      addLog('VAULT', 'SIGN IN REQUIRED before generating links.', 'red');
+      return;
+    }
+    generateLink();
+  };
+
+  /* ── BOOT: CHECK EXISTING SESSION ───────────────────────────── */
+  document.addEventListener('DOMContentLoaded', function() {
+    var username = vaultGetUsername();
+    if (username) vaultUpdateUI(username);
+
+    // Keyboard nav in vault inputs
+    var enterSignIn = function(e) { if (e.key === 'Enter') window.vaultSignIn(); };
+    var enterCreate = function(e) { if (e.key === 'Enter') window.vaultCreateAccount(); };
+    var focusNext   = function(nextId) { return function(e) { if (e.key === 'Enter') { var n = document.getElementById(nextId); if (n) n.focus(); } }; };
+    var ids = ['vault-signin-user','vault-signin-pass','vault-create-user','vault-create-pass','vault-create-pass2'];
+    ids.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      if (id === 'vault-signin-user')  el.addEventListener('keydown', focusNext('vault-signin-pass'));
+      if (id === 'vault-signin-pass')  el.addEventListener('keydown', enterSignIn);
+      if (id === 'vault-create-user')  el.addEventListener('keydown', focusNext('vault-create-pass'));
+      if (id === 'vault-create-pass')  el.addEventListener('keydown', focusNext('vault-create-pass2'));
+      if (id === 'vault-create-pass2') el.addEventListener('keydown', enterCreate);
+    });
+  });
+
+  /* ── EXPOSE ──────────────────────────────────────────────────── */
+  window._vaultGetUsername  = vaultGetUsername;
+  window._vaultRevealApp    = vaultRevealApp;
+  window._vaultUpdateUI     = vaultUpdateUI;
+  window._vaultSetStatus    = vaultSetStatus;
+  window._vaultClearSession = vaultClearSession;
+
+})();
+</script>
 </body>
 </html>
