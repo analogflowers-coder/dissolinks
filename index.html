@@ -67,6 +67,44 @@
     100% { box-shadow: 0 0 4px rgba(0,255,65,0.10); border-color: rgba(0,255,65,0.25); }
   }
 
+  /* STATUS BAR — responsive */
+  .header-status-row {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    width: 100%;
+    gap: 8px;
+  }
+  .header-status-center {
+    font-size: 10px;
+    color: var(--text-dim);
+    text-align: center;
+    white-space: nowrap;
+  }
+  .header-status-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+  @media (max-width: 520px) {
+    .header-status-row {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .header-status-center {
+      white-space: normal;
+      text-align: center;
+      font-size: 9px;
+      letter-spacing: 0.5px;
+    }
+    .header-status-right {
+      justify-content: center;
+    }
+  }
+
   @keyframes flicker {
     0% { opacity: 0.97; }
     50% { opacity: 1; }
@@ -354,7 +392,7 @@
    DISS0LINKZ AUTH GATE v3.0 -- TERMINAL PORTAL
    IRONWIRE | Claude Code | Node 002 | DISSOVERSE LLC
    2026-04-09 -- FULL OVERHAUL
-   Password: 444 | PBKDF2-SHA256 | 200k iterations
+   Auth: PBKDF2-SHA256 | 200k iterations
    ================================================================ */
 
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=VT323&display=swap');
@@ -1245,18 +1283,18 @@ body.dv-glitching #diss0linkz-auth-gate {
           >
         </div>
         <div style="font-size:10px; color:var(--text-dim); letter-spacing:3px; margin-top:8px;">
-          SOVEREIGN DEEP LINK GENERATOR v1.0
+          LINK GENERATOR v.1.1.1
         </div>
       </div>
 
       <!-- STATUS BAR: 3-column — spacer | status centered | gear + exit portal -->
-      <div style="display:grid; grid-template-columns:1fr auto 1fr; align-items:center; width:100%; gap:8px;">
+      <div class="header-status-row">
 
         <!-- Left spacer (mirrors right buttons width for true centering) -->
-        <div></div>
+        <div class="header-status-spacer"></div>
 
         <!-- Center: status text -->
-        <div style="font-size:10px; color:var(--text-dim); text-align:center; white-space:nowrap;">
+        <div class="header-status-center">
           <span>STATUS: <span style="color:var(--neon);">■</span> ONLINE</span>
           <span style="margin:0 10px; opacity:0.4;">|</span>
           <span id="clock"></span>
@@ -1265,7 +1303,7 @@ body.dv-glitching #diss0linkz-auth-gate {
         </div>
 
         <!-- Right: gear + EXIT PORTAL -->
-        <div style="display:flex; align-items:center; justify-content:flex-end; gap:8px;">
+        <div class="header-status-right">
           <button id="gear-btn" onclick="openSettings()" title="NODE CONTROL PANEL"
             style="background:transparent; border:1px solid var(--border-mid); color:var(--text-dim);
             font-family:'Share Tech Mono',monospace; font-size:18px; width:36px; height:36px;
@@ -2454,7 +2492,6 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
    DISS0LINKZ AUTH GATE v3.0
    IRONWIRE | Claude Code | Node 002 | DISSOVERSE LLC
    PBKDF2-SHA256 | 200,000 iterations
-   Hash: 871b590d0eb2de04c0f25f7e0d69f3986b8a7e21303d909ddade2a00e1fb46a4
    ================================================================ */
 (function() {
   'use strict';
