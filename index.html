@@ -4138,10 +4138,7 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
     }
 
     document.body.classList.add('dv-gate-active');
-    // Play terminal open sound when terminal slit appears (at 4s delay)
-    setTimeout(function() {
-      if (window.dvAudio) dvAudio.terminalOpen();
-    }, 4000);
+    // Terminal open sound removed — only glitch SFX plays during load
     // Wait for typewriter (3.2s) + fade (0.8s) + terminal open (1.8s) then boot text
     setTimeout(function() {
       runBootSequence();
