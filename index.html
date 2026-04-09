@@ -833,6 +833,23 @@ body.dv-glitching #diss0linkz-auth-gate {
   transition: all 0.2s;
 }
 #dv-music-btn:hover { border-color: var(--neon); color: var(--neon); }
+/* ── SONIC_PHANTOM // AMBIENT HUM BUTTON ────────────────── */
+#dv-ambient-btn {
+  position: fixed;
+  bottom: 40px;
+  right: 14px;
+  z-index: 150;
+  background: rgba(0,4,0,0.85);
+  border: 1px solid rgba(var(--neon-rgb),0.25);
+  color: rgba(var(--neon-rgb),0.55);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  padding: 5px 9px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+#dv-ambient-btn:hover { border-color: var(--neon); color: var(--neon); }
 /* ── INPUT HIDDEN UNTIL BOOT DONE ───────────────────────── */
 #dv-input-row {
   opacity: 0;
@@ -1417,6 +1434,9 @@ body.dv-glitching #diss0linkz-auth-gate {
 <!-- MUSIC TOGGLE -->
 <button id="dv-music-btn" onclick="dvToggleMusic()">&#9834; MUTE</button>
 
+<!-- SONIC_PHANTOM // AMBIENT HUM TOGGLE -->
+<button id="dv-ambient-btn" onclick="if(window.dvAudio) dvAudio.toggleHum();">&#11041; AMBIENT // OFF</button>
+
 <!-- FLASH OVERLAY -->
 <div id="dv-granted-flash"></div>
 
@@ -1562,6 +1582,11 @@ body.dv-glitching #diss0linkz-auth-gate {
       <div class="ncp-stat-row" style="margin-top:8px;"><span>MATRIX LAYER</span><span style="color:var(--neon);">ACTIVE // 7% OPACITY</span></div>
       <div class="ncp-stat-row" style="margin-top:8px;"><span>ENCRYPTION</span><span style="color:var(--neon);">AES-256 // ZERO-LOG</span></div>
       <div class="ncp-stat-row" style="margin-top:8px;"><span>VERITAS ENGINE</span><span style="color:var(--neon);">GUARDING</span></div>
+      <!-- SONIC_PHANTOM // AMBIENT HUM CONTROL IN SYSTEM PANEL -->
+      <div class="ncp-stat-row" style="margin-top:12px; border-top:1px solid var(--border-dim); padding-top:10px;">
+        <span>AUDIO HUM</span>
+        <button id="dv-ambient-panel-btn" onclick="if(window.dvAudio){ dvAudio.toggleHum(); var s=dvAudio.isHumOn(); this.textContent=s?'\u2B21 AMBIENT // ON':'\u2B21 AMBIENT // OFF'; var fb=document.getElementById('dv-ambient-btn'); if(fb) fb.textContent=s?'\u2B21 AMBIENT // ON':'\u2B21 AMBIENT // OFF'; }" style="background:transparent; border:1px solid var(--border-dim); color:var(--text-dim); font-family:'Share Tech Mono',monospace; font-size:9px; letter-spacing:1px; padding:3px 8px; cursor:pointer; transition:all 0.2s;">&#11041; AMBIENT // OFF</button>
+      </div>
     </div>
     <!-- Tab: THEME -->
     <div id="ncp-panel-theme" class="p-5" style="display:none; min-height:220px;">
@@ -5149,6 +5174,382 @@ setTimeout(dvEntropyStage2, 10 * 60 * 1000);
 setTimeout(dvEntropyStage3, 20 * 60 * 1000);
 /* END DYNAMIC ENTROPY // RAIN_DANCER x REACTIVE_SOUL */
 
+</script>
+
+<!-- SONIC_PHANTOM // WEB AUDIO MODULE -->
+<script>
+/* ================================================================
+   SONIC_PHANTOM // WEB AUDIO UI SOUNDS
+   DISSOVERSE DissOLinK — Pure Web Audio API synthesis
+   No external files. No CDN audio. Zero dependencies.
+   ================================================================ */
+var dvAudio = (function() {
+  'use strict';
+
+  /* Guard: browser must support AudioContext */
+  if (!window.AudioContext && !window.webkitAudioContext) {
+    return { click: function(){}, confirm: function(){}, error: function(){},
+             boot: function(){}, startHum: function(){}, stopHum: function(){},
+             toggleHum: function(){}, isHumOn: function(){ return false; } };
+  }
+
+  var _ctx        = null;
+  var _humNode    = null;   /* OscillatorNode for ambient hum */
+  var _humGain    = null;   /* GainNode for ambient hum */
+  var _humActive  = false;
+  var _bootQueued = false;  /* boot tones queued, plays on first interaction */
+
+  /* ── LAZY CONTEXT INIT ─────────────────────────────────────── */
+  function _getCtx() {
+    if (!_ctx) {
+      try {
+        _ctx = new (window.AudioContext || window.webkitAudioContext)();
+      } catch(e) { return null; }
+    }
+    /* Resume if suspended (browser autoplay policy) */
+    if (_ctx.state === 'suspended') {
+      try { _ctx.resume(); } catch(e) {}
+    }
+    return _ctx;
+  }
+
+  /* ── MARK READY ON FIRST USER INTERACTION ──────────────────── */
+  var _dvAudioReady = false;
+  function _onFirstInteraction() {
+    if (_dvAudioReady) return;
+    _dvAudioReady = true;
+    _getCtx(); /* warm up context */
+    /* Play queued boot sequence if it was deferred */
+    if (_bootQueued) {
+      _bootQueued = false;
+      setTimeout(function() { _playBoot(); }, 50);
+    }
+    document.removeEventListener('click',   _onFirstInteraction, true);
+    document.removeEventListener('keydown', _onFirstInteraction, true);
+  }
+  document.addEventListener('click',   _onFirstInteraction, true);
+  document.addEventListener('keydown', _onFirstInteraction, true);
+
+  /* ── 1. MECHANICAL CLICK ────────────────────────────────────── */
+  /* Square oscillator, 800->200Hz sweep over 25ms, gain 0.08 */
+  function click() {
+    try {
+      var ctx = _getCtx();
+      if (!ctx) return;
+      var now  = ctx.currentTime;
+      var osc  = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(800, now);
+      osc.frequency.linearRampToValueAtTime(200, now + 0.025);
+      gain.gain.setValueAtTime(0.08, now);
+      gain.gain.linearRampToValueAtTime(0.0, now + 0.025);
+      osc.start(now);
+      osc.stop(now + 0.030);
+    } catch(e) {}
+  }
+
+  /* ── 2. SOFT CONFIRM TONE ───────────────────────────────────── */
+  /* Sine 440Hz, 80ms, soft attack+release, gain 0.05 */
+  function confirm() {
+    try {
+      var ctx = _getCtx();
+      if (!ctx) return;
+      var now  = ctx.currentTime;
+      var osc  = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(440, now);
+      gain.gain.setValueAtTime(0.0,  now);
+      gain.gain.linearRampToValueAtTime(0.05, now + 0.015);
+      gain.gain.setValueAtTime(0.05, now + 0.060);
+      gain.gain.linearRampToValueAtTime(0.0,  now + 0.080);
+      osc.start(now);
+      osc.stop(now + 0.090);
+    } catch(e) {}
+  }
+
+  /* ── 3. ERROR BUZZ ──────────────────────────────────────────── */
+  /* Sawtooth 120Hz, 150ms, slight reverb tail via delay, gain 0.06 */
+  function error() {
+    try {
+      var ctx  = _getCtx();
+      if (!ctx) return;
+      var now  = ctx.currentTime;
+      var osc  = ctx.createOscillator();
+      var gain = ctx.createGain();
+      /* Lightweight reverb tail: short feedback delay */
+      var delay  = ctx.createDelay(0.5);
+      var fbGain = ctx.createGain();
+      delay.delayTime.setValueAtTime(0.06, now);
+      fbGain.gain.setValueAtTime(0.18, now);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      gain.connect(delay);
+      delay.connect(fbGain);
+      fbGain.connect(delay);
+      fbGain.connect(ctx.destination);
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(120, now);
+      gain.gain.setValueAtTime(0.06, now);
+      gain.gain.linearRampToValueAtTime(0.0, now + 0.150);
+      osc.start(now);
+      osc.stop(now + 0.160);
+    } catch(e) {}
+  }
+
+  /* ── 4. BOOT SEQUENCE TONES ─────────────────────────────────── */
+  /* 3-note ascending: 220->330->440Hz, each 100ms, 50ms gap, sine, gain 0.04 */
+  function _playBoot() {
+    try {
+      var ctx   = _getCtx();
+      if (!ctx) return;
+      var freqs = [220, 330, 440];
+      freqs.forEach(function(freq, i) {
+        var startOffset = i * 0.150; /* 100ms note + 50ms gap */
+        var t    = ctx.currentTime + startOffset;
+        var osc  = ctx.createOscillator();
+        var gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, t);
+        gain.gain.setValueAtTime(0.0,  t);
+        gain.gain.linearRampToValueAtTime(0.04, t + 0.010);
+        gain.gain.setValueAtTime(0.04, t + 0.080);
+        gain.gain.linearRampToValueAtTime(0.0,  t + 0.100);
+        osc.start(t);
+        osc.stop(t + 0.110);
+      });
+    } catch(e) {}
+  }
+
+  function boot() {
+    if (_dvAudioReady) {
+      setTimeout(function() { _playBoot(); }, 0);
+    } else {
+      /* Defer until first user interaction (AudioContext requires gesture) */
+      _bootQueued = true;
+    }
+  }
+
+  /* ── 5. AMBIENT LOW HUM ─────────────────────────────────────── */
+  /* Sub-bass drone: 40Hz, gain 0.02, continuous */
+  function startHum() {
+    try {
+      var ctx = _getCtx();
+      if (!ctx || _humActive) return;
+      _humNode = ctx.createOscillator();
+      _humGain = ctx.createGain();
+      _humNode.connect(_humGain);
+      _humGain.connect(ctx.destination);
+      _humNode.type = 'sine';
+      _humNode.frequency.setValueAtTime(40, ctx.currentTime);
+      _humGain.gain.setValueAtTime(0.0, ctx.currentTime);
+      _humGain.gain.linearRampToValueAtTime(0.02, ctx.currentTime + 0.5);
+      _humNode.start();
+      _humActive = true;
+    } catch(e) {}
+  }
+
+  function stopHum() {
+    try {
+      if (!_humActive || !_humNode || !_humGain || !_ctx) return;
+      var ctx  = _ctx;
+      var node = _humNode;
+      _humGain.gain.setValueAtTime(_humGain.gain.value, ctx.currentTime);
+      _humGain.gain.linearRampToValueAtTime(0.0, ctx.currentTime + 0.5);
+      setTimeout(function() { try { node.stop(); } catch(e) {} }, 600);
+      _humNode   = null;
+      _humGain   = null;
+      _humActive = false;
+    } catch(e) {}
+  }
+
+  function toggleHum() {
+    if (_humActive) {
+      stopHum();
+    } else {
+      startHum();
+    }
+    /* Update ambient button label */
+    var btn = document.getElementById('dv-ambient-btn');
+    if (btn) btn.textContent = _humActive ? '\u2B21 AMBIENT // ON' : '\u2B21 AMBIENT // OFF';
+    return _humActive;
+  }
+
+  /* ── BOOT TONES: fire on DOMContentLoaded (500ms delay) ──────── */
+  document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() { boot(); }, 500);
+  });
+
+  /* ── HOOK: MECHANICAL CLICK on all buttons ──────────────────── */
+  document.addEventListener('click', function(e) {
+    var el    = e.target;
+    var depth = 0;
+    while (el && depth < 4) {
+      if (el.tagName === 'BUTTON' ||
+          (el.hasAttribute && el.hasAttribute('onclick')) ||
+          (el.id && (el.id === 'f1-copy-link-btn' || el.id === 'dv-ambient-btn'))) {
+        click();
+        break;
+      }
+      el = el.parentElement;
+      depth++;
+    }
+  }, true); /* capture phase — fires before onclick handlers */
+
+  /* ── HOOK: SOFT CONFIRM on f1CopyOutputLink ([COPIED] flash) ─── */
+  (function() {
+    function patchF1() {
+      if (typeof window.f1CopyOutputLink === 'function') {
+        var _orig = window.f1CopyOutputLink;
+        window.f1CopyOutputLink = function(btn) {
+          _orig.call(this, btn);
+          confirm();
+        };
+      } else { setTimeout(patchF1, 200); }
+    }
+    patchF1();
+  })();
+
+  /* ── HOOK: SOFT CONFIRM on copyLink (COPY LINK ARMED button) ─── */
+  (function() {
+    function patchCopyLink() {
+      if (typeof window.copyLink === 'function') {
+        var _orig = window.copyLink;
+        window.copyLink = function() {
+          _orig.apply(this, arguments);
+          confirm();
+        };
+      } else { setTimeout(patchCopyLink, 200); }
+    }
+    patchCopyLink();
+  })();
+
+  /* ── HOOK: SOFT CONFIRM on dvCopyLink (active links dashboard) ── */
+  (function() {
+    function patchDvCopyLink() {
+      if (typeof window.dvCopyLink === 'function') {
+        var _orig = window.dvCopyLink;
+        window.dvCopyLink = function(url, btn) {
+          _orig.call(this, url, btn);
+          confirm();
+        };
+      } else { setTimeout(patchDvCopyLink, 200); }
+    }
+    patchDvCopyLink();
+  })();
+
+  /* ── HOOK: SOFT CONFIRM on deployLive success ───────────────── */
+  (function() {
+    function patchDeployLive() {
+      if (typeof window.deployLive === 'function') {
+        var _orig = window.deployLive;
+        window.deployLive = async function() {
+          var result = await _orig.apply(this, arguments);
+          confirm();
+          return result;
+        };
+      } else { setTimeout(patchDeployLive, 200); }
+    }
+    patchDeployLive();
+  })();
+
+  /* ── HOOK: CONFIRM/ERROR on vaultSignIn ─────────────────────── */
+  (function() {
+    function patchVaultSignIn() {
+      if (typeof window.vaultSignIn === 'function') {
+        var _orig = window.vaultSignIn;
+        window.vaultSignIn = async function() {
+          await _orig.apply(this, arguments);
+          /* Inspect vault status text after authentication attempt */
+          var statusEl = document.querySelector('.vault-status, #vault-signin-status, #vault-status, [id$="-status"]');
+          if (statusEl) {
+            var txt = (statusEl.textContent || '').toUpperCase();
+            if (txt.indexOf('ACCESS GRANTED') !== -1 || txt.indexOf('WELCOME') !== -1) {
+              confirm();
+            } else if (txt.indexOf('DENIED') !== -1 || txt.indexOf('INVALID') !== -1 ||
+                       txt.indexOf('NOT FOUND') !== -1 || txt.indexOf('ERROR') !== -1) {
+              error();
+            }
+          }
+        };
+      } else { setTimeout(patchVaultSignIn, 200); }
+    }
+    patchVaultSignIn();
+  })();
+
+  /* ── HOOK: ERROR BUZZ on showErrorPopup ─────────────────────── */
+  (function() {
+    function patchShowErrorPopup() {
+      if (typeof window.showErrorPopup === 'function') {
+        var _orig = window.showErrorPopup;
+        window.showErrorPopup = function(code, title, msg, cb) {
+          error();
+          return _orig.call(this, code, title, msg, cb);
+        };
+      } else { setTimeout(patchShowErrorPopup, 200); }
+    }
+    patchShowErrorPopup();
+  })();
+
+  /* ── HOOK: ERROR BUZZ on health monitor DEAD result ─────────── */
+  (function() {
+    var _deadObs = new MutationObserver(function(mutations) {
+      mutations.forEach(function(m) {
+        /* Watch for DEAD text injected into health label elements */
+        if (m.addedNodes && m.addedNodes.forEach) {
+          m.addedNodes.forEach(function(node) {
+            if (node.nodeType === 1) {
+              var labels = node.querySelectorAll ? node.querySelectorAll('[class*="health"], [class*="status"]') : [];
+              labels.forEach(function(lbl) {
+                if ((lbl.textContent || '').toUpperCase().indexOf('DEAD') !== -1) { error(); }
+              });
+              if ((node.textContent || '').toUpperCase().indexOf('DEAD') !== -1 &&
+                  node.className && (String(node.className).indexOf('health') !== -1 ||
+                                     String(node.className).indexOf('status') !== -1)) {
+                error();
+              }
+            }
+          });
+        }
+        /* Watch attribute changes on health indicator dots */
+        if (m.type === 'attributes' && m.attributeName === 'title') {
+          if (m.target && m.target.title &&
+              m.target.title.toUpperCase().indexOf('DEAD') !== -1) { error(); }
+        }
+      });
+    });
+    document.addEventListener('DOMContentLoaded', function() {
+      var container = document.getElementById('active-links-list') ||
+                      document.getElementById('dv-links-list') ||
+                      document.body;
+      _deadObs.observe(container, {
+        childList: true, subtree: true,
+        attributes: true, attributeFilter: ['title']
+      });
+    });
+  })();
+
+  /* ── EXPOSE PUBLIC API ──────────────────────────────────────── */
+  return {
+    click:     click,
+    confirm:   confirm,
+    error:     error,
+    boot:      boot,
+    startHum:  startHum,
+    stopHum:   stopHum,
+    toggleHum: toggleHum,
+    isHumOn:   function() { return _humActive; }
+  };
+
+})();
+/* END SONIC_PHANTOM // WEB AUDIO MODULE */
 </script>
 </body>
 </html>
