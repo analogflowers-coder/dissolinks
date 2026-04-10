@@ -1842,24 +1842,61 @@ body.dv-glitching #diss0linkz-auth-gate {
 
     <div class="dv-separator">&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</div>
 
-    <div id="dv-input-row">
-      <span class="dv-prompt">&gt;</span>
-      <input
-        type="password"
-        id="dv-passphrase-input"
-        autocomplete="off"
-        autocorrect="off"
-        autocapitalize="off"
-        spellcheck="false"
-        placeholder="&#95;&#95;&#95;&#95;&#95;&#95;&#95;&#95;"
-        aria-label="Access code"
-        maxlength="32"
-      />
-      <button id="dv-submit-btn" onclick="dvSubmitPassphrase()">ENTER</button>
-    </div>
+    <!-- ACCOUNT LOGIN FORM — merged auth gate -->
+    <div id="dv-auth-form" style="opacity:0; transform:translateY(10px); transition:opacity 0.5s ease, transform 0.5s ease; pointer-events:none;">
 
-    <div id="dv-status-line">&gt; ATTEMPT 1 OF 5.</div>
-    <div id="dv-lockout-timer"></div>
+      <div class="vault-tab-row" style="margin-bottom:14px;">
+        <button class="vault-tab active" id="dv-tab-signin" onclick="dvShowAuthTab('signin')">&#9658; OPERATOR ACCESS</button>
+        <button class="vault-tab" id="dv-tab-create" onclick="dvShowAuthTab('create')">&#9658; REQUEST CLEARANCE</button>
+      </div>
+
+      <!-- SIGN IN PANEL -->
+      <div id="dv-panel-signin">
+        <div style="text-align:center; margin-bottom:12px;">
+          <img src="https://cdn.shopify.com/s/files/1/0897/5686/0735/files/GREEN_Account_Login-Icon..png?v=1775772105" alt="OPERATIVE" style="width:36px; height:36px; opacity:0.8; filter:var(--dv-icon-filter, none);" draggable="false">
+        </div>
+        <div class="vault-field">
+          <label class="vault-label" for="dv-signin-user">&#62; OPERATIVE ID</label>
+          <input type="text" id="dv-signin-user" class="vault-input" placeholder="ENTER OPERATIVE ID"
+            autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" maxlength="30">
+        </div>
+        <div class="vault-field">
+          <label class="vault-label" for="dv-signin-pass">&#62; CLEARANCE CODE</label>
+          <input type="password" id="dv-signin-pass" class="vault-input" placeholder="CLEARANCE CODE // MIN 12 CHARS"
+            autocomplete="off" spellcheck="false" minlength="12">
+        </div>
+        <button class="vault-btn-primary" id="dv-signin-btn" onclick="dvAccountSignIn()">&#9654; AUTHENTICATE</button>
+      </div>
+
+      <!-- CREATE ACCOUNT PANEL -->
+      <div id="dv-panel-create" style="display:none;">
+        <div style="text-align:center; margin-bottom:12px;">
+          <img src="https://cdn.shopify.com/s/files/1/0897/5686/0735/files/GREEN_Account_Login-Icon..png?v=1775772105" alt="OPERATIVE" style="width:36px; height:36px; opacity:0.8; filter:var(--dv-icon-filter, none);" draggable="false">
+        </div>
+        <div class="vault-field">
+          <label class="vault-label" for="dv-create-user">&#62; OPERATIVE ID</label>
+          <input type="text" id="dv-create-user" class="vault-input" placeholder="ENTER OPERATIVE ID"
+            autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" maxlength="30">
+          <div style="font-size:9px; color:rgba(0,255,65,0.35); margin-top:4px; letter-spacing:1.5px;">
+            LETTERS, NUMBERS, HYPHENS, UNDERSCORES ONLY
+          </div>
+        </div>
+        <div class="vault-field">
+          <label class="vault-label" for="dv-create-pass">&#62; ESTABLISH CLEARANCE CODE</label>
+          <input type="password" id="dv-create-pass" class="vault-input" placeholder="ESTABLISH CODE // MIN 12 CHARS"
+            autocomplete="off" spellcheck="false" minlength="12">
+        </div>
+        <div class="vault-field">
+          <label class="vault-label" for="dv-create-pass2">&#62; CONFIRM CLEARANCE CODE</label>
+          <input type="password" id="dv-create-pass2" class="vault-input" placeholder="REPEAT CLEARANCE CODE"
+            autocomplete="off" spellcheck="false" minlength="12">
+        </div>
+        <button class="vault-btn-primary" id="dv-create-btn" onclick="dvAccountCreate()">&#9654; SUBMIT FOR CLEARANCE</button>
+      </div>
+
+      <div class="vault-status" id="dv-auth-status"></div>
+    </div>
+    <!-- END ACCOUNT LOGIN FORM -->
 
     <canvas id="dv-visualizer"></canvas>
   </div>
@@ -1867,75 +1904,7 @@ body.dv-glitching #diss0linkz-auth-gate {
   <div class="dv-veritas-badge">PROTECTED BY VERITAS_ENGINE // DISSOVERSE NEURAL NETWORK</div>
 </div>
 
-<!-- ================================================================
-     VAULT ACCOUNT GATE | IRONWIRE | DISSOVERSE LLC
-     Appears after master passphrase passes, before app unlocks.
-     ================================================================ -->
-<div id="vault-account-gate">
-  <div class="vault-terminal-wrap">
-    <span class="dv-corner tl">[+]</span>
-    <span class="dv-corner tr">[+]</span>
-    <span class="dv-corner bl">[+]</span>
-    <span class="dv-corner br">[+]</span>
-
-    <div class="vault-title">VAULT // OPERATOR REGISTRY</div>
-    <div class="vault-subtitle">// DISSOVERSE NODE AUTHENTICATION //</div>
-
-    <div class="vault-tab-row">
-      <button class="vault-tab active" id="vault-tab-signin" onclick="vaultShowTab('signin')">&#9658; OPERATOR ACCESS</button>
-      <button class="vault-tab" id="vault-tab-create" onclick="vaultShowTab('create')">&#9658; REQUEST CLEARANCE</button>
-    </div>
-
-    <!-- SIGN IN PANEL -->
-    <div id="vault-panel-signin">
-      <div style="text-align:center; margin-bottom:12px;">
-        <img src="https://cdn.shopify.com/s/files/1/0897/5686/0735/files/GREEN_Account_Login-Icon..png?v=1775772105" alt="OPERATIVE" style="width:36px; height:36px; opacity:0.8; filter:var(--dv-icon-filter, none);" draggable="false">
-      </div>
-      <div class="vault-field">
-        <label class="vault-label" for="vault-signin-user">&#62; OPERATIVE ID</label>
-        <input type="text" id="vault-signin-user" class="vault-input" placeholder="ENTER OPERATIVE ID"
-          autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" maxlength="30">
-      </div>
-      <div class="vault-field">
-        <label class="vault-label" for="vault-signin-pass">&#62; CLEARANCE CODE</label>
-        <input type="password" id="vault-signin-pass" class="vault-input" placeholder="CLEARANCE CODE // MIN 12 CHARS"
-          autocomplete="off" spellcheck="false" minlength="12">
-      </div>
-      <button class="vault-btn-primary" id="vault-signin-btn" onclick="vaultSignIn()">&#9654; AUTHENTICATE</button>
-    </div>
-
-    <!-- CREATE ACCOUNT PANEL -->
-    <div id="vault-panel-create" style="display:none;">
-      <div style="text-align:center; margin-bottom:12px;">
-        <img src="https://cdn.shopify.com/s/files/1/0897/5686/0735/files/GREEN_Account_Login-Icon..png?v=1775772105" alt="OPERATIVE" style="width:36px; height:36px; opacity:0.8; filter:var(--dv-icon-filter, none);" draggable="false">
-      </div>
-      <div class="vault-field">
-        <label class="vault-label" for="vault-create-user">&#62; OPERATIVE ID</label>
-        <input type="text" id="vault-create-user" class="vault-input" placeholder="ENTER OPERATIVE ID"
-          autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" maxlength="30">
-        <div style="font-size:9px; color:rgba(0,255,65,0.35); margin-top:4px; letter-spacing:1.5px;">
-          LETTERS, NUMBERS, HYPHENS, UNDERSCORES ONLY
-        </div>
-      </div>
-      <div class="vault-field">
-        <label class="vault-label" for="vault-create-pass">&#62; ESTABLISH CLEARANCE CODE</label>
-        <input type="password" id="vault-create-pass" class="vault-input" placeholder="ESTABLISH CODE // MIN 12 CHARS"
-          autocomplete="off" spellcheck="false" minlength="12">
-      </div>
-      <div class="vault-field">
-        <label class="vault-label" for="vault-create-pass2">&#62; CONFIRM CLEARANCE CODE</label>
-        <input type="password" id="vault-create-pass2" class="vault-input" placeholder="REPEAT CLEARANCE CODE"
-          autocomplete="off" spellcheck="false" minlength="12">
-      </div>
-      <button class="vault-btn-primary" id="vault-create-btn" onclick="vaultCreateAccount()">&#9654; SUBMIT FOR CLEARANCE</button>
-    </div>
-
-    <div class="vault-status" id="vault-status-line"></div>
-    <div style="margin-top:14px; font-size:9px; color:rgba(0,255,65,0.2); text-align:center; letter-spacing:1.5px;">
-      VAULT v1.0 // PBKDF2-SHA256 // 200K ITERATIONS // DISSOVERSE NEURAL NETWORK
-    </div>
-  </div>
-</div>
+<!-- VAULT ACCOUNT GATE REMOVED — merged into auth gate terminal -->
 
 
 <div id="diss0linkz-app">
@@ -2519,22 +2488,18 @@ function ncpRefreshStatus() {
   var cnt = document.querySelectorAll('.link-item').length;
   var cntEl = document.getElementById('ncp-link-count');
   if (cntEl) cntEl.textContent = cnt > 0 ? cnt + ' LINKS' : 'NONE LOADED';
-  // Last login from cookie
-  var cookies = document.cookie.split(';');
-  var authCookie = null;
-  for (var i = 0; i < cookies.length; i++) {
-    if (cookies[i].trim().indexOf('diss0linkz_auth=') === 0) {
-      authCookie = cookies[i].trim().split('=')[1]; break;
-    }
-  }
+  // Last login from sessionStorage
   var llEl = document.getElementById('ncp-last-login');
-  if (llEl && authCookie) {
-    var tsHex = authCookie.replace('d0lz_', '');
+  if (llEl) {
     try {
-      var ts = parseInt(tsHex, 36);
-      llEl.textContent = new Date(ts).toLocaleString();
+      var sess = JSON.parse(sessionStorage.getItem('dv_session') || 'null');
+      if (sess && sess.loginTime) {
+        llEl.textContent = new Date(sess.loginTime).toLocaleString();
+      } else {
+        llEl.textContent = 'THIS SESSION';
+      }
     } catch(e) { llEl.textContent = 'THIS SESSION'; }
-  } else if (llEl) { llEl.textContent = 'THIS SESSION'; }
+  }
 }
 
 function ncpTickUptime() {
@@ -2846,13 +2811,11 @@ function toggleDrawer(id) {
 function ncpPanic() {
   var fb = document.getElementById('ncp-panic-feedback');
   if (fb) fb.textContent = '⚠ WIPING SESSION...';
-  // VAULT: clear account session + UI
+  // Clear account session + UI
   if (window._vaultClearSession) window._vaultClearSession();
   if (window._vaultUpdateUI) window._vaultUpdateUI(null);
   try { sessionStorage.clear(); } catch(e) {}
-  try { localStorage.clear(); }  catch(e) {}
-  // Expire auth cookie
-  document.cookie = 'diss0linkz_auth=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Strict';
+  // Note: localStorage NOT cleared — accounts persist across sessions
   setTimeout(function() {
     if (fb) fb.textContent = '⚠ WIPED. RELOADING...';
     setTimeout(function() { window.location.reload(); }, 1200);
@@ -3594,18 +3557,11 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
 
   // ── CONFIG ─────────────────────────────────────────────────────
   var CFG = {
-    SALT: 'DISS0LINKZ_SALT_2026_v1',
-    HASH: '871b590d0eb2de04c0f25f7e0d69f3986b8a7e21303d909ddade2a00e1fb46a4',
     ITER: 200000,
-    MAX_ATTEMPTS: 5,
-    LOCKOUT_SECS: 60,
-    COOKIE_NAME: 'diss0linkz_auth',
-    COOKIE_PREFIX: 'd0lz_'
+    STORAGE_KEY: 'dv_accounts',
+    SESSION_KEY: 'dv_session'
   };
 
-  var attempts = 0;
-  var locked = false;
-  var lockTimer = null;
   var audioCtx = null;
   var musicStarted = false;
   var musicMuted = false;
@@ -3613,13 +3569,10 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
 
   // ── BOOT SEQUENCE ───────────────────────────────────────────────
   var BOOT_LINES = [
-    { text: '> DISS0LINKZ NEURAL NETWORK v3.0', cls: 'dv-bright', delay: 0 },
-    { text: '> INITIALIZING SECURE CHANNEL...', cls: '', delay: 120 },
-    { text: '> ENCRYPTION: AES-256 [ACTIVE]', cls: '', delay: 240 },
-    { text: '> FIREWALL: [ARMED]', cls: '', delay: 360 },
-    { text: '> SCANNING PERIMETER... [CLEAR]', cls: '', delay: 480 },
-    { text: '> SIGNAL INTEGRITY: [VERIFIED]', cls: 'dv-bright', delay: 600 },
-    { text: '> ENTER ACCESS CODE:', cls: 'dv-bright', delay: 720 }
+    { text: '> DISSOVERSE NEURAL NETWORK v3.0', cls: 'dv-bright', delay: 0 },
+    { text: '> ESTABLISHING SECURE CHANNEL...', cls: '', delay: 120 },
+    { text: '> SIGNAL INTEGRITY: [VERIFIED]', cls: '', delay: 240 },
+    { text: '> OPERATOR AUTHENTICATION REQUIRED', cls: 'dv-bright', delay: 360 }
   ];
 
   // ── MATRIX RAIN ─────────────────────────────────────────────────
@@ -3808,27 +3761,42 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
     } catch(e) {}
   }
 
-  // ── COOKIE ──────────────────────────────────────────────────────
-  function setAuthCookie() {
-    var val = CFG.COOKIE_PREFIX + Date.now().toString(36);
-    var exp = new Date(Date.now() + 86400000).toUTCString();
-    document.cookie = CFG.COOKIE_NAME + '=' + val + '; expires=' + exp + '; path=/; SameSite=Strict; Secure';
+  // ── SESSION (sessionStorage — clears on tab close) ──────────────
+  function dvSetSession(username) {
+    sessionStorage.setItem(CFG.SESSION_KEY, JSON.stringify({ username: username, loginTime: Date.now() }));
   }
-  function checkAuthCookie() {
-    return document.cookie.split(';').some(function(c) {
-      return c.trim().startsWith(CFG.COOKIE_NAME + '=' + CFG.COOKIE_PREFIX);
-    });
+  function dvGetSession() {
+    try { return JSON.parse(sessionStorage.getItem(CFG.SESSION_KEY) || 'null'); } catch(e) { return null; }
+  }
+  function dvClearSession() { sessionStorage.removeItem(CFG.SESSION_KEY); }
+  function dvGetUsername() { var s = dvGetSession(); return s ? s.username : null; }
+  function dvCheckSession() { return !!dvGetSession(); }
+
+  // ── ACCOUNT STORAGE (localStorage) ─────────────────────────────
+  function dvReadAccounts() {
+    try {
+      var raw = localStorage.getItem(CFG.STORAGE_KEY);
+      if (!raw) return { accounts: [] };
+      return JSON.parse(raw);
+    } catch(e) { return { accounts: [] }; }
+  }
+  function dvWriteAccounts(data) {
+    localStorage.setItem(CFG.STORAGE_KEY, JSON.stringify(data));
   }
 
-  // ── PBKDF2 HASH ─────────────────────────────────────────────────
-  async function hashPassphrase(pw) {
+  // ── PBKDF2-SHA256 200k iterations ──────────────────────────────
+  async function dvPBKDF2(password, salt) {
     var enc = new TextEncoder();
-    var key = await crypto.subtle.importKey('raw', enc.encode(pw), 'PBKDF2', false, ['deriveBits']);
+    var key = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']);
     var bits = await crypto.subtle.deriveBits(
-      { name:'PBKDF2', salt:enc.encode(CFG.SALT), iterations:CFG.ITER, hash:'SHA-256' },
-      key, 256
+      { name: 'PBKDF2', salt: enc.encode(salt), iterations: CFG.ITER, hash: 'SHA-256' }, key, 256
     );
-    return Array.from(new Uint8Array(bits)).map(b => b.toString(16).padStart(2,'0')).join('');
+    return Array.from(new Uint8Array(bits)).map(function(b) { return b.toString(16).padStart(2,'0'); }).join('');
+  }
+  function dvGenSalt() {
+    var arr = new Uint8Array(16);
+    crypto.getRandomValues(arr);
+    return Array.from(arr).map(function(b) { return b.toString(16).padStart(2,'0'); }).join('');
   }
 
   // ── BOOT SEQUENCE ───────────────────────────────────────────────
@@ -3844,15 +3812,18 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
         typeWriter(span, line.text, 28, function() {
           if (line === BOOT_LINES[BOOT_LINES.length-1]) {
             bootDone = true;
-            var inputRow = document.getElementById('dv-input-row');
             var sep = document.querySelector('.dv-separator');
-            var statusEl = document.getElementById('dv-status-line');
             if (sep) sep.classList.add('dv-sep-visible');
-            if (statusEl) statusEl.classList.add('dv-status-visible');
+            // Reveal the account login form
             setTimeout(function() {
-              if (inputRow) inputRow.classList.add('dv-input-visible');
-              var input = document.getElementById('dv-passphrase-input');
-              if (input) input.focus();
+              var authForm = document.getElementById('dv-auth-form');
+              if (authForm) {
+                authForm.style.opacity = '1';
+                authForm.style.transform = 'none';
+                authForm.style.pointerEvents = 'auto';
+              }
+              var userInput = document.getElementById('dv-signin-user');
+              if (userInput) userInput.focus();
             }, 150);
           }
         });
@@ -3934,7 +3905,7 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
       if (stamp) stamp.classList.add('active');
     }, 500);
 
-    setAuthCookie();
+    // Session set by dvAccountSignIn/dvAccountCreate before calling accessGranted
 
     // 5. Transition to app at 2s -- Matrix stays as background layer
     setTimeout(function() {
@@ -3975,25 +3946,15 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
         // Show neural loading screen, THEN reveal app
         showNeuralLoadScreen(function() {
           document.body.classList.remove('dv-gate-active');
-          // VAULT: if account session exists skip vault gate
-          if (window._vaultGetUsername && window._vaultGetUsername()) {
-            if (app) app.classList.add('app-visible');
-            if (window._vaultUpdateUI) window._vaultUpdateUI(window._vaultGetUsername());
-          } else {
-            // Show vault account gate; app stays hidden until vault auth
-            var vaultGate = document.getElementById('vault-account-gate');
-            if (vaultGate) {
-              vaultGate.style.display = 'flex';
-              vaultGate.classList.add('vault-visible');
-            }
-          }
+          var username = dvGetUsername();
+          if (app) app.classList.add('app-visible');
+          dvUpdateUI(username);
         });
       }, 800);
     }, 2000);
   }
   // ── ACCESS DENIED ───────────────────────────────────────────
   function accessDenied() {
-    attempts++;
     playDeniedSound();
     triggerGlitch();
 
@@ -4014,25 +3975,6 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
 
     // Scramble + reform boot text (red)
     scrambleBootText();
-
-    var status    = document.getElementById('dv-status-line');
-    var input     = document.getElementById('dv-passphrase-input');
-    var remaining = CFG.MAX_ATTEMPTS - attempts;
-    if (input) input.value = '';
-
-    if (attempts >= CFG.MAX_ATTEMPTS) {
-      startLockout();
-    } else {
-      if (status) {
-        status.style.color = '#ff3333';
-        status.textContent = '> INVALID CREDENTIALS — RETRY. ' + remaining + ' ATTEMPT' + (remaining !== 1 ? 'S' : '') + ' LEFT.';
-        setTimeout(function() {
-          status.style.color = '';
-          status.textContent = '> ATTEMPT ' + (attempts + 1) + ' OF ' + CFG.MAX_ATTEMPTS + '.';
-        }, 2500);
-      }
-      if (input) input.focus();
-    }
   }
 
   function showScreenCrack() {
@@ -4080,104 +4022,151 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
     }, 80);
   }
 
-    // ── LOCKOUT ─────────────────────────────────────────────────────
-  function startLockout() {
-    locked = true;
-    document.getElementById('diss0linkz-auth-gate').classList.add('dv-lockout-mode');
-    var timer  = document.getElementById('dv-lockout-timer');
-    var status = document.getElementById('dv-status-line');
-    var input  = document.getElementById('dv-passphrase-input');
-    var btn    = document.getElementById('dv-submit-btn');
-    if (status) status.textContent = '> LOCKOUT INITIATED -- TOO MANY FAILED ATTEMPTS.';
-    if (input)  input.disabled = true;
-    if (btn)    btn.disabled = true;
-    var secs = CFG.LOCKOUT_SECS;
-    function tick() {
-      if (timer) timer.textContent = '> SYSTEM LOCKED -- ' + secs + 's REMAINING';
-      if (secs <= 0) {
-        locked = false; attempts = 0;
-        document.getElementById('diss0linkz-auth-gate').classList.remove('dv-lockout-mode');
-        if (timer)  timer.textContent = '';
-        if (status) status.textContent = '> ATTEMPT 1 OF ' + CFG.MAX_ATTEMPTS + '.';
-        if (input)  { input.disabled = false; input.focus(); }
-        if (btn)    btn.disabled = false;
-      } else {
-        secs--;
-        lockTimer = setTimeout(tick, 1000);
-      }
-    }
-    tick();
+  // ── AUTH TAB SWITCHER ─────────────────────────────────────────
+  window.dvShowAuthTab = function(tab) {
+    ['signin','create'].forEach(function(k) {
+      var panel = document.getElementById('dv-panel-' + k);
+      var btn   = document.getElementById('dv-tab-' + k);
+      if (panel) panel.style.display = (k === tab) ? 'block' : 'none';
+      if (btn)   btn.classList.toggle('active', k === tab);
+    });
+    var statusEl = document.getElementById('dv-auth-status');
+    if (statusEl) { statusEl.textContent = ''; statusEl.className = 'vault-status'; }
+  };
+
+  function dvSetAuthStatus(msg, type) {
+    var el = document.getElementById('dv-auth-status');
+    if (!el) return;
+    el.textContent = msg;
+    el.className = 'vault-status' + (type ? ' vault-' + type : '');
   }
 
-  // ── SUBMIT ──────────────────────────────────────────────────────
-  window.dvSubmitPassphrase = async function() {
-    if (locked) return;
-    var input = document.getElementById('dv-passphrase-input');
-    if (!input) return;
-    var pw = input.value.trim();
-    if (!pw) { input.focus(); return; }
+  function dvUpdateUI(username) {
+    var badge  = document.getElementById('vault-logged-in-badge');
+    var dispEl = document.getElementById('vault-username-display');
+    if (badge)  badge.classList.toggle('badge-active', !!username);
+    if (dispEl) dispEl.textContent = username || '\u2014';
+    loadActiveLinks();
+  }
 
-    // Music moved to UX open — not password screen
-
-    var btn = document.getElementById('dv-submit-btn');
-    if (btn) { btn.disabled = true; btn.textContent = '...'; }
-
+  // ── SIGN IN ─────────────────────────────────────────────────────
+  window.dvAccountSignIn = async function() {
+    var userInput = document.getElementById('dv-signin-user');
+    var passInput = document.getElementById('dv-signin-pass');
+    var btn       = document.getElementById('dv-signin-btn');
+    if (!userInput || !passInput) return;
+    var username = userInput.value.trim().toUpperCase();
+    var password = passInput.value;
+    if (!username || !password) { dvSetAuthStatus('> OPERATIVE ID AND CLEARANCE CODE REQUIRED.', 'err'); return; }
+    if (password.length < 12) { dvSetAuthStatus('> CLEARANCE CODE INSUFFICIENT. MINIMUM 12 CHARACTERS REQUIRED.', 'err'); return; }
+    btn.disabled = true;
+    dvSetAuthStatus('> AUTHENTICATING...', 'wait');
     try {
-      var hash = await hashPassphrase(pw);
-      if (hash === CFG.HASH) {
-        accessGranted();
-      } else {
-        if (btn) { btn.disabled = false; btn.textContent = 'ENTER'; }
-        accessDenied();
+      var reg = dvReadAccounts();
+      var accounts = reg.accounts || [];
+      var account = accounts.find(function(a) { return a.username === username; });
+      if (!account) {
+        dvSetAuthStatus('> OPERATOR NOT FOUND. CREATE AN ACCOUNT FIRST.', 'err');
+        btn.disabled = false; return;
       }
+      var hash = await dvPBKDF2(password, account.salt);
+      if (hash !== account.hash) {
+        dvSetAuthStatus('> AUTHENTICATION FAILED. CLEARANCE DENIED.', 'err');
+        accessDenied();
+        btn.disabled = false; return;
+      }
+      dvSetSession(username);
+      dvSetAuthStatus('> ACCESS GRANTED // OPERATIVE ' + username, 'ok');
+      passInput.value = '';
+      setTimeout(function() { accessGranted(); }, 600);
     } catch(e) {
-      if (btn) { btn.disabled = false; btn.textContent = 'ENTER'; }
-      console.error('Auth error:', e);
+      dvSetAuthStatus('> ERROR: ' + e.message, 'err');
+      btn.disabled = false;
+    }
+  };
+
+  // ── CREATE ACCOUNT ──────────────────────────────────────────────
+  window.dvAccountCreate = async function() {
+    var userInput  = document.getElementById('dv-create-user');
+    var passInput  = document.getElementById('dv-create-pass');
+    var pass2Input = document.getElementById('dv-create-pass2');
+    var btn        = document.getElementById('dv-create-btn');
+    if (!userInput || !passInput || !pass2Input) return;
+    var username = userInput.value.trim().toUpperCase().replace(/[^A-Z0-9_\-]/g, '');
+    var password = passInput.value;
+    var pass2    = pass2Input.value;
+    if (!username) { dvSetAuthStatus('> OPERATIVE ID REQUIRED.', 'err'); return; }
+    if (!password) { dvSetAuthStatus('> CLEARANCE CODE REQUIRED.', 'err'); return; }
+    if (password.length < 12) { dvSetAuthStatus('> CLEARANCE CODE INSUFFICIENT. MINIMUM 12 CHARACTERS REQUIRED.', 'err'); return; }
+    if (password !== pass2) { dvSetAuthStatus('> CLEARANCE CODE MISMATCH. TRANSMISSION ABORTED.', 'err'); return; }
+    btn.disabled = true;
+    dvSetAuthStatus('> HASHING CREDENTIALS...', 'wait');
+    try {
+      var reg = dvReadAccounts();
+      var accounts = reg.accounts || [];
+      if (accounts.find(function(a) { return a.username === username; })) {
+        dvSetAuthStatus('> OPERATIVE ID ALREADY REGISTERED.', 'err');
+        btn.disabled = false; return;
+      }
+      var salt = dvGenSalt();
+      var hash = await dvPBKDF2(password, salt);
+      accounts.push({
+        username: username, hash: hash, salt: salt,
+        created: new Date().toISOString()
+      });
+      dvWriteAccounts({ accounts: accounts });
+      dvSetSession(username);
+      dvSetAuthStatus('> CLEARANCE GRANTED. OPERATIVE ' + username + ' — STATUS: ACTIVE.', 'ok');
+      passInput.value = ''; pass2Input.value = '';
+      setTimeout(function() { accessGranted(); }, 600);
+    } catch(e) {
+      dvSetAuthStatus('> ERROR: ' + e.message, 'err');
+      btn.disabled = false;
     }
   };
 
   // ── INIT ────────────────────────────────────────────────────────
   document.addEventListener('DOMContentLoaded', function() {
-    // Check existing session
-    if (checkAuthCookie()) {
+    // Check existing sessionStorage session (replaces cookie check)
+    if (dvCheckSession()) {
       var gate = document.getElementById('diss0linkz-auth-gate');
       var app  = document.getElementById('diss0linkz-app');
-      var matrix = document.getElementById('dv-matrix-canvas');
       var flash  = document.getElementById('dv-granted-flash');
       if (gate)   gate.style.display = 'none';
-      if (matrix) matrix.style.display = 'none';
       if (flash)  flash.style.display = 'none';
       document.body.classList.remove('dv-gate-active');
       if (app) app.classList.add('app-visible');
       // Matrix persists behind app for returning users too
       var mtxR = document.getElementById('dv-matrix-canvas');
       if (mtxR) { mtxR.classList.add('dv-matrix-app-mode'); window.dvMatrixSpeed = 0.7; }
-      var inputRow = document.getElementById('dv-input-row');
-      if (inputRow) inputRow.classList.add('dv-input-visible');
       var initDiv = document.getElementById('dv-music-init');
       if (initDiv) initDiv.style.display = 'block';
+      dvUpdateUI(dvGetUsername());
       return;
     }
 
     document.body.classList.add('dv-gate-active');
-    // Terminal open sound removed — only glitch SFX plays during load
     // Wait for typewriter (3.2s) + fade (0.8s) + terminal open (1.8s) then boot text
     setTimeout(function() {
       runBootSequence();
       scheduleGlitch();
     }, 6000);
 
-    // Keyboard handler
-    var inputEl = document.getElementById('dv-passphrase-input');
-    if (inputEl) {
-      inputEl.addEventListener('keydown', function(e) {
-        if (!locked) {
-          // Music moved to UX open
-          playTypingSound();
-          if (e.key === 'Enter') dvSubmitPassphrase();
-        }
+    // Keyboard handlers for login form
+    setTimeout(function() {
+      var focusNext = function(nextId) { return function(e) { if (e.key === 'Enter') { var n = document.getElementById(nextId); if (n) n.focus(); } }; };
+      var ids = [
+        { id: 'dv-signin-user', handler: focusNext('dv-signin-pass') },
+        { id: 'dv-signin-pass', handler: function(e) { if (e.key === 'Enter') window.dvAccountSignIn(); } },
+        { id: 'dv-create-user', handler: focusNext('dv-create-pass') },
+        { id: 'dv-create-pass', handler: focusNext('dv-create-pass2') },
+        { id: 'dv-create-pass2', handler: function(e) { if (e.key === 'Enter') window.dvAccountCreate(); } }
+      ];
+      ids.forEach(function(item) {
+        var el = document.getElementById(item.id);
+        if (el) el.addEventListener('keydown', item.handler);
       });
-    }
+    }, 100);
   });
 
 
@@ -4692,239 +4681,48 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <script>
 /* ================================================================
-   VAULT — MULTI-USER ACCOUNT SYSTEM
-   IRONWIRE | Claude Code | DISSOVERSE LLC | 2026
-   PBKDF2-SHA256 | 200k iterations | GitHub API storage
-   accounts/registry.json — user registry
-   accounts/{USERNAME}/links.json — per-user link store
+   VAULT COMPAT SHIM — exposes legacy window globals
+   Auth is now handled in the main auth gate IIFE above.
+   This shim keeps downstream code (VAULT_CORE btn, panic, etc.) working.
    ================================================================ */
 (function() {
   'use strict';
 
-  var VAULT_REPO = 'analogflowers-coder/dissolinks';
-  var VAULT_API  = 'https://api.github.com/repos/' + VAULT_REPO + '/contents/';
-  var VAULT_REG  = 'accounts/registry.json';
-
-  /* ── SESSION (sessionStorage — clears on tab close) ─────────── */
-  function vaultGetSession() {
-    try { return JSON.parse(sessionStorage.getItem('vault_session') || 'null'); } catch(e) { return null; }
+  function _getSession() {
+    try { return JSON.parse(sessionStorage.getItem('dv_session') || 'null'); } catch(e) { return null; }
   }
-  function vaultSetSession(username) {
-    sessionStorage.setItem('vault_session', JSON.stringify({ username: username, ts: Date.now() }));
-  }
-  function vaultClearSession() { sessionStorage.removeItem('vault_session'); }
-  function vaultGetUsername() { var s = vaultGetSession(); return s ? s.username : null; }
-
-  /* ── PBKDF2-SHA256 200k iterations ──────────────────────────── */
-  async function vaultPBKDF2(password, salt) {
-    var enc = new TextEncoder();
-    var key = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']);
-    var bits = await crypto.subtle.deriveBits(
-      { name: 'PBKDF2', salt: enc.encode(salt), iterations: 200000, hash: 'SHA-256' }, key, 256
-    );
-    return Array.from(new Uint8Array(bits)).map(function(b) { return b.toString(16).padStart(2,'0'); }).join('');
-  }
-  function vaultGenSalt() {
-    var arr = new Uint8Array(16);
-    crypto.getRandomValues(arr);
-    return Array.from(arr).map(function(b) { return b.toString(16).padStart(2,'0'); }).join('');
-  }
-
-  /* ── GITHUB REGISTRY R/W ────────────────────────────────────── */
-  function vaultToken() { return sessionStorage.getItem('gh_pat') || ''; }
-
-  async function vaultReadRegistry() {
-    var resp = await fetch(VAULT_API + VAULT_REG, {
-      headers: { 'Authorization': 'Bearer ' + vaultToken(), 'Accept': 'application/vnd.github+json' }
-    });
-    if (resp.status === 404) return { data: { accounts: [] }, sha: null };
-    if (!resp.ok) throw new Error('Registry read failed: ' + resp.status);
-    var json = await resp.json();
-    var data = JSON.parse(atob(json.content.replace(/\n/g,'')));
-    return { data: data, sha: json.sha };
-  }
-
-  async function vaultWriteRegistry(data, sha) {
-    var body = {
-      message: 'vault: update account registry',
-      content: btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))))
-    };
-    if (sha) body.sha = sha;
-    var resp = await fetch(VAULT_API + VAULT_REG, {
-      method: 'PUT',
-      headers: {
-        'Authorization': 'Bearer ' + vaultToken(),
-        'Content-Type': 'application/json',
-        'Accept': 'application/vnd.github+json'
-      },
-      body: JSON.stringify(body)
-    });
-    if (resp.status !== 200 && resp.status !== 201) {
-      var err = await resp.json().catch(function() { return {}; });
-      throw new Error('Registry write failed: ' + resp.status + ' ' + (err.message || ''));
-    }
-  }
-
-  /* ── UI HELPERS ─────────────────────────────────────────────── */
-  window.vaultShowTab = function(tab) {
-    ['signin','create'].forEach(function(k) {
-      var panel = document.getElementById('vault-panel-' + k);
-      var btn   = document.getElementById('vault-tab-' + k);
-      if (panel) panel.style.display = (k === tab) ? 'block' : 'none';
-      if (btn)   btn.classList.toggle('active', k === tab);
-    });
-    vaultSetStatus('', '');
-  };
-
-  function vaultSetStatus(msg, type) {
-    var el = document.getElementById('vault-status-line');
-    if (!el) return;
-    el.textContent = msg;
-    el.className = 'vault-status' + (type ? ' vault-' + type : '');
-  }
-
-  function vaultUpdateUI(username) {
+  function _getUsername() { var s = _getSession(); return s ? s.username : null; }
+  function _clearSession() { sessionStorage.removeItem('dv_session'); }
+  function _updateUI(username) {
     var badge  = document.getElementById('vault-logged-in-badge');
     var dispEl = document.getElementById('vault-username-display');
-    var notice = document.getElementById('vault-locked-notice');
     if (badge)  badge.classList.toggle('badge-active', !!username);
     if (dispEl) dispEl.textContent = username || '\u2014';
-    if (notice) notice.style.display = 'none';
-    loadActiveLinks();
+    if (typeof loadActiveLinks === 'function') loadActiveLinks();
   }
 
-  /* ── SIGN IN ────────────────────────────────────────────────── */
-  window.vaultSignIn = async function() {
-    var userInput = document.getElementById('vault-signin-user');
-    var passInput = document.getElementById('vault-signin-pass');
-    var btn       = document.getElementById('vault-signin-btn');
-    if (!userInput || !passInput) return;
-    var username = userInput.value.trim().toUpperCase();
-    var password = passInput.value;
-    if (!username || !password) { vaultSetStatus('> OPERATIVE ID REQUIRED. CANNOT PROCESS NULL IDENTITY.', 'err'); return; }
-    // Token check removed — accounts work without PAT
-    btn.disabled = true;
-    vaultSetStatus('> AUTHENTICATING...', 'wait');
-    try {
-      var reg = await vaultReadRegistry();
-      var accounts = (reg.data && reg.data.accounts) ? reg.data.accounts : [];
-      var account = accounts.find(function(a) { return a.username === username; });
-      if (!account) {
-        vaultSetStatus('> OPERATOR NOT FOUND. CREATE AN ACCOUNT FIRST.', 'err');
-        btn.disabled = false; return;
-      }
-      var hash = await vaultPBKDF2(password, account.salt);
-      if (hash !== account.hash) {
-        vaultSetStatus('> AUTHENTICATION FAILED. CLEARANCE DENIED.', 'err');
-        btn.disabled = false; return;
-      }
-      vaultSetSession(username);
-      vaultSetStatus('> ACCESS GRANTED // OPERATIVE ' + username + ' — CLEARANCE CONFIRMED', 'ok');
-      passInput.value = '';
-      setTimeout(function() { vaultRevealApp(username); }, 900);
-    } catch(e) {
-      vaultSetStatus('> ERROR: ' + e.message, 'err');
-      btn.disabled = false;
-    }
-  };
-
-  /* ── CREATE ACCOUNT ─────────────────────────────────────────── */
-  window.vaultCreateAccount = async function() {
-    var userInput  = document.getElementById('vault-create-user');
-    var passInput  = document.getElementById('vault-create-pass');
-    var pass2Input = document.getElementById('vault-create-pass2');
-    var btn        = document.getElementById('vault-create-btn');
-    if (!userInput || !passInput || !pass2Input) return;
-    var username = userInput.value.trim().toUpperCase().replace(/[^A-Z0-9_\-]/g, '');
-    var password = passInput.value;
-    var pass2    = pass2Input.value;
-    if (!username) { vaultSetStatus('> OPERATIVE ID REQUIRED. CANNOT PROCESS NULL IDENTITY.', 'err'); return; }
-    if (!password) { vaultSetStatus('> CLEARANCE CODE REQUIRED. CANNOT PROCESS NULL IDENTITY.', 'err'); return; }
-    if (password !== pass2) { vaultSetStatus('> CLEARANCE CODE MISMATCH. TRANSMISSION ABORTED.', 'err'); return; }
-    // STEALTH-PACKET: Min 12 chars — hashes stored in public GitHub repo
-    if (password.length < 12) { vaultSetStatus('> CLEARANCE CODE INSUFFICIENT. MINIMUM 12 CHARACTERS REQUIRED.', 'err'); return; }
-    // Token check removed — account creation works without PAT
-    btn.disabled = true;
-    vaultSetStatus('> HASHING CREDENTIALS...', 'wait');
-    try {
-      var reg = await vaultReadRegistry();
-      var accounts = (reg.data && reg.data.accounts) ? reg.data.accounts : [];
-      if (accounts.find(function(a) { return a.username === username; })) {
-        vaultSetStatus('> OPERATIVE ID ALREADY REGISTERED.', 'err');
-        btn.disabled = false; return;
-      }
-      vaultSetStatus('> WRITING TO REGISTRY...', 'wait');
-      var salt = vaultGenSalt();
-      var hash = await vaultPBKDF2(password, salt);
-      accounts.push({
-        username: username, hash: hash, salt: salt,
-        created: new Date().toISOString(),
-        folder: 'accounts/' + username + '/'
-      });
-      await vaultWriteRegistry({ accounts: accounts }, reg.sha);
-      vaultSetSession(username);
-      vaultSetStatus('> CLEARANCE GRANTED. OPERATIVE ' + username + ' — OPERATIVE STATUS: ACTIVE.', 'ok');
-      passInput.value = ''; pass2Input.value = '';
-      setTimeout(function() { vaultRevealApp(username); }, 900);
-    } catch(e) {
-      vaultSetStatus('> ERROR: ' + e.message, 'err');
-      btn.disabled = false;
-    }
-  };
-
-  /* ── REVEAL APP POST-VAULT AUTH ─────────────────────────────── */
-  function vaultRevealApp(username) {
-    var gate = document.getElementById('vault-account-gate');
-    var app  = document.getElementById('diss0linkz-app');
-    if (gate) { gate.classList.remove('vault-visible'); gate.classList.add('vault-exit'); setTimeout(function() { gate.style.display = 'none'; }, 500); }
-    if (app)  app.classList.add('app-visible');
-    vaultUpdateUI(username);
-    // Brief ACCESS GRANTED stamp
-    var stamp = document.getElementById('dv-access-stamp');
-    if (stamp) { stamp.classList.add('active'); setTimeout(function() { stamp.classList.remove('active'); }, 1200); }
-    addLog('VAULT', 'Signed in as ' + username + '. Link namespace: accounts/' + username + '/', 'neon');
-  }
-
-  /* ── GUARDED GENERATE ───────────────────────────────────────── */
+  /* Guarded generate — blocks link creation if not logged in */
   window.vaultGuardedGenerate = function() {
-    var username = vaultGetUsername();
+    var username = _getUsername();
     if (!username) {
-      var notice = document.getElementById('vault-locked-notice');
-      if (notice) notice.style.display = 'block';
-      addLog('VAULT', 'CLEARANCE REQUIRED before generating links.', 'red');
+      if (typeof addLog === 'function') addLog('VAULT', 'CLEARANCE REQUIRED before generating links.', 'red');
       return;
     }
     generateLink();
   };
 
-  /* ── BOOT: CHECK EXISTING SESSION ───────────────────────────── */
+  /* Boot: update UI if session exists */
   document.addEventListener('DOMContentLoaded', function() {
-    var username = vaultGetUsername();
-    if (username) vaultUpdateUI(username);
-
-    // Keyboard nav in vault inputs
-    var enterSignIn = function(e) { if (e.key === 'Enter') window.vaultSignIn(); };
-    var enterCreate = function(e) { if (e.key === 'Enter') window.vaultCreateAccount(); };
-    var focusNext   = function(nextId) { return function(e) { if (e.key === 'Enter') { var n = document.getElementById(nextId); if (n) n.focus(); } }; };
-    var ids = ['vault-signin-user','vault-signin-pass','vault-create-user','vault-create-pass','vault-create-pass2'];
-    ids.forEach(function(id) {
-      var el = document.getElementById(id);
-      if (!el) return;
-      if (id === 'vault-signin-user')  el.addEventListener('keydown', focusNext('vault-signin-pass'));
-      if (id === 'vault-signin-pass')  el.addEventListener('keydown', enterSignIn);
-      if (id === 'vault-create-user')  el.addEventListener('keydown', focusNext('vault-create-pass'));
-      if (id === 'vault-create-pass')  el.addEventListener('keydown', focusNext('vault-create-pass2'));
-      if (id === 'vault-create-pass2') el.addEventListener('keydown', enterCreate);
-    });
+    var username = _getUsername();
+    if (username) _updateUI(username);
   });
 
-  /* ── EXPOSE ──────────────────────────────────────────────────── */
-  window._vaultGetUsername  = vaultGetUsername;
-  window._vaultRevealApp    = vaultRevealApp;
-  window._vaultUpdateUI     = vaultUpdateUI;
-  window._vaultSetStatus    = vaultSetStatus;
-  window._vaultClearSession = vaultClearSession;
-
+  /* Expose globals for downstream consumers */
+  window._vaultGetUsername  = _getUsername;
+  window._vaultUpdateUI     = _updateUI;
+  window._vaultClearSession = _clearSession;
+  /* Legacy tab switcher — no-op, gate tabs are handled by dvShowAuthTab */
+  window.vaultShowTab = function() {};
 })();
 </script>
 
@@ -5457,16 +5255,16 @@ document.addEventListener('DOMContentLoaded', function() {
     qrBtn.addEventListener('click', function() { dvHaptic([15]); }, { capture: true });
   }
 
-  // Auth submit button — click haptic
-  var authBtn = document.getElementById('dv-submit-btn');
+  // Auth sign in button — click haptic
+  var authBtn = document.getElementById('dv-signin-btn');
   if (authBtn) {
     authBtn.addEventListener('click', function() { dvHaptic([15]); }, { capture: true });
   }
 
-  // Vault sign in button — click haptic
-  var vaultBtn = document.getElementById('vault-signin-btn');
-  if (vaultBtn) {
-    vaultBtn.addEventListener('click', function() { dvHaptic([15]); }, { capture: true });
+  // Auth create button — click haptic
+  var createBtn = document.getElementById('dv-create-btn');
+  if (createBtn) {
+    createBtn.addEventListener('click', function() { dvHaptic([15]); }, { capture: true });
   }
 
 });
@@ -6036,15 +5834,15 @@ var dvAudio = (function() {
     patchDeployLive();
   })();
 
-  /* ── HOOK: CONFIRM/ERROR on vaultSignIn ─────────────────────── */
+  /* ── HOOK: CONFIRM/ERROR on dvAccountSignIn ──────────────────── */
   (function() {
-    function patchVaultSignIn() {
-      if (typeof window.vaultSignIn === 'function') {
-        var _orig = window.vaultSignIn;
-        window.vaultSignIn = async function() {
+    function patchAccountSignIn() {
+      if (typeof window.dvAccountSignIn === 'function') {
+        var _orig = window.dvAccountSignIn;
+        window.dvAccountSignIn = async function() {
           await _orig.apply(this, arguments);
-          /* Inspect vault status text after authentication attempt */
-          var statusEl = document.querySelector('.vault-status, #vault-signin-status, #vault-status, [id$="-status"]');
+          /* Inspect auth status text after authentication attempt */
+          var statusEl = document.getElementById('dv-auth-status');
           if (statusEl) {
             var txt = (statusEl.textContent || '').toUpperCase();
             if (txt.indexOf('ACCESS GRANTED') !== -1 || txt.indexOf('WELCOME') !== -1) {
@@ -6055,9 +5853,9 @@ var dvAudio = (function() {
             }
           }
         };
-      } else { setTimeout(patchVaultSignIn, 200); }
+      } else { setTimeout(patchAccountSignIn, 200); }
     }
-    patchVaultSignIn();
+    patchAccountSignIn();
   })();
 
   /* ── HOOK: ERROR BUZZ on showErrorPopup ─────────────────────── */
