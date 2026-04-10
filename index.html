@@ -3557,10 +3557,17 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
 
   // ── CONFIG ─────────────────────────────────────────────────────
   var CFG = {
-    ITER: 200000,
+    /* Reduce iterations on mobile — 200k takes 3-5s on phone CPUs, causes perceived freeze */
+    ITER: (navigator.maxTouchPoints > 0 || window.innerWidth < 768) ? 50000 : 200000,
     STORAGE_KEY: 'dv_accounts',
     SESSION_KEY: 'dv_session'
   };
+
+  /* ── localStorage availability check ── */
+  var _lsAvailable = (function() {
+    try { localStorage.setItem('_dv_test','1'); localStorage.removeItem('_dv_test'); return true; }
+    catch(e) { return false; }
+  })();
 
   var audioCtx = null;
   var musicStarted = false;
@@ -3774,6 +3781,7 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
 
   // ── ACCOUNT STORAGE (localStorage) ─────────────────────────────
   function dvReadAccounts() {
+    if (!_lsAvailable) return { accounts: [] };
     try {
       var raw = localStorage.getItem(CFG.STORAGE_KEY);
       if (!raw) return { accounts: [] };
@@ -3781,7 +3789,12 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
     } catch(e) { return { accounts: [] }; }
   }
   function dvWriteAccounts(data) {
-    localStorage.setItem(CFG.STORAGE_KEY, JSON.stringify(data));
+    if (!_lsAvailable) throw new Error('STORAGE BLOCKED: browser is in private mode or has restricted localStorage. Accounts cannot be saved.');
+    try {
+      localStorage.setItem(CFG.STORAGE_KEY, JSON.stringify(data));
+    } catch(e) {
+      throw new Error('STORAGE WRITE FAILED: ' + (e.message || 'quota exceeded or access denied'));
+    }
   }
 
   // ── PBKDF2-SHA256 200k iterations ──────────────────────────────
@@ -3930,21 +3943,21 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
           window.dvMatrixSpeed = 0.7;
         }
 
-        // Fade + stop music
-        var initDiv = document.getElementById('dv-music-init');
-        if (initDiv) initDiv.style.display = 'none';
-        var music = document.getElementById('dv-bg-music');
-        if (music && !music.paused) {
-          var vol = music.volume;
-          var fade = setInterval(function() {
-            vol = Math.max(0, vol - 0.05);
-            music.volume = vol;
-            if (vol <= 0) { clearInterval(fade); music.pause(); }
-          }, 70);
-        }
-
         // Show neural loading screen, THEN reveal app
+        // Music fades AFTER loading completes — not during — so it plays through the full sequence
         showNeuralLoadScreen(function() {
+          // Fade + stop music now that loading is done
+          var initDiv = document.getElementById('dv-music-init');
+          if (initDiv) initDiv.style.display = 'none';
+          var music = document.getElementById('dv-bg-music');
+          if (music && !music.paused) {
+            var vol = music.volume;
+            var fade = setInterval(function() {
+              vol = Math.max(0, vol - 0.05);
+              music.volume = vol;
+              if (vol <= 0) { clearInterval(fade); music.pause(); }
+            }, 70);
+          }
           document.body.classList.remove('dv-gate-active');
           var username = dvGetUsername();
           if (app) app.classList.add('app-visible');
@@ -4066,7 +4079,10 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
       var accounts = reg.accounts || [];
       var account = accounts.find(function(a) { return a.username === username; });
       if (!account) {
-        dvSetAuthStatus('> OPERATOR NOT FOUND. CREATE AN ACCOUNT FIRST.', 'err');
+        var notFoundMsg = _lsAvailable
+          ? '> OPERATOR NOT FOUND. CREATE AN ACCOUNT FIRST.'
+          : '> STORAGE BLOCKED: PRIVATE MODE DETECTED. ACCOUNTS CANNOT BE SAVED IN THIS BROWSER MODE.';
+        dvSetAuthStatus(notFoundMsg, 'err');
         btn.disabled = false; return;
       }
       var hash = await dvPBKDF2(password, account.salt);
@@ -5759,8 +5775,12 @@ var dvAudio = (function() {
   /* Boot tones removed to prevent unwanted beeping on page load.
      All sounds now require explicit user interaction (button click). */
 
-  /* ── HOOK: BLEEP only on BUTTONS + INTERACTIVE elements ── */
+  /* ── HOOK: BLEEP only on BUTTONS + INTERACTIVE elements — DESKTOP ONLY ── */
+  /* Mobile: bleep disabled — oscillator sounds cheap on phone speakers.
+     Haptic feedback (vibrate) already handles tactile response on touch devices. */
+  var _isTouchDevice = (navigator.maxTouchPoints > 0);
   document.addEventListener('click', function(e) {
+    if (_isTouchDevice) return;
     var el = e.target;
     var depth = 0;
     while (el && depth < 4) {
