@@ -4802,7 +4802,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var username = userInput.value.trim().toUpperCase();
     var password = passInput.value;
     if (!username || !password) { vaultSetStatus('> OPERATIVE ID REQUIRED. CANNOT PROCESS NULL IDENTITY.', 'err'); return; }
-    if (!vaultToken()) { vaultSetStatus('> OPERATOR TOKEN REQUIRED. CONNECT IN SETTINGS \u2699', 'err'); return; }
+    // Token check removed — accounts work without PAT
     btn.disabled = true;
     vaultSetStatus('> AUTHENTICATING...', 'wait');
     try {
@@ -4843,7 +4843,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (password !== pass2) { vaultSetStatus('> CLEARANCE CODE MISMATCH. TRANSMISSION ABORTED.', 'err'); return; }
     // STEALTH-PACKET: Min 12 chars — hashes stored in public GitHub repo
     if (password.length < 12) { vaultSetStatus('> CLEARANCE CODE INSUFFICIENT. MINIMUM 12 CHARACTERS REQUIRED.', 'err'); return; }
-    if (!vaultToken()) { vaultSetStatus('> OPERATOR TOKEN REQUIRED. CONNECT IN SETTINGS \u2699', 'err'); return; }
+    // Token check removed — account creation works without PAT
     btn.disabled = true;
     vaultSetStatus('> HASHING CREDENTIALS...', 'wait');
     try {
