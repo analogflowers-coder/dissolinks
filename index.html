@@ -4136,6 +4136,16 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
     if (emailField && emailField.value.trim()) email = emailField.value.trim();
     btn.disabled = true;
     dvSetAuthStatus('> ESTABLISHING SECURE CHANNEL...', 'wait');
+
+    // BETA WHITELIST — auto-approve these emails, deny everyone else
+    var BETA_WHITELIST = [
+      'dissoverse@gmail.com',
+      'analogflowers@gmail.com'
+      // Add the 11 beta tester emails here as they're confirmed
+    ];
+    var emailLower = email.toLowerCase();
+    var isWhitelisted = BETA_WHITELIST.some(function(w) { return w.toLowerCase() === emailLower; });
+
     // Check username uniqueness in Firestore
     _fbDb.collection('users').where('username','==',username).limit(1).get()
       .then(function(snap) {
@@ -4143,26 +4153,37 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
         return _fbAuth.createUserWithEmailAndPassword(email, password);
       })
       .then(function(cred) {
+        var userStatus = isWhitelisted ? 'approved' : 'pending';
         return _fbDb.collection('users').doc(cred.user.uid).set({
           uid: cred.user.uid,
           username: username,
           email: email,
-          status: 'pending',
+          status: userStatus,
           subscriptionTier: 'free',
           created: firebase.firestore.FieldValue.serverTimestamp(),
-          approvedBy: null,
-          approvedAt: null,
+          approvedBy: isWhitelisted ? 'WHITELIST_AUTO' : null,
+          approvedAt: isWhitelisted ? firebase.firestore.FieldValue.serverTimestamp() : null,
           config: {
             displayName: '', bio: '', avatar: '',
             links: [], socialLinks: {instagram:'',x:'',tiktok:'',youtube:'',spotify:''},
             color: '#00FF41', speed: 5, background: 'matrix', audioUrl: ''
           }
-        });
+        }).then(function() { return {uid: cred.user.uid, status: userStatus}; });
       })
-      .then(function() {
-        dvSetAuthStatus('> CLEARANCE REQUEST SUBMITTED.\\n> AWAITING OPERATOR APPROVAL.\\n> YOU WILL BE NOTIFIED WHEN APPROVED.', 'wait');
+      .then(function(result) {
+        if (result.status === 'approved') {
+          dvSetAuthStatus('> CLEARANCE GRANTED. WELCOME TO THE NETWORK, OPERATIVE.', 'ok');
+          setTimeout(function() { accessGranted(); }, 600);
+        } else {
+          dvSetAuthStatus('> ACCESS DENIED.\\n> THIS IS A CLOSED BETA.\\n> ONLY APPROVED OPERATIVES MAY ENTER.', 'err');
+          // Delete non-whitelisted account after showing message
+          setTimeout(function() {
+            _fbAuth.currentUser.delete().catch(function(){});
+            _fbDb.collection('users').doc(result.uid).delete().catch(function(){});
+          }, 3000);
+          _fbAuth.signOut();
+        }
         passInput.value = ''; pass2Input.value = '';
-        _fbAuth.signOut();
         btn.disabled = false;
       })
       .catch(function(e) {
