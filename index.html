@@ -1644,7 +1644,11 @@ body.dv-glitching #diss0linkz-auth-gate {
   text-align: center; color: rgba(0,255,65,0.55); transition: color 0.2s;
 }
 .vault-status.vault-ok  { color: #00ff41; text-shadow: 0 0 6px rgba(0,255,65,0.4); }
-.vault-status.vault-err { color: #ff3333; }
+.vault-status.vault-err { color: #ff3333; animation: dvAuthErrorStrobe 0.8s ease-in-out infinite; }
+@keyframes dvAuthErrorStrobe {
+  0%,100% { text-shadow: 0 0 4px rgba(255,51,51,0.3); opacity: 0.8; }
+  50% { text-shadow: 0 0 16px rgba(255,51,51,0.8), 0 0 30px rgba(255,0,0,0.3); opacity: 1; }
+}
 .vault-status.vault-wait { color: #ffcc00; }
 #vault-logged-in-badge {
   display: none; align-items: center; gap: 6px; font-size: 10px; letter-spacing: 2px;
@@ -4227,9 +4231,9 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
       })
       .catch(function(e) {
         var msg = e.code === 'auth/user-not-found' ? '> OPERATIVE NOT FOUND. REQUEST CLEARANCE FIRST.'
-                : e.code === 'auth/wrong-password' ? '> AUTHENTICATION FAILED. CLEARANCE DENIED.'
+                : e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential' ? '> AUTH ERROR: MYRAVYRA ACCESS DENIED >> CREDENTIALS = FALSE. CONTACT ADMIN NODE SUPPORT STATION.'
                 : e.code === 'auth/invalid-email' ? '> INVALID EMAIL FORMAT.'
-                : '> AUTH ERROR: ' + e.message;
+                : '> AUTH ERROR: MYRAVYRA ACCESS DENIED >> CREDENTIALS = FALSE. CONTACT ADMIN NODE SUPPORT STATION.';
         dvSetAuthStatus(msg, 'err');
         if (e.code === 'auth/wrong-password') accessDenied();
         btn.disabled = false;
@@ -4273,10 +4277,9 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
     dvSetAuthStatus('> ESTABLISHING SECURE CHANNEL...', 'wait');
 
     // BETA WHITELIST — auto-approve these emails, deny everyone else
+    // LOCKED WHITELIST — GRANDMASTER ONLY until full beta test passes
     var BETA_WHITELIST = [
-      'dissoverse@gmail.com',
       'analogflowers@gmail.com'
-      // Add the 11 beta tester emails here as they're confirmed
     ];
     var emailLower = email.toLowerCase();
     var isWhitelisted = BETA_WHITELIST.some(function(w) { return w.toLowerCase() === emailLower; });
