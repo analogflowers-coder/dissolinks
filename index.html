@@ -795,6 +795,8 @@ body.dv-gate-active * { cursor: none !important; }
   padding: 20px 16px;
   background: transparent;
   transition: opacity 0.8s ease, filter 0.8s ease;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 #diss0linkz-auth-gate.gate-exit {
   opacity: 0;
@@ -1858,12 +1860,12 @@ body.dv-glitching #diss0linkz-auth-gate {
         <div class="vault-field">
           <label class="vault-label" for="dv-signin-user">&#62; OPERATIVE ID</label>
           <input type="text" id="dv-signin-user" class="vault-input" placeholder="ENTER OPERATIVE ID"
-            autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" maxlength="30">
+            autocomplete="username" autocorrect="off" autocapitalize="off" spellcheck="false" maxlength="30">
         </div>
         <div class="vault-field">
           <label class="vault-label" for="dv-signin-pass">&#62; CLEARANCE CODE</label>
           <input type="password" id="dv-signin-pass" class="vault-input" placeholder="CLEARANCE CODE // MIN 12 CHARS"
-            autocomplete="off" spellcheck="false" minlength="12">
+            autocomplete="current-password" spellcheck="false" minlength="12">
         </div>
         <button class="vault-btn-primary" id="dv-signin-btn" onclick="dvAccountSignIn()">&#9654; AUTHENTICATE</button>
       </div>
@@ -1876,7 +1878,7 @@ body.dv-glitching #diss0linkz-auth-gate {
         <div class="vault-field">
           <label class="vault-label" for="dv-create-user">&#62; OPERATIVE ID</label>
           <input type="text" id="dv-create-user" class="vault-input" placeholder="ENTER OPERATIVE ID"
-            autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" maxlength="30">
+            autocomplete="username" autocorrect="off" autocapitalize="off" spellcheck="false" maxlength="30">
           <div style="font-size:9px; color:rgba(0,255,65,0.35); margin-top:4px; letter-spacing:1.5px;">
             LETTERS, NUMBERS, HYPHENS, UNDERSCORES ONLY
           </div>
@@ -1884,12 +1886,12 @@ body.dv-glitching #diss0linkz-auth-gate {
         <div class="vault-field">
           <label class="vault-label" for="dv-create-pass">&#62; ESTABLISH CLEARANCE CODE</label>
           <input type="password" id="dv-create-pass" class="vault-input" placeholder="ESTABLISH CODE // MIN 12 CHARS"
-            autocomplete="off" spellcheck="false" minlength="12">
+            autocomplete="new-password" spellcheck="false" minlength="12">
         </div>
         <div class="vault-field">
           <label class="vault-label" for="dv-create-pass2">&#62; CONFIRM CLEARANCE CODE</label>
           <input type="password" id="dv-create-pass2" class="vault-input" placeholder="REPEAT CLEARANCE CODE"
-            autocomplete="off" spellcheck="false" minlength="12">
+            autocomplete="new-password" spellcheck="false" minlength="12">
         </div>
         <button class="vault-btn-primary" id="dv-create-btn" onclick="dvAccountCreate()">&#9654; SUBMIT FOR CLEARANCE</button>
       </div>
