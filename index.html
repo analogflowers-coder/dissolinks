@@ -3606,6 +3606,69 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
   var musicMuted = false;
   var glitchTimeout = null;
 
+  // ── CYBERPUNK UI CLICK SOUND (synthesized, no external files) ──
+  var _dvClickCtx = null;
+  function dvClickSound() {
+    try {
+      if (!_dvClickCtx) _dvClickCtx = new (window.AudioContext || window.webkitAudioContext)();
+      var ctx = _dvClickCtx;
+      var now = ctx.currentTime;
+
+      // Layer 1: Short noise burst (digital glitch texture)
+      var bufLen = ctx.sampleRate * 0.04;
+      var noiseBuf = ctx.createBuffer(1, bufLen, ctx.sampleRate);
+      var noiseData = noiseBuf.getChannelData(0);
+      for (var i = 0; i < bufLen; i++) {
+        noiseData[i] = (Math.random() * 2 - 1) * (1 - i / bufLen);
+      }
+      var noise = ctx.createBufferSource();
+      noise.buffer = noiseBuf;
+      var noiseFilter = ctx.createBiquadFilter();
+      noiseFilter.type = 'bandpass';
+      noiseFilter.frequency.value = 4000;
+      noiseFilter.Q.value = 2;
+      var noiseGain = ctx.createGain();
+      noiseGain.gain.setValueAtTime(0.15, now);
+      noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+      noise.connect(noiseFilter);
+      noiseFilter.connect(noiseGain);
+      noiseGain.connect(ctx.destination);
+      noise.start(now);
+
+      // Layer 2: Quick sine blip (arcade bleep)
+      var osc = ctx.createOscillator();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(1800, now);
+      osc.frequency.exponentialRampToValueAtTime(400, now + 0.06);
+      var oscGain = ctx.createGain();
+      oscGain.gain.setValueAtTime(0.08, now);
+      oscGain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+      osc.connect(oscGain);
+      oscGain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.07);
+
+      // Layer 3: Sub hit (weight)
+      var sub = ctx.createOscillator();
+      sub.type = 'sine';
+      sub.frequency.setValueAtTime(120, now);
+      sub.frequency.exponentialRampToValueAtTime(60, now + 0.05);
+      var subGain = ctx.createGain();
+      subGain.gain.setValueAtTime(0.12, now);
+      subGain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+      sub.connect(subGain);
+      subGain.connect(ctx.destination);
+      sub.start(now);
+      sub.stop(now + 0.06);
+    } catch(e) {}
+  }
+
+  // Attach click sound to ALL interactive elements
+  document.addEventListener('click', function(e) {
+    var target = e.target.closest('button, a, .vault-tab, .vault-btn-primary, .s-swatch, .s-color, .dv-mood__color-btn, .dv-mood__bg-btn, .dv-mood__toggle-btn, input[type="submit"]');
+    if (target) dvClickSound();
+  }, true);
+
   // ── BOOT SEQUENCE ───────────────────────────────────────────────
   var BOOT_LINES = [
     { text: '> DISSOVERSE NEURAL NETWORK v.3.3.3', cls: 'dv-bright', delay: 0 },
