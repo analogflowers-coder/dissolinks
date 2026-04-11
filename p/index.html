@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Diss0LinkZ</title>
+<link rel="apple-touch-icon" sizes="180x180" href="https://cdn.shopify.com/s/files/1/0897/5686/0735/files/BIG-DISSOVERSE-APP-LOGO.png?v=1775799330">
+<link rel="icon" type="image/png" href="https://cdn.shopify.com/s/files/1/0897/5686/0735/files/BIG-DISSOVERSE-APP-LOGO.png?v=1775799330">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<style>
+:root{--c:0,255,65;--hex:#00ff41}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;background:#000;font-family:'Courier New',monospace;color:var(--hex);overflow-x:hidden}
+canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none;opacity:0.15}
+.scanlines{position:fixed;inset:0;z-index:2;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.1) 2px,rgba(0,0,0,.1) 4px)}
+.content{position:relative;z-index:10;max-width:420px;margin:0 auto;padding:30px 16px 80px;display:flex;flex-direction:column;align-items:center;gap:14px}
+.avatar{width:100px;height:100px;border-radius:50%;object-fit:cover;border:2px solid rgba(var(--c),.4)}
+.logo{width:clamp(100px,35vw,180px);height:auto;filter:drop-shadow(0 0 14px rgba(var(--c),.5))}
+.handle{font-size:9px;letter-spacing:2px;color:rgba(var(--c),.4)}
+.bio{font-size:10px;letter-spacing:1.5px;text-align:center;color:rgba(var(--c),.5);max-width:90%;line-height:1.6}
+.social-row{display:flex;gap:12px;align-items:center;justify-content:center;margin:8px 0}
+.social-icon{font-size:11px;letter-spacing:2px;color:rgba(var(--c),.5);text-decoration:none;padding:4px 8px;border:1px solid rgba(var(--c),.15);transition:all 0.3s}
+.social-icon:hover{color:var(--hex);border-color:var(--hex);box-shadow:0 0 10px rgba(var(--c),.3)}
+.tile{width:100%;border:1px solid rgba(var(--c),.2);background:rgba(0,0,0,.75);cursor:pointer;transition:all .3s;text-decoration:none;display:block}
+.tile:hover{border-color:rgba(var(--c),.7);box-shadow:0 0 25px rgba(var(--c),.2);transform:translateY(-2px)}
+.tile-bar{padding:12px 16px;display:flex;align-items:center;gap:8px}
+.tile-icon{font-size:12px;opacity:.5}
+.tile-title{font-size:10px;letter-spacing:3px;flex:1;color:var(--hex)}
+.tile-arrow{font-size:8px;opacity:.3}
+.footer{text-align:center;font-size:7px;letter-spacing:3px;opacity:.3;padding:20px 0}
+.not-found{display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:12px;text-align:center}
+.not-found h1{font-size:40px;letter-spacing:8px}
+.not-found p{font-size:10px;letter-spacing:3px;color:rgba(var(--c),.4)}
+@media(min-width:768px){.content{max-width:600px;padding:50px 24px 100px}.avatar{width:160px;height:160px}.tile-title{font-size:13px;letter-spacing:4px}}
+</style>
+</head>
+<body>
+<canvas id="bg-canvas"></canvas>
+<div class="scanlines"></div>
+<div class="content" id="page-content" style="display:none"></div>
+<div class="not-found" id="not-found" style="display:none">
+  <h1>404</h1>
+  <p>OPERATIVE NOT FOUND</p>
+  <a href="/" style="color:var(--hex);font-size:9px;letter-spacing:2px">&#9664; RETURN TO MAINFRAME</a>
+</div>
+
+<script>
+var firebaseConfig = {
+  apiKey: "AIzaSyBJW5JIetcStxkvZoqpk3IwQbUY7BI9-JI",
+  authDomain: "diss0linkz.firebaseapp.com",
+  projectId: "diss0linkz",
+  storageBucket: "diss0linkz.firebasestorage.app",
+  messagingSenderId: "50981881114",
+  appId: "1:50981881114:web:4392a0aa58399a627f18a3"
+};
+firebase.initializeApp(firebaseConfig);
+var db = firebase.firestore();
+
+// Get username from URL path: /p/username/
+var path = window.location.pathname.replace(/\/$/, '').split('/');
+var username = path[path.length - 1] || path[path.length - 2];
+
+if (!username || username === 'p') {
+  document.getElementById('not-found').style.display = 'flex';
+} else {
+  // Look up user by username
+  db.collection('users').where('username', '==', username).where('status', '==', 'approved').limit(1).get()
+    .then(function(snap) {
+      if (snap.empty) {
+        document.getElementById('not-found').style.display = 'flex';
+        return;
+      }
+      var userData = snap.docs[0].data();
+      var config = userData.config || {};
+      renderPage(config, userData);
+    })
+    .catch(function(e) {
+      document.getElementById('not-found').style.display = 'flex';
+    });
+}
+
+function renderPage(config, userData) {
+  // Apply theme color
+  var color = config.color || '#00ff41';
+  var rgb = hexToRgb(color);
+  document.documentElement.style.setProperty('--hex', color);
+  document.documentElement.style.setProperty('--c', rgb);
+  document.title = (config.displayName || userData.username) + ' // Diss0LinkZ';
+
+  var content = document.getElementById('page-content');
+  var html = '';
+
+  // Avatar
+  if (config.avatar) {
+    html += '<img class="avatar" src="' + escHtml(config.avatar) + '" alt="' + escHtml(config.displayName || '') + '">';
+  }
+
+  // Logo
+  html += '<img class="logo" src="https://cdn.shopify.com/s/files/1/0897/5686/0735/files/Diss0Links---CHROME.png?v=1775720592" alt="Diss0LinkZ">';
+
+  // Name + handle
+  if (config.displayName) {
+    html += '<div style="font-size:16px;letter-spacing:4px;text-align:center">' + escHtml(config.displayName) + '</div>';
+  }
+  if (config.handle) {
+    html += '<div class="handle">' + escHtml(config.handle) + '</div>';
+  }
+
+  // Bio
+  if (config.bio) {
+    html += '<div class="bio">' + escHtml(config.bio) + '</div>';
+  }
+
+  // Social icons
+  var socials = [];
+  if (config.instagram) socials.push({name:'IG', url:config.instagram});
+  if (config.twitter) socials.push({name:'X', url:config.twitter});
+  if (config.tiktok) socials.push({name:'TT', url:config.tiktok});
+  if (config.youtube) socials.push({name:'YT', url:config.youtube});
+  if (config.spotify) socials.push({name:'SP', url:config.spotify});
+  if (socials.length) {
+    html += '<div class="social-row">';
+    socials.forEach(function(s) {
+      html += '<a class="social-icon" href="' + escHtml(s.url) + '" target="_blank" rel="noopener">' + s.name + '</a>';
+    });
+    html += '</div>';
+  }
+
+  // Link tiles
+  if (config.links && config.links.length) {
+    config.links.forEach(function(link) {
+      if (link.title && link.url) {
+        html += '<a class="tile" href="' + escHtml(link.url) + '" target="_blank" rel="noopener">' +
+          '<div class="tile-bar"><span class="tile-icon">&#9654;</span>' +
+          '<span class="tile-title">' + escHtml(link.title) + '</span>' +
+          '<span class="tile-arrow">&gt;&gt;</span></div></a>';
+      }
+    });
+  }
+
+  // Footer
+  html += '<div class="footer">POWERED BY DISS0LINKZ // DISSOVERSE NEURAL NETWORK</div>';
+
+  content.innerHTML = html;
+  content.style.display = 'flex';
+
+  // Start background animation
+  startBg(config.background || 'matrix', rgb);
+}
+
+function hexToRgb(hex) {
+  hex = hex.replace('#','');
+  return parseInt(hex.substring(0,2),16) + ',' + parseInt(hex.substring(2,4),16) + ',' + parseInt(hex.substring(4,6),16);
+}
+
+function escHtml(str) {
+  var div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// Minimal background engine for public pages
+function startBg(type, rgb) {
+  var canvas = document.getElementById('bg-canvas');
+  if (!canvas || type === 'none') return;
+  var ctx = canvas.getContext('2d');
+  var W, H;
+  function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+  window.addEventListener('resize', resize);
+  resize();
+  var rgbArr = rgb.split(',').map(Number);
+  var fontSize = 14;
+  var cols = Math.floor(W / fontSize);
+  var drops = [];
+  for (var i = 0; i < cols; i++) drops[i] = Math.random() * -H / fontSize;
+  var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%ァアィイゥウェエォコ';
+
+  function drawMatrix() {
+    ctx.fillStyle = 'rgba(0,0,0,0.055)';
+    ctx.fillRect(0, 0, W, H);
+    for (var i = 0; i < cols; i++) {
+      var y = drops[i] * fontSize;
+      if (drops[i] > 0) {
+        ctx.fillStyle = 'rgb(' + rgbArr.join(',') + ')';
+        ctx.font = fontSize + 'px monospace';
+        ctx.fillText(chars[Math.floor(Math.random()*chars.length)], i*fontSize, y);
+      }
+      if (y > H && Math.random() > 0.975) drops[i] = 0;
+      drops[i] += 0.5 + Math.random() * 0.5;
+    }
+  }
+
+  var scanY = 0, scanDir = 1;
+  function drawSignal() {
+    ctx.fillStyle = 'rgba(0,0,0,0.03)';
+    ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = 'rgba(' + rgbArr.join(',') + ',0.6)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, scanY); ctx.lineTo(W, scanY); ctx.stroke();
+    var grad = ctx.createLinearGradient(0, scanY-30, 0, scanY+30);
+    grad.addColorStop(0, 'transparent');
+    grad.addColorStop(0.5, 'rgba(' + rgbArr.join(',') + ',0.15)');
+    grad.addColorStop(1, 'transparent');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, scanY-30, W, 60);
+    scanY += 2 * scanDir;
+    if (scanY > H+40) scanDir = -1;
+    if (scanY < -40) scanDir = 1;
+  }
+
+  function drawGrid() {
+    ctx.fillStyle = 'rgba(0,0,0,0.12)';
+    ctx.fillRect(0, 0, W, H);
+    var cx = W/2, cy = H*0.65;
+    for (var z = 1; z < 25; z++) {
+      var screenY = cy + 30000/z/40;
+      if (screenY > H) continue;
+      ctx.strokeStyle = 'rgba(' + rgbArr.join(',') + ',' + Math.max(0,1-z/25)*0.2 + ')';
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(0, screenY); ctx.lineTo(W, screenY); ctx.stroke();
+    }
+  }
+
+  var drawFn = type === 'signal' ? drawSignal : type === 'grid' ? drawGrid : drawMatrix;
+  setInterval(drawFn, 45);
+}
+</script>
+</body>
+</html>

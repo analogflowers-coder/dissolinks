@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>DISS0LINKZ // OPERATOR SETTINGS</title>
+<link rel="apple-touch-icon" sizes="180x180" href="https://cdn.shopify.com/s/files/1/0897/5686/0735/files/BIG-DISSOVERSE-APP-LOGO.png?v=1775799330">
+<link rel="icon" type="image/png" href="https://cdn.shopify.com/s/files/1/0897/5686/0735/files/BIG-DISSOVERSE-APP-LOGO.png?v=1775799330">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Diss0LinkZ Settings">
+<meta name="robots" content="noindex, nofollow">
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<style>
+:root { --neon:#00ff41; --neon-rgb:0,255,65; --bg:#0a0a0a; }
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--neon);font-family:'Courier New',monospace;min-height:100vh;overflow-x:hidden}
+.gate{display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:12px;text-align:center;padding:20px}
+.gate-msg{font-size:10px;letter-spacing:3px;color:rgba(var(--neon-rgb),0.5);max-width:400px;line-height:1.8}
+.gate-status{font-size:14px;letter-spacing:4px;margin-bottom:8px}
+.gate a{color:var(--neon);font-size:9px;letter-spacing:2px}
+
+/* Settings panel */
+.settings-wrap{max-width:500px;margin:0 auto;padding:20px 16px 100px}
+.settings-header{text-align:center;padding:20px 0;border-bottom:1px solid rgba(var(--neon-rgb),0.15);margin-bottom:20px}
+.settings-header h1{font-size:12px;letter-spacing:5px}
+.settings-header .sub{font-size:8px;letter-spacing:2px;color:rgba(var(--neon-rgb),0.35);margin-top:4px}
+.s-section{margin-bottom:20px;border:1px solid rgba(var(--neon-rgb),0.1);padding:14px}
+.s-section:hover{border-color:rgba(var(--neon-rgb),0.25)}
+.s-title{font-size:8px;letter-spacing:3px;color:rgba(var(--neon-rgb),0.45);margin-bottom:10px}
+.s-input{width:100%;background:transparent;border:1px solid rgba(var(--neon-rgb),0.2);color:var(--neon);font-family:'Courier New',monospace;font-size:12px;padding:9px 12px;letter-spacing:1px;margin-bottom:6px}
+.s-input:focus{outline:none;border-color:var(--neon);box-shadow:0 0 8px rgba(var(--neon-rgb),0.15)}
+.s-input::placeholder{color:rgba(var(--neon-rgb),0.2)}
+.s-row{display:flex;gap:6px}.s-row .s-input{flex:1}
+.s-textarea{width:100%;background:transparent;border:1px solid rgba(var(--neon-rgb),0.2);color:var(--neon);font-family:'Courier New',monospace;font-size:11px;padding:9px 12px;letter-spacing:1px;resize:vertical;min-height:60px}
+.s-textarea:focus{outline:none;border-color:var(--neon)}
+.s-colors{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin-top:6px}
+.s-color{height:28px;border:1px solid rgba(255,255,255,0.08);cursor:pointer;transition:all 0.2s}
+.s-color:hover{transform:scaleY(1.3);border-color:#fff}
+.s-color.active{border-color:#fff;box-shadow:0 0 10px rgba(255,255,255,0.3)}
+.s-bgs{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:6px}
+.s-bg-btn{background:rgba(0,0,0,0.6);border:1px solid rgba(var(--neon-rgb),0.2);color:var(--neon);font-family:'Courier New',monospace;font-size:7px;letter-spacing:1px;padding:8px 4px;cursor:pointer;text-align:center}
+.s-bg-btn:hover{border-color:var(--neon);background:rgba(var(--neon-rgb),0.05)}
+.s-bg-btn.active{border-color:var(--neon);background:rgba(var(--neon-rgb),0.1);box-shadow:0 0 8px rgba(var(--neon-rgb),0.2)}
+.s-slider{-webkit-appearance:none;width:100%;height:2px;background:linear-gradient(90deg,var(--neon),rgba(var(--neon-rgb),0.2));cursor:pointer;margin-top:6px}
+.s-slider::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;background:var(--neon);cursor:pointer}
+.s-speed-labels{display:flex;justify-content:space-between;margin-top:3px}
+.s-speed-labels span{font-size:6px;letter-spacing:1px;color:rgba(var(--neon-rgb),0.25)}
+.s-toggle{display:flex;align-items:center;gap:8px;cursor:pointer;margin-top:6px}
+.s-toggle-box{width:36px;height:18px;border:1px solid rgba(var(--neon-rgb),0.3);position:relative;transition:all 0.3s}
+.s-toggle-box.on{border-color:var(--neon);background:rgba(var(--neon-rgb),0.15)}
+.s-toggle-box::after{content:'';position:absolute;top:2px;left:2px;width:12px;height:12px;background:rgba(var(--neon-rgb),0.4);transition:all 0.3s}
+.s-toggle-box.on::after{left:20px;background:var(--neon)}
+.s-toggle span{font-size:8px;letter-spacing:2px;color:rgba(var(--neon-rgb),0.5)}
+.save-bar{position:fixed;bottom:0;left:0;right:0;padding:12px 16px;background:rgba(0,0,0,0.95);border-top:1px solid rgba(var(--neon-rgb),0.2);display:flex;justify-content:center;gap:12px;backdrop-filter:blur(12px)}
+.save-btn{background:rgba(var(--neon-rgb),0.15);border:1px solid var(--neon);color:var(--neon);font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;padding:10px 24px;cursor:pointer}
+.save-btn:hover{background:rgba(var(--neon-rgb),0.25);box-shadow:0 0 15px rgba(var(--neon-rgb),0.3)}
+.preview-btn{background:transparent;border:1px solid rgba(var(--neon-rgb),0.3);color:rgba(var(--neon-rgb),0.6);font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;padding:10px 24px;cursor:pointer}
+.preview-btn:hover{border-color:var(--neon);color:var(--neon)}
+.logout-btn{position:fixed;top:16px;right:16px;background:none;border:1px solid rgba(var(--neon-rgb),0.2);color:rgba(var(--neon-rgb),0.4);font-family:'Courier New',monospace;font-size:8px;letter-spacing:2px;padding:6px 12px;cursor:pointer}
+.logout-btn:hover{border-color:#ff4444;color:#ff4444}
+#settings-panel{display:none}
+.link-row{display:flex;gap:6px;margin-bottom:6px;align-items:center}
+.link-row .s-input{flex:1}
+.link-remove{background:none;border:1px solid rgba(255,68,68,0.3);color:#ff4444;font-size:10px;width:28px;height:28px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.link-remove:hover{border-color:#ff4444;background:rgba(255,68,68,0.1)}
+.add-link-btn{width:100%;background:transparent;border:1px dashed rgba(var(--neon-rgb),0.2);color:rgba(var(--neon-rgb),0.4);font-family:'Courier New',monospace;font-size:9px;letter-spacing:2px;padding:8px;cursor:pointer;margin-top:6px}
+.add-link-btn:hover{border-color:var(--neon);color:var(--neon)}
+</style>
+</head>
+<body>
+
+<!-- AUTH GATE -->
+<div id="auth-gate" class="gate">
+  <div class="gate-status">DISS0LINKZ SETTINGS</div>
+  <div class="gate-msg">CHECKING CLEARANCE...</div>
+</div>
+
+<!-- PENDING GATE -->
+<div id="pending-gate" class="gate" style="display:none">
+  <div class="gate-status" style="color:#ffaa00">CLEARANCE PENDING</div>
+  <div class="gate-msg">YOUR REQUEST HAS BEEN SUBMITTED.<br>AWAITING OPERATOR APPROVAL.<br><br>YOU WILL RECEIVE CONFIRMATION AT YOUR REGISTERED EMAIL.</div>
+  <a href="/">&#9664; RETURN TO GATE</a>
+</div>
+
+<!-- SUSPENDED GATE -->
+<div id="suspended-gate" class="gate" style="display:none">
+  <div class="gate-status" style="color:#ff4444">CLEARANCE REVOKED</div>
+  <div class="gate-msg">YOUR ACCESS HAS BEEN SUSPENDED.<br>CONTACT COMMAND FOR REINSTATEMENT.</div>
+  <a href="/">&#9664; RETURN TO GATE</a>
+</div>
+
+<!-- SETTINGS PANEL -->
+<div id="settings-panel">
+  <button class="logout-btn" onclick="firebase.auth().signOut().then(function(){location.reload()})">DISCONNECT</button>
+  <div class="settings-wrap">
+    <div class="settings-header">
+      <h1>>> OPERATOR TERMINAL</h1>
+      <div class="sub">LANDING PAGE CONFIGURATION // v.3.3.3</div>
+    </div>
+
+    <!-- PROFILE -->
+    <div class="s-section">
+      <div class="s-title">// PROFILE</div>
+      <input class="s-input" id="s-avatar" placeholder="PROFILE PHOTO URL (CDN link)">
+      <div class="s-row">
+        <input class="s-input" id="s-name" placeholder="DISPLAY NAME">
+        <input class="s-input" id="s-handle" placeholder="@handle">
+      </div>
+      <textarea class="s-textarea" id="s-bio" placeholder="BIO — your one-line manifesto"></textarea>
+    </div>
+
+    <!-- LINKS -->
+    <div class="s-section">
+      <div class="s-title">// LINK TILES</div>
+      <div id="links-container">
+        <div class="link-row">
+          <input class="s-input link-title" placeholder="TITLE">
+          <input class="s-input link-url" placeholder="URL">
+          <button class="link-remove" onclick="this.parentElement.remove()">&times;</button>
+        </div>
+      </div>
+      <button class="add-link-btn" onclick="addLinkRow()">+ ADD LINK</button>
+    </div>
+
+    <!-- SOCIAL ICONS -->
+    <div class="s-section">
+      <div class="s-title">// SOCIAL CHANNELS</div>
+      <input class="s-input" id="s-instagram" placeholder="INSTAGRAM URL">
+      <input class="s-input" id="s-twitter" placeholder="X / TWITTER URL">
+      <input class="s-input" id="s-tiktok" placeholder="TIKTOK URL">
+      <input class="s-input" id="s-youtube" placeholder="YOUTUBE URL">
+      <input class="s-input" id="s-spotify" placeholder="SPOTIFY URL">
+    </div>
+
+    <!-- THEME -->
+    <div class="s-section">
+      <div class="s-title">// COLOR NODE</div>
+      <div class="s-colors">
+        <div class="s-color active" style="background:#00FF41" data-color="#00FF41"></div>
+        <div class="s-color" style="background:#E91885" data-color="#E91885"></div>
+        <div class="s-color" style="background:#7B2FFF" data-color="#7B2FFF"></div>
+        <div class="s-color" style="background:#00FFFF" data-color="#00FFFF"></div>
+        <div class="s-color" style="background:#FF0000" data-color="#FF0000"></div>
+        <div class="s-color" style="background:#FFFFFF" data-color="#FFFFFF"></div>
+      </div>
+      <input class="s-input" id="s-custom-color" placeholder="CUSTOM HEX (e.g. #FF6600)" style="margin-top:8px">
+    </div>
+
+    <!-- BACKGROUND -->
+    <div class="s-section">
+      <div class="s-title">// BACKGROUND MODE</div>
+      <div class="s-bgs">
+        <button class="s-bg-btn active" data-bg="matrix">MATRIX RAIN</button>
+        <button class="s-bg-btn" data-bg="signal">SIGNAL SCAN</button>
+        <button class="s-bg-btn" data-bg="hex">HEX STREAM</button>
+        <button class="s-bg-btn" data-bg="static">STATIC NOISE</button>
+        <button class="s-bg-btn" data-bg="grid">GRID PULSE</button>
+        <button class="s-bg-btn" data-bg="none">OFF</button>
+      </div>
+    </div>
+
+    <!-- ANIMATION SPEED -->
+    <div class="s-section">
+      <div class="s-title">// ANIMATION SPEED</div>
+      <input type="range" class="s-slider" id="s-speed" min="1" max="10" value="5" step="0.5">
+      <div class="s-speed-labels"><span>FAST</span><span>SLOW</span></div>
+    </div>
+
+    <!-- AUDIO -->
+    <div class="s-section">
+      <div class="s-title">// AUDIO</div>
+      <input class="s-input" id="s-audio" placeholder="AUDIO FILE URL (MP3)">
+      <div class="s-toggle" onclick="toggleAutoplay()">
+        <div class="s-toggle-box" id="s-autoplay-toggle"></div>
+        <span>AUTOPLAY ON VISIT</span>
+      </div>
+    </div>
+
+    <!-- RGB SHIFT -->
+    <div class="s-section">
+      <div class="s-title">// RGB SPECTRUM SHIFT</div>
+      <div class="s-toggle" onclick="toggleRgb()">
+        <div class="s-toggle-box" id="s-rgb-toggle"></div>
+        <span>ENABLE RGB SHIFT (visitors can toggle)</span>
+      </div>
+      <input type="range" class="s-slider" id="s-rgb-speed" min="1" max="10" value="5" step="0.5" style="margin-top:8px">
+      <div class="s-speed-labels"><span>FAST</span><span>SLOW</span></div>
+    </div>
+  </div>
+
+  <!-- SAVE BAR -->
+  <div class="save-bar">
+    <button class="preview-btn" onclick="previewPage()">&#9654; PREVIEW</button>
+    <button class="save-btn" onclick="saveSettings()">&#9654; SAVE CONFIG</button>
+  </div>
+</div>
+
+<script>
+var firebaseConfig = {
+  apiKey: "AIzaSyBJW5JIetcStxkvZoqpk3IwQbUY7BI9-JI",
+  authDomain: "diss0linkz.firebaseapp.com",
+  projectId: "diss0linkz",
+  storageBucket: "diss0linkz.firebasestorage.app",
+  messagingSenderId: "50981881114",
+  appId: "1:50981881114:web:4392a0aa58399a627f18a3"
+};
+firebase.initializeApp(firebaseConfig);
+var auth = firebase.auth();
+var db = firebase.firestore();
+
+var currentUser = null;
+var userData = null;
+
+// Auth state check
+auth.onAuthStateChanged(function(user) {
+  if (!user) {
+    // Not logged in — redirect to main gate
+    window.location.href = '/';
+    return;
+  }
+  currentUser = user;
+  // Check approval status
+  db.collection('users').doc(user.uid).get().then(function(doc) {
+    if (!doc.exists) {
+      window.location.href = '/';
+      return;
+    }
+    userData = doc.data();
+    if (userData.status === 'pending') {
+      document.getElementById('auth-gate').style.display = 'none';
+      document.getElementById('pending-gate').style.display = 'flex';
+    } else if (userData.status === 'suspended') {
+      document.getElementById('auth-gate').style.display = 'none';
+      document.getElementById('suspended-gate').style.display = 'flex';
+    } else if (userData.status === 'approved') {
+      document.getElementById('auth-gate').style.display = 'none';
+      document.getElementById('settings-panel').style.display = 'block';
+      loadSettings(userData);
+    } else {
+      window.location.href = '/';
+    }
+  });
+});
+
+function loadSettings(data) {
+  var config = data.config || {};
+  if (config.avatar) document.getElementById('s-avatar').value = config.avatar;
+  if (config.displayName) document.getElementById('s-name').value = config.displayName;
+  if (config.handle) document.getElementById('s-handle').value = config.handle;
+  if (config.bio) document.getElementById('s-bio').value = config.bio;
+  if (config.instagram) document.getElementById('s-instagram').value = config.instagram;
+  if (config.twitter) document.getElementById('s-twitter').value = config.twitter;
+  if (config.tiktok) document.getElementById('s-tiktok').value = config.tiktok;
+  if (config.youtube) document.getElementById('s-youtube').value = config.youtube;
+  if (config.spotify) document.getElementById('s-spotify').value = config.spotify;
+  if (config.audio) document.getElementById('s-audio').value = config.audio;
+  if (config.speed) document.getElementById('s-speed').value = config.speed;
+  if (config.rgbSpeed) document.getElementById('s-rgb-speed').value = config.rgbSpeed;
+  if (config.customColor) document.getElementById('s-custom-color').value = config.customColor;
+  if (config.autoplay) document.getElementById('s-autoplay-toggle').classList.add('on');
+  if (config.rgbEnabled) document.getElementById('s-rgb-toggle').classList.add('on');
+  // Load color
+  if (config.color) {
+    document.querySelectorAll('.s-color').forEach(function(c) {
+      c.classList.toggle('active', c.dataset.color === config.color);
+    });
+  }
+  // Load background
+  if (config.background) {
+    document.querySelectorAll('.s-bg-btn').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.bg === config.background);
+    });
+  }
+  // Load links
+  if (config.links && config.links.length) {
+    var container = document.getElementById('links-container');
+    container.innerHTML = '';
+    config.links.forEach(function(link) {
+      var row = document.createElement('div');
+      row.className = 'link-row';
+      row.innerHTML = '<input class="s-input link-title" placeholder="TITLE" value="' + (link.title || '') + '">' +
+        '<input class="s-input link-url" placeholder="URL" value="' + (link.url || '') + '">' +
+        '<button class="link-remove" onclick="this.parentElement.remove()">&times;</button>';
+      container.appendChild(row);
+    });
+  }
+}
+
+function addLinkRow() {
+  var container = document.getElementById('links-container');
+  var row = document.createElement('div');
+  row.className = 'link-row';
+  row.innerHTML = '<input class="s-input link-title" placeholder="TITLE">' +
+    '<input class="s-input link-url" placeholder="URL">' +
+    '<button class="link-remove" onclick="this.parentElement.remove()">&times;</button>';
+  container.appendChild(row);
+}
+
+function toggleAutoplay() {
+  document.getElementById('s-autoplay-toggle').classList.toggle('on');
+}
+function toggleRgb() {
+  document.getElementById('s-rgb-toggle').classList.toggle('on');
+}
+
+// Color picker
+document.querySelectorAll('.s-color').forEach(function(c) {
+  c.addEventListener('click', function() {
+    document.querySelectorAll('.s-color').forEach(function(s) { s.classList.remove('active'); });
+    c.classList.add('active');
+  });
+});
+
+// Background picker
+document.querySelectorAll('.s-bg-btn').forEach(function(b) {
+  b.addEventListener('click', function() {
+    document.querySelectorAll('.s-bg-btn').forEach(function(s) { s.classList.remove('active'); });
+    b.classList.add('active');
+  });
+});
+
+function saveSettings() {
+  if (!currentUser) return;
+  // Gather all settings
+  var links = [];
+  document.querySelectorAll('.link-row').forEach(function(row) {
+    var title = row.querySelector('.link-title').value;
+    var url = row.querySelector('.link-url').value;
+    if (title || url) links.push({ title: title, url: url });
+  });
+
+  var activeColor = document.querySelector('.s-color.active');
+  var activeBg = document.querySelector('.s-bg-btn.active');
+
+  var config = {
+    avatar: document.getElementById('s-avatar').value,
+    displayName: document.getElementById('s-name').value,
+    handle: document.getElementById('s-handle').value,
+    bio: document.getElementById('s-bio').value,
+    links: links,
+    instagram: document.getElementById('s-instagram').value,
+    twitter: document.getElementById('s-twitter').value,
+    tiktok: document.getElementById('s-tiktok').value,
+    youtube: document.getElementById('s-youtube').value,
+    spotify: document.getElementById('s-spotify').value,
+    color: activeColor ? activeColor.dataset.color : '#00FF41',
+    customColor: document.getElementById('s-custom-color').value,
+    background: activeBg ? activeBg.dataset.bg : 'matrix',
+    speed: parseFloat(document.getElementById('s-speed').value),
+    audio: document.getElementById('s-audio').value,
+    autoplay: document.getElementById('s-autoplay-toggle').classList.contains('on'),
+    rgbEnabled: document.getElementById('s-rgb-toggle').classList.contains('on'),
+    rgbSpeed: parseFloat(document.getElementById('s-rgb-speed').value)
+  };
+
+  db.collection('users').doc(currentUser.uid).update({
+    config: config,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(function() {
+    alert('CONFIGURATION SAVED.');
+  }).catch(function(e) {
+    alert('SAVE FAILED: ' + e.message);
+  });
+}
+
+function previewPage() {
+  var username = userData.username || currentUser.uid;
+  window.open('/p/' + username + '/', '_blank');
+}
+</script>
+</body>
+</html>
