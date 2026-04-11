@@ -3967,7 +3967,12 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
     }, 2000);
   }
   // ── ACCESS DENIED ───────────────────────────────────────────
+  var _failedAttempts = 0;
+  var _terminalDead = false;
+
   function accessDenied() {
+    if (_terminalDead) return;
+    _failedAttempts++;
     playDeniedSound();
     triggerGlitch();
 
@@ -3988,6 +3993,136 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
 
     // Scramble + reform boot text (red)
     scrambleBootText();
+
+    // After 7 failed attempts — KILL THE TERMINAL
+    if (_failedAttempts >= 7) {
+      _terminalDead = true;
+      setTimeout(function() { dvTerminalDeath(); }, 800);
+    }
+  }
+
+  function dvTerminalDeath() {
+    // Create the death screen overlay
+    var death = document.createElement('div');
+    death.id = 'dv-death-screen';
+    death.style.cssText = 'position:fixed;inset:0;z-index:99999;background:#000;display:flex;align-items:center;justify-content:center;flex-direction:column;overflow:hidden;';
+
+    // VHS scanline overlay
+    var scanlines = document.createElement('div');
+    scanlines.style.cssText = 'position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,0.02) 2px,rgba(255,255,255,0.02) 4px);pointer-events:none;z-index:2;animation:dvDeathScan 0.1s infinite;';
+    death.appendChild(scanlines);
+
+    // Cracked screen SVG
+    var crackSvg = '<svg style="position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none" xmlns="http://www.w3.org/2000/svg">';
+    var cx = window.innerWidth/2, cy = window.innerHeight/2;
+    for (var i = 0; i < 20; i++) {
+      var angle = (i/20) * Math.PI * 2;
+      var len = 100 + Math.random() * 400;
+      var x2 = cx + Math.cos(angle) * len;
+      var y2 = cy + Math.sin(angle) * len;
+      var midX = cx + Math.cos(angle) * len * 0.5 + (Math.random()-0.5) * 40;
+      var midY = cy + Math.sin(angle) * len * 0.5 + (Math.random()-0.5) * 40;
+      crackSvg += '<path d="M'+cx+','+cy+' Q'+midX+','+midY+' '+x2+','+y2+'" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="'+(1+Math.random()*2)+'"/>';
+      // Sub-cracks
+      for (var j = 0; j < 3; j++) {
+        var bx = midX + (Math.random()-0.5)*80;
+        var by = midY + (Math.random()-0.5)*80;
+        crackSvg += '<path d="M'+midX+','+midY+' L'+bx+','+by+'" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>';
+      }
+    }
+    // Impact circle
+    crackSvg += '<circle cx="'+cx+'" cy="'+cy+'" r="30" fill="none" stroke="rgba(255,0,0,0.2)" stroke-width="2"/>';
+    crackSvg += '<circle cx="'+cx+'" cy="'+cy+'" r="8" fill="rgba(255,0,0,0.15)"/>';
+    crackSvg += '</svg>';
+    death.innerHTML += crackSvg;
+
+    // 404 text
+    var textBlock = document.createElement('div');
+    textBlock.style.cssText = 'position:relative;z-index:4;text-align:center;';
+    textBlock.innerHTML = '<div style="font-family:Courier New,monospace;font-size:80px;font-weight:bold;color:#ff0000;letter-spacing:12px;text-shadow:0 0 40px rgba(255,0,0,0.5),0 0 80px rgba(255,0,0,0.2);animation:dvDeathFlicker 0.15s infinite alternate">404</div>' +
+      '<div style="font-family:Courier New,monospace;font-size:14px;letter-spacing:6px;color:rgba(255,0,0,0.6);margin-top:16px;text-shadow:0 0 10px rgba(255,0,0,0.3)">SIGNAL LOST</div>' +
+      '<div style="font-family:Courier New,monospace;font-size:9px;letter-spacing:3px;color:rgba(255,0,0,0.25);margin-top:24px">TERMINAL COMPROMISED // CONNECTION SEVERED</div>' +
+      '<div style="font-family:Courier New,monospace;font-size:8px;letter-spacing:2px;color:rgba(255,255,255,0.08);margin-top:40px">[ REFRESH TO RECONNECT ]</div>';
+    death.appendChild(textBlock);
+
+    // Add CSS animations
+    var style = document.createElement('style');
+    style.textContent = '@keyframes dvDeathFlicker{0%{opacity:1;transform:translate(0)}25%{opacity:0.8;transform:translate(-1px,1px)}50%{opacity:0.95;transform:translate(1px,0)}75%{opacity:0.85;transform:translate(0,-1px)}100%{opacity:1;transform:translate(0)}}' +
+      '@keyframes dvDeathScan{0%{background-position:0 0}100%{background-position:0 4px}}';
+    document.head.appendChild(style);
+
+    // Cinematic transition: glitch → static → death screen
+    document.body.style.transition = 'none';
+
+    // Phase 1: Heavy glitch (0.3s)
+    var glitchPhase = document.createElement('div');
+    glitchPhase.style.cssText = 'position:fixed;inset:0;z-index:99998;background:#000;mix-blend-mode:difference;animation:dvDeathGlitchPhase 0.3s steps(4) forwards;';
+    var glitchStyle = document.createElement('style');
+    glitchStyle.textContent = '@keyframes dvDeathGlitchPhase{0%{opacity:0;filter:none}20%{opacity:1;filter:hue-rotate(90deg) brightness(3)}40%{filter:hue-rotate(-60deg) brightness(5) saturate(3)}60%{filter:brightness(10) hue-rotate(180deg)}80%{filter:brightness(0.5)}100%{opacity:0}}';
+    document.head.appendChild(glitchStyle);
+    document.body.appendChild(glitchPhase);
+
+    // Phase 2: Static noise burst (0.2s)
+    setTimeout(function() {
+      glitchPhase.remove();
+      var staticBurst = document.createElement('canvas');
+      staticBurst.style.cssText = 'position:fixed;inset:0;z-index:99998;width:100%;height:100%';
+      staticBurst.width = window.innerWidth;
+      staticBurst.height = window.innerHeight;
+      var sCtx = staticBurst.getContext('2d');
+      var sData = sCtx.createImageData(staticBurst.width, staticBurst.height);
+      for (var i = 0; i < sData.data.length; i+=4) {
+        var v = Math.random()*255;
+        sData.data[i]=v; sData.data[i+1]=v; sData.data[i+2]=v; sData.data[i+3]=Math.random()*180;
+      }
+      sCtx.putImageData(sData, 0, 0);
+      document.body.appendChild(staticBurst);
+      setTimeout(function() { staticBurst.remove(); }, 200);
+    }, 300);
+
+    // Phase 3: Death screen fades in (0.5s after static)
+    death.style.opacity = '0';
+    death.style.transition = 'opacity 0.5s ease';
+    document.body.appendChild(death);
+    setTimeout(function() {
+      death.style.opacity = '1';
+      // Kill all other content
+      var gate = document.getElementById('diss0linkz-auth-gate');
+      if (gate) gate.style.display = 'none';
+      var canvas = document.getElementById('dv-matrix-canvas');
+      if (canvas) canvas.style.display = 'none';
+    }, 500);
+
+    // Play death sound
+    try {
+      if (!_dvClickCtx) _dvClickCtx = new (window.AudioContext || window.webkitAudioContext)();
+      var ctx = _dvClickCtx;
+      var now = ctx.currentTime;
+      // Deep rumble
+      var rumble = ctx.createOscillator();
+      rumble.type = 'sawtooth';
+      rumble.frequency.setValueAtTime(80, now);
+      rumble.frequency.exponentialRampToValueAtTime(20, now + 1);
+      var rumbleGain = ctx.createGain();
+      rumbleGain.gain.setValueAtTime(0.15, now);
+      rumbleGain.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
+      rumble.connect(rumbleGain);
+      rumbleGain.connect(ctx.destination);
+      rumble.start(now);
+      rumble.stop(now + 1.5);
+      // Static hiss
+      var hissBuf = ctx.createBuffer(1, ctx.sampleRate * 0.8, ctx.sampleRate);
+      var hissData = hissBuf.getChannelData(0);
+      for (var h = 0; h < hissBuf.length; h++) hissData[h] = (Math.random()*2-1) * (1 - h/hissBuf.length);
+      var hiss = ctx.createBufferSource();
+      hiss.buffer = hissBuf;
+      var hissGain = ctx.createGain();
+      hissGain.gain.setValueAtTime(0.1, now);
+      hissGain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+      hiss.connect(hissGain);
+      hissGain.connect(ctx.destination);
+      hiss.start(now + 0.1);
+    } catch(e) {}
   }
 
   function showScreenCrack() {
