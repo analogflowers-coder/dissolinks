@@ -3597,8 +3597,10 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
     { text: '> OPERATOR AUTHENTICATION REQUIRED', cls: 'dv-bright', delay: 360 }
   ];
 
-  // ── MATRIX RAIN ─────────────────────────────────────────────────
-  (function initMatrix() {
+  // ── MATRIX RAIN (disabled — replaced by backgrounds.js) ────────
+  // The backgrounds.js file handles all 5 background types now
+  (function initMatrix_DISABLED() { return; /* disabled */
+  (function initMatrix_OLD() {
     var canvas = document.getElementById('dv-matrix-canvas');
     if (!canvas) return;
     var ctx = canvas.getContext('2d');
@@ -6311,7 +6313,18 @@ var now=Date.now();if(now-lastN<400){dvNightVision();lastN=0;}else{lastN=now;}}
     <input type="range" class="dv-mood__slider" id="dv-matrix-speed" min="1" max="10" value="5" step="0.5">
     <div class="dv-mood__speed-labels"><span>FAST</span><span>SLOW</span></div>
   </div>
-  <div class="dv-mood__footer">DISSOVERSE MOOD ENGINE v1.0</div>
+  <div class="dv-mood__section">
+    <label class="dv-mood__label">// BACKGROUND MODE</label>
+    <div class="dv-mood__buttons">
+      <button class="dv-mood__color-btn dv-mood__bg-btn dv-mood__color-btn--active" data-bg="matrix" style="--btn-color:var(--neon)">MATRIX</button>
+      <button class="dv-mood__color-btn dv-mood__bg-btn" data-bg="signal" style="--btn-color:var(--neon)">SIGNAL SCAN</button>
+      <button class="dv-mood__color-btn dv-mood__bg-btn" data-bg="hex" style="--btn-color:var(--neon)">HEX STREAM</button>
+      <button class="dv-mood__color-btn dv-mood__bg-btn" data-bg="static" style="--btn-color:var(--neon)">STATIC</button>
+      <button class="dv-mood__color-btn dv-mood__bg-btn" data-bg="grid" style="--btn-color:var(--neon)">GRID PULSE</button>
+      <button class="dv-mood__color-btn dv-mood__bg-btn" data-bg="none" style="--btn-color:var(--neon)">OFF</button>
+    </div>
+  </div>
+  <div class="dv-mood__footer">DISSOVERSE MOOD ENGINE v.3.3.3</div>
 </div>
 
 <style>
@@ -6463,9 +6476,28 @@ var now=Date.now();if(now-lastN<400){dvNightVision();lastN=0;}else{lastN=now;}}
     if (window.dvRestartMatrix) window.dvRestartMatrix(ms);
     else if (window.dvSetMatrixSpeed) window.dvSetMatrixSpeed(ms);
   });
+
+  /* ── Background selector ── */
+  var bgBtns = document.querySelectorAll('.dv-mood__bg-btn');
+  bgBtns.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      bgBtns.forEach(function(b) { b.classList.remove('dv-mood__color-btn--active'); });
+      btn.classList.add('dv-mood__color-btn--active');
+      var bg = btn.dataset.bg;
+      if (bg === 'none') {
+        var c = document.getElementById('dv-matrix-canvas');
+        if (c) { c.style.display = 'none'; }
+      } else {
+        var c = document.getElementById('dv-matrix-canvas');
+        if (c) { c.style.display = ''; }
+        if (window.dvSetBackground) window.dvSetBackground(bg);
+      }
+    });
+  });
 })();
 </script>
 <!-- END MOOD ENGINE -->
+<script src="backgrounds.js"></script>
 
 </body>
 </html>
