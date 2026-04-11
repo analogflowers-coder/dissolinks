@@ -798,6 +798,13 @@ body.dv-gate-active * { cursor: none !important; }
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
+@media (max-width: 768px) {
+  #diss0linkz-auth-gate {
+    justify-content: flex-start;
+    padding-top: 40px;
+    padding-bottom: 80px;
+  }
+}
 #diss0linkz-auth-gate.gate-exit {
   opacity: 0;
   filter: blur(12px) brightness(2);
@@ -6382,6 +6389,7 @@ var now=Date.now();if(now-lastN<400){dvNightVision();lastN=0;}else{lastN=now;}}
     document.documentElement.style.setProperty('--neon-rgb', r + ',' + g + ',' + b);
     document.documentElement.style.setProperty('--neon-dim', hex);
     document.documentElement.style.setProperty('--neon-glow', 'rgba(' + r + ',' + g + ',' + b + ',0.5)');
+    document.documentElement.style.setProperty('--matrix-color', hex);
     document.documentElement.style.setProperty('--matrix-fade', 'rgba(' + r + ',' + g + ',' + b + ',0.4)');
     document.documentElement.style.setProperty('--glow-color', 'rgba(' + r + ',' + g + ',' + b + ',0.6)');
     document.documentElement.style.setProperty('--text-dim', 'rgba(' + r + ',' + g + ',' + b + ',0.5)');
@@ -6390,6 +6398,9 @@ var now=Date.now();if(now-lastN<400){dvNightVision();lastN=0;}else{lastN=now;}}
     document.documentElement.style.setProperty('--border-mid', 'rgba(' + r + ',' + g + ',' + b + ',0.25)');
     document.documentElement.style.setProperty('--border-glow', 'rgba(' + r + ',' + g + ',' + b + ',0.55)');
     document.documentElement.style.setProperty('--bg-glass', 'rgba(' + r + ',' + g + ',' + b + ',0.03)');
+    /* Update matrix rain globals so canvas reads new colors */
+    window.dvMatrixColor = hex;
+    window.dvMatrixFade = 'rgba(' + r + ',' + g + ',' + b + ',0.4)';
   }
 
   swatches.forEach(function(sw) {
@@ -6440,7 +6451,8 @@ var now=Date.now();if(now-lastN<400){dvNightVision();lastN=0;}else{lastN=now;}}
   matrixSpeedSlider.addEventListener('input', function() {
     var val = parseFloat(this.value);
     var ms = Math.round(15 + (val - 1) * (120 - 15) / 9);
-    if (window.dvSetMatrixSpeed) window.dvSetMatrixSpeed(ms);
+    if (window.dvRestartMatrix) window.dvRestartMatrix(ms);
+    else if (window.dvSetMatrixSpeed) window.dvSetMatrixSpeed(ms);
   });
 })();
 </script>
