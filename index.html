@@ -6418,6 +6418,9 @@ var now=Date.now();if(now-lastN<400){dvNightVision();lastN=0;}else{lastN=now;}}
   });
 
   rgbToggle.addEventListener('click', function() {
+    if (!rgbShiftActive) {
+      if (!confirm('⚠ WARNING: RGB SPECTRUM SHIFT CONTAINS RAPID COLOR CHANGES THAT MAY AFFECT PHOTOSENSITIVE INDIVIDUALS.\n\nPROCEED?')) return;
+    }
     rgbShiftActive = !rgbShiftActive;
     rgbToggle.textContent = rgbShiftActive ? 'ON' : 'OFF';
     rgbToggle.classList.toggle('dv-mood--on', rgbShiftActive);
