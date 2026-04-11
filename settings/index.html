@@ -95,7 +95,15 @@ body{background:var(--bg);color:var(--neon);font-family:'Courier New',monospace;
 
 <!-- SETTINGS PANEL -->
 <div id="settings-panel">
-  <button class="logout-btn" onclick="firebase.auth().signOut().then(function(){location.reload()})">DISCONNECT</button>
+  <div style="padding:12px 20px;border-bottom:1px solid rgba(var(--neon-rgb),0.1);display:flex;justify-content:space-between;align-items:center">
+    <span style="font-size:11px;letter-spacing:4px;color:var(--neon)">>> DISS0LINKZ</span>
+    <div style="display:flex;gap:6px;align-items:center">
+      <a href="/settings/" style="color:var(--neon);font-size:9px;letter-spacing:2px;text-decoration:none;padding:4px 10px;border:1px solid var(--neon)">SETTINGS</a>
+      <a href="/links/" style="color:rgba(var(--neon-rgb),0.5);font-size:9px;letter-spacing:2px;text-decoration:none;padding:4px 10px;border:1px solid rgba(var(--neon-rgb),0.15)">DEEP LINKS</a>
+      <a href="/" style="color:rgba(var(--neon-rgb),0.5);font-size:9px;letter-spacing:2px;text-decoration:none;padding:4px 10px;border:1px solid rgba(var(--neon-rgb),0.15)">GATE</a>
+      <button onclick="firebase.auth().signOut().then(function(){location.href='/'})" style="background:none;border:1px solid rgba(255,68,68,0.3);color:rgba(255,68,68,0.5);font-family:'Courier New',monospace;font-size:8px;letter-spacing:2px;padding:4px 10px;cursor:pointer">LOGOUT</button>
+    </div>
+  </div>
   <div class="settings-wrap">
     <div class="settings-header">
       <h1>>> OPERATOR TERMINAL</h1>

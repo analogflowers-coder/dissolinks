@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<script>if(location.hostname==='links.dissoverse.com')location.replace('https://diss0linkz.com'+location.pathname+location.search);</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>DISS0LINKZ // DEEP LINKS</title>
+<link rel="apple-touch-icon" sizes="180x180" href="https://cdn.shopify.com/s/files/1/0897/5686/0735/files/BIG-DISSOVERSE-APP-LOGO.png?v=1775799330">
+<link rel="icon" type="image/png" href="https://cdn.shopify.com/s/files/1/0897/5686/0735/files/BIG-DISSOVERSE-APP-LOGO.png?v=1775799330">
+<meta name="robots" content="noindex, nofollow">
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<style>
+:root{--neon:#00ff41;--neon-rgb:0,255,65;--bg:#0a0a0a}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--neon);font-family:'Courier New',monospace;min-height:100vh}
+.gate{display:flex;align-items:center;justify-content:center;min-height:100vh;font-size:11px;letter-spacing:3px;color:rgba(var(--neon-rgb),0.4)}
+.nav{padding:12px 20px;border-bottom:1px solid rgba(var(--neon-rgb),0.1);display:flex;justify-content:space-between;align-items:center}
+.nav a{color:rgba(var(--neon-rgb),0.5);font-size:9px;letter-spacing:2px;text-decoration:none;padding:4px 10px;border:1px solid rgba(var(--neon-rgb),0.15);transition:all 0.3s}
+.nav a:hover{color:var(--neon);border-color:var(--neon)}
+.nav .active{color:var(--neon);border-color:var(--neon)}
+.nav-title{font-size:11px;letter-spacing:4px}
+.content{max-width:600px;margin:0 auto;padding:24px 16px}
+h2{font-size:11px;letter-spacing:4px;color:rgba(var(--neon-rgb),0.5);margin-bottom:16px;border-bottom:1px solid rgba(var(--neon-rgb),0.08);padding-bottom:8px}
+.info{font-size:10px;letter-spacing:1px;color:rgba(var(--neon-rgb),0.35);line-height:1.8;margin-bottom:20px}
+.coming-soon{text-align:center;padding:60px 20px;font-size:12px;letter-spacing:4px;color:rgba(var(--neon-rgb),0.25)}
+.coming-soon span{display:block;margin-top:8px;font-size:9px;letter-spacing:2px;color:rgba(var(--neon-rgb),0.15)}
+.logout-btn{background:none;border:1px solid rgba(255,68,68,0.3);color:rgba(255,68,68,0.5);font-family:'Courier New',monospace;font-size:8px;letter-spacing:2px;padding:4px 10px;cursor:pointer}
+.logout-btn:hover{border-color:#ff4444;color:#ff4444}
+#app{display:none}
+</style>
+</head>
+<body>
+
+<div class="gate" id="gate">CHECKING CLEARANCE...</div>
+
+<div id="app">
+  <div class="nav">
+    <span class="nav-title">>> DISS0LINKZ</span>
+    <div>
+      <a href="/settings/">SETTINGS</a>
+      <a href="/links/" class="active">DEEP LINKS</a>
+      <a href="/">GATE</a>
+      <button class="logout-btn" onclick="_fbAuth.signOut().then(function(){location.href='/'})">LOGOUT</button>
+    </div>
+  </div>
+  <div class="content">
+    <h2>// DEEP LINK MANAGER</h2>
+    <div class="info">Create vanity short links that redirect through the DISSOVERSE bridge system. Links deploy as static HTML files via GitHub Pages.</div>
+    <div class="coming-soon">
+      DEEP LINK ENGINE COMING SOON
+      <span>This feature is being migrated from the Force-Op tool to a user-friendly interface with Firebase-backed link storage and click tracking.</span>
+    </div>
+  </div>
+</div>
+
+<script>
+firebase.initializeApp({apiKey:"AIzaSyBJW5JIetcStxkvZoqpk3IwQbUY7BI9-JI",authDomain:"diss0linkz.firebaseapp.com",projectId:"diss0linkz",storageBucket:"diss0linkz.firebasestorage.app",messagingSenderId:"50981881114",appId:"1:50981881114:web:4392a0aa58399a627f18a3"});
+var _fbAuth = firebase.auth();
+var _fbDb = firebase.firestore();
+
+_fbAuth.onAuthStateChanged(function(user) {
+  if (!user) { window.location.href = '/'; return; }
+  _fbDb.collection('users').doc(user.uid).get().then(function(doc) {
+    if (!doc.exists || doc.data().status !== 'approved') { window.location.href = '/'; return; }
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+  });
+});
+</script>
+</body>
+</html>

@@ -23,10 +23,10 @@
 <meta name="twitter:description" content="VOID_STRIDE PROTOCOL ACTIVE. SOVEREIGN LINK ARCHITECTURE.">
 <meta name="theme-color" content="#00FF41">
 <meta name="robots" content="noindex, nofollow">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' https://cdn.shopify.com; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://cdn.shopify.com; media-src 'self' https://cdn.shopify.com; connect-src 'self' https://api.github.com https://discord.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' https://cdn.shopify.com; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://cdn.shopify.com; media-src 'self' https://cdn.shopify.com; connect-src 'self' https://api.github.com https://discord.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
 <!-- END META TAGS // META_CRACKER -->
 <!-- TODO: Replace Tailwind Play CDN with self-hosted build for full SRI support -->
-<script src="https://cdn.tailwindcss.com" crossorigin="anonymous"></script>
+<!-- Tailwind CDN removed — was dev-only bloat (~300KB) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" integrity="sha512-CNvpLwFDaYITwIOb9XLz6pAQnS6P5a5D1jtSc30wUW7sVuS1r1lP5DfFHOeJrEqdpOBHRgrW7MGQq3nSWjKg==" crossorigin="anonymous"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap');
@@ -1886,10 +1886,13 @@ var _fbDb = firebase.firestore();
         </div>
         <div class="vault-field">
           <label class="vault-label" for="dv-signin-pass">&#62; CLEARANCE CODE</label>
-          <input type="password" id="dv-signin-pass" class="vault-input" placeholder="CLEARANCE CODE // MIN 12 CHARS"
+          <input type="password" id="dv-signin-pass" class="vault-input" placeholder="CLEARANCE CODE // MIN 8 CHARS"
             autocomplete="current-password" spellcheck="false" minlength="12">
         </div>
         <button class="vault-btn-primary" id="dv-signin-btn" onclick="dvAccountSignIn()">&#9654; AUTHENTICATE</button>
+        <div style="text-align:center;margin-top:10px">
+          <a href="#" id="dv-forgot-link" onclick="dvForgotPassword();return false" style="font-size:8px;letter-spacing:2px;color:rgba(var(--neon-rgb,0,255,65),0.35);text-decoration:none">FORGOT CREDENTIALS?</a>
+        </div>
       </div>
 
       <!-- CREATE ACCOUNT PANEL -->
@@ -4032,6 +4035,20 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
         dvSetAuthStatus(msg, 'err');
         if (e.code === 'auth/wrong-password') accessDenied();
         btn.disabled = false;
+      });
+  };
+
+  // ── FORGOT PASSWORD ─────────────────────────────────────────────
+  window.dvForgotPassword = function() {
+    var emailInput = document.getElementById('dv-signin-user');
+    var email = emailInput ? emailInput.value.trim() : '';
+    if (!email) { dvSetAuthStatus('> ENTER YOUR EMAIL FIRST, THEN CLICK FORGOT CREDENTIALS.', 'err'); return; }
+    _fbAuth.sendPasswordResetEmail(email)
+      .then(function() { dvSetAuthStatus('> PASSWORD RESET SENT TO ' + email.toUpperCase() + '. CHECK YOUR INBOX.', 'ok'); })
+      .catch(function(e) {
+        var msg = e.code === 'auth/user-not-found' ? '> NO ACCOUNT FOUND WITH THAT EMAIL.'
+                : '> ERROR: ' + e.message;
+        dvSetAuthStatus(msg, 'err');
       });
   };
 
