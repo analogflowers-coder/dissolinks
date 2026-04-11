@@ -1663,14 +1663,6 @@ body.dv-glitching #diss0linkz-auth-gate {
 }
 
 </style>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-<script>
-firebase.initializeApp({apiKey:"AIzaSyBJW5JIetcStxkvZoqpk3IwQbUY7BI9-JI",authDomain:"diss0linkz.firebaseapp.com",projectId:"diss0linkz",storageBucket:"diss0linkz.firebasestorage.app",messagingSenderId:"50981881114",appId:"1:50981881114:web:4392a0aa58399a627f18a3"});
-var _fbAuth = firebase.auth();
-var _fbDb = firebase.firestore();
-</script>
 </head>
 <body>
 
@@ -1881,8 +1873,8 @@ var _fbDb = firebase.firestore();
         </div>
         <div class="vault-field">
           <label class="vault-label" for="dv-signin-user">&#62; OPERATIVE ID</label>
-          <input type="email" id="dv-signin-user" class="vault-input" placeholder="EMAIL ADDRESS"
-            autocomplete="email" autocorrect="off" autocapitalize="off" spellcheck="false" maxlength="60">
+          <input type="text" id="dv-signin-user" class="vault-input" placeholder="ENTER OPERATIVE ID"
+            autocomplete="username" autocorrect="off" autocapitalize="off" spellcheck="false" maxlength="30">
         </div>
         <div class="vault-field">
           <label class="vault-label" for="dv-signin-pass">&#62; CLEARANCE CODE</label>
@@ -1899,13 +1891,8 @@ var _fbDb = firebase.firestore();
         </div>
         <div class="vault-field">
           <label class="vault-label" for="dv-create-user">&#62; OPERATIVE ID</label>
-          <input type="text" id="dv-create-user" class="vault-input" placeholder="ENTER OPERATIVE ID (username)"
+          <input type="text" id="dv-create-user" class="vault-input" placeholder="ENTER OPERATIVE ID"
             autocomplete="username" autocorrect="off" autocapitalize="off" spellcheck="false" maxlength="30">
-        </div>
-        <div class="vault-field">
-          <label class="vault-label" for="dv-create-email">&#62; EMAIL ADDRESS</label>
-          <input type="email" id="dv-create-email" class="vault-input" placeholder="YOUR EMAIL ADDRESS"
-            autocomplete="email" spellcheck="false">
           <div style="font-size:9px; color:rgba(0,255,65,0.35); margin-top:4px; letter-spacing:1.5px;">
             LETTERS, NUMBERS, HYPHENS, UNDERSCORES ONLY
           </div>
@@ -3741,10 +3728,38 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
   function dvGetUsername() { var s = dvGetSession(); return s ? s.username : null; }
   function dvCheckSession() { return !!dvGetSession(); }
 
-  // ── FIREBASE AUTH (replaces old localStorage + PBKDF2) ─────────
-  // No localStorage fallback. Firebase only. Per AXIOM directive.
-  function dvReadAccounts() { return { accounts: [] }; } // stub
-  function dvWriteAccounts() {} // stub
+  // ── ACCOUNT STORAGE (localStorage) ─────────────────────────────
+  function dvReadAccounts() {
+    if (!_lsAvailable) return { accounts: [] };
+    try {
+      var raw = localStorage.getItem(CFG.STORAGE_KEY);
+      if (!raw) return { accounts: [] };
+      return JSON.parse(raw);
+    } catch(e) { return { accounts: [] }; }
+  }
+  function dvWriteAccounts(data) {
+    if (!_lsAvailable) throw new Error('STORAGE BLOCKED: browser is in private mode or has restricted localStorage. Accounts cannot be saved.');
+    try {
+      localStorage.setItem(CFG.STORAGE_KEY, JSON.stringify(data));
+    } catch(e) {
+      throw new Error('STORAGE WRITE FAILED: ' + (e.message || 'quota exceeded or access denied'));
+    }
+  }
+
+  // ── PBKDF2-SHA256 200k iterations ──────────────────────────────
+  async function dvPBKDF2(password, salt) {
+    var enc = new TextEncoder();
+    var key = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']);
+    var bits = await crypto.subtle.deriveBits(
+      { name: 'PBKDF2', salt: enc.encode(salt), iterations: CFG.ITER, hash: 'SHA-256' }, key, 256
+    );
+    return Array.from(new Uint8Array(bits)).map(function(b) { return b.toString(16).padStart(2,'0'); }).join('');
+  }
+  function dvGenSalt() {
+    var arr = new Uint8Array(16);
+    crypto.getRandomValues(arr);
+    return Array.from(arr).map(function(b) { return b.toString(16).padStart(2,'0'); }).join('');
+  }
 
   // ── BOOT SEQUENCE ───────────────────────────────────────────────
   var bootDone = false;
@@ -4002,37 +4017,37 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
     var passInput = document.getElementById('dv-signin-pass');
     var btn       = document.getElementById('dv-signin-btn');
     if (!userInput || !passInput) return;
-    var email = userInput.value.trim();
+    var username = userInput.value.trim().toUpperCase();
     var password = passInput.value;
-    if (!email || !password) { dvSetAuthStatus('> EMAIL AND CLEARANCE CODE REQUIRED.', 'err'); return; }
+    if (!username || !password) { dvSetAuthStatus('> OPERATIVE ID AND CLEARANCE CODE REQUIRED.', 'err'); return; }
+    if (password.length < 12) { dvSetAuthStatus('> CLEARANCE CODE INSUFFICIENT. MINIMUM 12 CHARACTERS REQUIRED.', 'err'); return; }
     btn.disabled = true;
-    dvSetAuthStatus('> AUTHENTICATING VIA FIREBASE...', 'wait');
-    _fbAuth.signInWithEmailAndPassword(email, password)
-      .then(function(cred) {
-        return _fbDb.collection('users').doc(cred.user.uid).get();
-      })
-      .then(function(doc) {
-        if (!doc.exists) { dvSetAuthStatus('> ACCOUNT NOT FOUND IN NETWORK.', 'err'); btn.disabled=false; return; }
-        var status = doc.data().status;
-        if (status === 'pending') { dvSetAuthStatus('> CLEARANCE REQUEST UNDER REVIEW. STAND BY FOR OPERATOR AUTHORIZATION.', 'wait'); btn.disabled=false; return; }
-        if (status === 'suspended') { dvSetAuthStatus('> CLEARANCE REVOKED. CONTACT COMMAND FOR REINSTATEMENT.', 'err'); btn.disabled=false; return; }
-        if (status === 'approved') {
-          var uname = doc.data().username || email.split('@')[0];
-          dvSetSession(uname);
-          dvSetAuthStatus('> ACCESS GRANTED // OPERATIVE ' + uname.toUpperCase(), 'ok');
-          passInput.value = '';
-          setTimeout(function() { accessGranted(); }, 600);
-        }
-      })
-      .catch(function(e) {
-        var msg = e.code === 'auth/user-not-found' ? '> OPERATIVE NOT FOUND. REQUEST CLEARANCE FIRST.'
-                : e.code === 'auth/wrong-password' ? '> AUTHENTICATION FAILED. CLEARANCE DENIED.'
-                : e.code === 'auth/invalid-email' ? '> INVALID EMAIL FORMAT.'
-                : '> AUTH ERROR: ' + e.message;
-        dvSetAuthStatus(msg, 'err');
-        if (e.code === 'auth/wrong-password') accessDenied();
-        btn.disabled = false;
-      });
+    dvSetAuthStatus('> AUTHENTICATING...', 'wait');
+    try {
+      var reg = dvReadAccounts();
+      var accounts = reg.accounts || [];
+      var account = accounts.find(function(a) { return a.username === username; });
+      if (!account) {
+        var notFoundMsg = _lsAvailable
+          ? '> OPERATOR NOT FOUND. CREATE AN ACCOUNT FIRST.'
+          : '> STORAGE BLOCKED: PRIVATE MODE DETECTED. ACCOUNTS CANNOT BE SAVED IN THIS BROWSER MODE.';
+        dvSetAuthStatus(notFoundMsg, 'err');
+        btn.disabled = false; return;
+      }
+      var hash = await dvPBKDF2(password, account.salt);
+      if (hash !== account.hash) {
+        dvSetAuthStatus('> AUTHENTICATION FAILED. CLEARANCE DENIED.', 'err');
+        accessDenied();
+        btn.disabled = false; return;
+      }
+      dvSetSession(username);
+      dvSetAuthStatus('> ACCESS GRANTED // OPERATIVE ' + username, 'ok');
+      passInput.value = '';
+      setTimeout(function() { accessGranted(); }, 600);
+    } catch(e) {
+      dvSetAuthStatus('> ERROR: ' + e.message, 'err');
+      btn.disabled = false;
+    }
   };
 
   // ── CREATE ACCOUNT ──────────────────────────────────────────────
@@ -4042,91 +4057,58 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
     var pass2Input = document.getElementById('dv-create-pass2');
     var btn        = document.getElementById('dv-create-btn');
     if (!userInput || !passInput || !pass2Input) return;
-    var username = userInput.value.trim().toLowerCase().replace(/[^a-z0-9_\-]/g, '');
+    var username = userInput.value.trim().toUpperCase().replace(/[^A-Z0-9_\-]/g, '');
     var password = passInput.value;
     var pass2    = pass2Input.value;
-    if (!username || username.length < 3) { dvSetAuthStatus('> OPERATIVE ID REQUIRED (3+ CHARACTERS).', 'err'); return; }
+    if (!username) { dvSetAuthStatus('> OPERATIVE ID REQUIRED.', 'err'); return; }
     if (!password) { dvSetAuthStatus('> CLEARANCE CODE REQUIRED.', 'err'); return; }
-    if (password.length < 8) { dvSetAuthStatus('> CLEARANCE CODE INSUFFICIENT. MINIMUM 8 CHARACTERS.', 'err'); return; }
+    if (password.length < 12) { dvSetAuthStatus('> CLEARANCE CODE INSUFFICIENT. MINIMUM 12 CHARACTERS REQUIRED.', 'err'); return; }
     if (password !== pass2) { dvSetAuthStatus('> CLEARANCE CODE MISMATCH. TRANSMISSION ABORTED.', 'err'); return; }
-    // Check if username input has @ — treat as email
-    var email = username.includes('@') ? username : username + '@diss0linkz.user';
-    // If there's no email field, use username as identifier
-    var emailField = document.getElementById('dv-create-email');
-    if (emailField && emailField.value.trim()) email = emailField.value.trim();
     btn.disabled = true;
-    dvSetAuthStatus('> ESTABLISHING SECURE CHANNEL...', 'wait');
-    // Check username uniqueness in Firestore
-    _fbDb.collection('users').where('username','==',username).limit(1).get()
-      .then(function(snap) {
-        if (!snap.empty) { throw {code:'username-taken',message:'OPERATIVE ID ALREADY REGISTERED.'}; }
-        return _fbAuth.createUserWithEmailAndPassword(email, password);
-      })
-      .then(function(cred) {
-        return _fbDb.collection('users').doc(cred.user.uid).set({
-          uid: cred.user.uid,
-          username: username,
-          email: email,
-          status: 'pending',
-          subscriptionTier: 'free',
-          created: firebase.firestore.FieldValue.serverTimestamp(),
-          approvedBy: null,
-          approvedAt: null,
-          config: {
-            displayName: '', bio: '', avatar: '',
-            links: [], socialLinks: {instagram:'',x:'',tiktok:'',youtube:'',spotify:''},
-            color: '#00FF41', speed: 5, background: 'matrix', audioUrl: ''
-          }
-        });
-      })
-      .then(function() {
-        dvSetAuthStatus('> CLEARANCE REQUEST SUBMITTED.\\n> AWAITING OPERATOR APPROVAL.\\n> YOU WILL BE NOTIFIED WHEN APPROVED.', 'wait');
-        passInput.value = ''; pass2Input.value = '';
-        _fbAuth.signOut();
-        btn.disabled = false;
-      })
-      .catch(function(e) {
-        var msg = e.code === 'username-taken' ? '> ' + e.message
-                : e.code === 'auth/email-already-in-use' ? '> EMAIL ALREADY REGISTERED. USE SIGN IN.'
-                : e.code === 'auth/weak-password' ? '> CLEARANCE CODE TOO WEAK. USE 8+ CHARACTERS.'
-                : e.code === 'auth/invalid-email' ? '> INVALID EMAIL FORMAT.'
-                : '> ERROR: ' + e.message;
-        dvSetAuthStatus(msg, 'err');
-        btn.disabled = false;
+    dvSetAuthStatus('> HASHING CREDENTIALS...', 'wait');
+    try {
+      var reg = dvReadAccounts();
+      var accounts = reg.accounts || [];
+      if (accounts.find(function(a) { return a.username === username; })) {
+        dvSetAuthStatus('> OPERATIVE ID ALREADY REGISTERED.', 'err');
+        btn.disabled = false; return;
+      }
+      var salt = dvGenSalt();
+      var hash = await dvPBKDF2(password, salt);
+      accounts.push({
+        username: username, hash: hash, salt: salt,
+        created: new Date().toISOString()
       });
+      dvWriteAccounts({ accounts: accounts });
+      dvSetSession(username);
+      dvSetAuthStatus('> CLEARANCE GRANTED. OPERATIVE ' + username + ' — STATUS: ACTIVE.', 'ok');
+      passInput.value = ''; pass2Input.value = '';
+      setTimeout(function() { accessGranted(); }, 600);
+    } catch(e) {
+      dvSetAuthStatus('> ERROR: ' + e.message, 'err');
+      btn.disabled = false;
+    }
   };
 
   // ── INIT ────────────────────────────────────────────────────────
   document.addEventListener('DOMContentLoaded', function() {
-    // Check Firebase auth state on load
-    _fbAuth.onAuthStateChanged(function(user) {
-      if (user) {
-        _fbDb.collection('users').doc(user.uid).get().then(function(doc) {
-          if (doc.exists && doc.data().status === 'approved') {
-            var uname = doc.data().username || user.email.split('@')[0];
-            dvSetSession(uname);
-            var gate = document.getElementById('diss0linkz-auth-gate');
-            var app  = document.getElementById('diss0linkz-app');
-            var flash  = document.getElementById('dv-granted-flash');
-            if (gate)   gate.style.display = 'none';
-            if (flash)  flash.style.display = 'none';
-            document.body.classList.remove('dv-gate-active');
-            if (app) app.classList.add('app-visible');
-            var mtxR = document.getElementById('dv-matrix-canvas');
-            if (mtxR) { mtxR.classList.add('dv-matrix-app-mode'); window.dvMatrixSpeed = 0.7; }
-            var initDiv = document.getElementById('dv-music-init');
-            if (initDiv) initDiv.style.display = 'block';
-            dvUpdateUI(uname);
-          }
-        });
-        return;
-      }
-      // Not logged in — check sessionStorage fallback for the app session
-      if (dvCheckSession()) {
-        // Session exists but no Firebase user — clear stale session
-        dvClearSession();
-      }
-    });
+    // Check existing sessionStorage session (replaces cookie check)
+    if (dvCheckSession()) {
+      var gate = document.getElementById('diss0linkz-auth-gate');
+      var app  = document.getElementById('diss0linkz-app');
+      var flash  = document.getElementById('dv-granted-flash');
+      if (gate)   gate.style.display = 'none';
+      if (flash)  flash.style.display = 'none';
+      document.body.classList.remove('dv-gate-active');
+      if (app) app.classList.add('app-visible');
+      // Matrix persists behind app for returning users too
+      var mtxR = document.getElementById('dv-matrix-canvas');
+      if (mtxR) { mtxR.classList.add('dv-matrix-app-mode'); window.dvMatrixSpeed = 0.7; }
+      var initDiv = document.getElementById('dv-music-init');
+      if (initDiv) initDiv.style.display = 'block';
+      dvUpdateUI(dvGetUsername());
+      return;
+    }
 
     document.body.classList.add('dv-gate-active');
     // Wait for typewriter (3.2s) + fade (0.8s) + terminal open (1.8s) then boot text
