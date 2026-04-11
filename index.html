@@ -3598,79 +3598,10 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
     { text: '> OPERATOR AUTHENTICATION REQUIRED', cls: 'dv-bright', delay: 360 }
   ];
 
-  // ── MATRIX RAIN (disabled — replaced by backgrounds.js) ────────
-  // The backgrounds.js file handles all 5 background types now
-  (function initMatrix_DISABLED() { return; /* disabled */
-  (function initMatrix_OLD() {
-    var canvas = document.getElementById('dv-matrix-canvas');
-    if (!canvas) return;
-    var ctx = canvas.getContext('2d');
-    var cols, drops, fontSize = 14;
-    var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()_+-=[]{}|;:,.<>?/\\~`゠ァアィイゥウェエォコデブプホラン';
-
-    function resize() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      cols = Math.floor(canvas.width / fontSize);
-      drops = [];
-      for (var i = 0; i < cols; i++) {
-        drops[i] = Math.random() * -canvas.height / fontSize;
-      }
-    }
-
-    window.addEventListener('resize', resize);
-    resize();
-
-    function drawMatrix() {
-      var spd  = window.dvMatrixSpeed || 1;
-      var head = window.dvMatrixHead  || '#ffffff';
-      var col  = window.dvMatrixColor || getComputedStyle(document.documentElement).getPropertyValue('--matrix-color').trim() || '#00ff41';
-      var fade = window.dvMatrixFade  || getComputedStyle(document.documentElement).getPropertyValue('--matrix-fade').trim() || 'rgba(0,255,65,0.4)';
-      ctx.fillStyle = 'rgba(0,0,0,0.055)';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      for (var i = 0; i < cols; i++) {
-        var char = chars[Math.floor(Math.random() * chars.length)];
-        var y = drops[i] * fontSize;
-        if (drops[i] > 0) {
-          ctx.fillStyle = drops[i] < 2 ? head : (Math.random() > 0.1 ? col : fade);
-          ctx.font = fontSize + 'px "JetBrains Mono", monospace';
-          ctx.fillText(char, i * fontSize, y);
-        }
-        if (y > canvas.height && Math.random() > 0.975) drops[i] = 0;
-        drops[i] += (0.5 + Math.random() * 0.5) * spd;
-      }
-    }
-
-    // GHOST-SCRIPT: mobile throttle — half frame rate + half column density on mobile
-    var _dvMatrixIsMobile = (window.innerWidth < 768 || navigator.maxTouchPoints > 0);
-    if (_dvMatrixIsMobile) {
-      fontSize = 28; // 50% column density (was 14px step → 28px step)
-      resize();      // recompute cols at new fontSize
-    }
-    var _dvMatrixInterval = _dvMatrixIsMobile ? 90 : 45; // 90ms on mobile, 45ms desktop
-    var _dvMatrixTimer = setInterval(drawMatrix, _dvMatrixInterval);
-    // REACTIVE-SOUL: expose globals so ncpSetTheme can restart interval with energy-based speed
-    window.dvMatrixInterval    = _dvMatrixInterval;
-    window.dvMatrixIntervalFn  = drawMatrix;
-    window.dvMatrixTimerRef    = _dvMatrixTimer;
-    window.dvRestartMatrix = function(newDelay) {
-      clearInterval(window.dvMatrixTimerRef);
-      window.dvMatrixInterval = newDelay;
-      window.dvMatrixTimerRef = setInterval(window.dvMatrixIntervalFn, newDelay);
-    };
-
-    // GHOST-SCRIPT: pause matrix rain when tab is hidden, resume on visibility
-    document.addEventListener('visibilitychange', function() {
-      if (document.hidden) {
-        clearInterval(_dvMatrixTimer);
-        _dvMatrixTimer = null;
-      } else {
-        if (!_dvMatrixTimer) {
-          _dvMatrixTimer = setInterval(drawMatrix, _dvMatrixInterval);
-        }
-      }
-    });
-  })();
+  /* ── OLD MATRIX RAIN — REPLACED BY backgrounds.js ──────────────
+     The backgrounds.js file now handles all 5 background types.
+     This entire block is commented out to prevent JS errors.
+  */
 
   // ── AUDIO VISUALIZER ─────────────────────────────────────────────
   (function initVisualizer() {
