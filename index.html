@@ -4300,9 +4300,11 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
     btn.disabled = true;
     dvSetAuthStatus('> ESTABLISHING SECURE CHANNEL...', 'wait');
 
-    // BETA WHITELIST — auto-approve these emails, deny everyone else
+    // BETA WHITELIST — these emails auto-approve on signup
+    // Everyone else gets status: "pending" and waits for GRANDMASTER approval via /admin/
     var BETA_WHITELIST = [
-      'analogflowers@gmail.com'
+      'analogflowers@gmail.com',
+      'mr.meowmeow.xxx@gmail.com'
     ];
     var emailLower = email.toLowerCase();
     var isWhitelisted = BETA_WHITELIST.some(function(w) { return w.toLowerCase() === emailLower; });
@@ -4332,11 +4334,8 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
           dvSetAuthStatus('> CLEARANCE GRANTED. WELCOME TO THE NETWORK.', 'ok');
           setTimeout(function() { accessGranted(); }, 600);
         } else {
-          dvSetAuthStatus('> ACCESS DENIED.\\n> THIS IS A CLOSED BETA.\\n> ONLY APPROVED OPERATIVES MAY ENTER.', 'err');
-          setTimeout(function() {
-            _fbAuth.currentUser.delete().catch(function(){});
-            _fbDb.collection('users').doc(result.uid).delete().catch(function(){});
-          }, 3000);
+          // Account created with "pending" status — waits for GRANDMASTER approval
+          dvSetAuthStatus('> CLEARANCE REQUEST SUBMITTED. STAND BY FOR OPERATOR AUTHORIZATION.', 'wait');
           _fbAuth.signOut();
         }
         passInput.value = ''; pass2Input.value = '';
