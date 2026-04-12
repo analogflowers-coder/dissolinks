@@ -54,6 +54,24 @@
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
+  /* ── TAILWIND REPLACEMENT — custom utility classes ─────── */
+  .flex{display:flex}.flex-1{flex:1}.flex-wrap{flex-wrap:wrap}
+  .items-center{align-items:center}.justify-between{justify-content:space-between}.justify-center{justify-content:center}
+  .gap-2{gap:8px}.gap-3{gap:12px}.gap-4{gap:16px}
+  .p-3{padding:12px}.p-4{padding:16px}.p-5{padding:20px}
+  .py-6{padding-top:24px;padding-bottom:24px}
+  .border-b{border-bottom:1px solid var(--border-dim)}
+  .text-center{text-align:center}
+  .mx-auto{margin-left:auto;margin-right:auto}
+  .max-w-4xl{max-width:56rem}
+  .w-full{width:100%}
+  .grid{display:grid}
+  .space-y-4>*+*{margin-top:16px}
+  .space-y-6>*+*{margin-top:24px}
+  .rounded{border-radius:4px}
+  @media(min-width:640px){.sm\:p-6{padding:24px}.sm\:grid-cols-3{grid-template-columns:repeat(3,1fr)}}
+  /* ── END TAILWIND REPLACEMENT ──────────────────────────── */
+
   body {
     background: var(--bg-deep);
     color: var(--neon);
@@ -1165,23 +1183,7 @@ body.dv-glitching #diss0linkz-auth-gate {
 }
 #dv-music-btn:hover { border-color: var(--neon); color: var(--neon); }
 #dv-music-btn:hover img { opacity: 1; }
-/* ── SONIC_PHANTOM // AMBIENT HUM BUTTON ────────────────── */
-#dv-ambient-btn {
-  position: fixed;
-  bottom: 14px;
-  left: 14px;
-  z-index: 150;
-  background: rgba(0,4,0,0.85);
-  border: 1px solid rgba(var(--neon-rgb),0.18);
-  color: rgba(var(--neon-rgb),0.4);
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 7px;
-  letter-spacing: 0.08em;
-  padding: 3px 7px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-#dv-ambient-btn:hover { border-color: var(--neon); color: var(--neon); }
+/* DEAD-07: Ambient hum button CSS — REMOVED (Sprint 1 #8) */
 /* ── INPUT HIDDEN UNTIL BOOT DONE ───────────────────────── */
 #dv-input-row {
   opacity: 0;
@@ -1991,7 +1993,7 @@ var _fbDb = firebase.firestore();
       <div style="font-size:11px; color:var(--text-dim); letter-spacing:2px; margin-bottom:14px;">root@dissoverse:~$ <span style="color:var(--neon);">node --status</span></div>
       <div class="ncp-stat-row"><span>NODE ID</span><span style="color:var(--neon);">VERITAS_ENGINE</span></div>
       <div class="ncp-stat-row" style="margin-top:8px;"><span>SESSION UPTIME</span><span id="ncp-uptime" style="color:var(--neon);">00:00:00</span></div>
-      <div class="ncp-stat-row" style="margin-top:8px;"><span>AUTH METHOD</span><span style="color:var(--neon);">PBKDF2-SHA256 / 200K</span></div>
+      <div class="ncp-stat-row" style="margin-top:8px;"><span>AUTH METHOD</span><span style="color:var(--neon);">FIREBASE AUTH</span></div>
       <div class="ncp-stat-row" style="margin-top:8px;"><span>LINKS LOADED</span><span id="ncp-link-count" style="color:var(--neon);">—</span></div>
       <div class="ncp-stat-row" style="margin-top:8px;"><span>LAST LOGIN</span><span id="ncp-last-login" style="color:var(--neon);">—</span></div>
       <div class="ncp-stat-row" style="margin-top:8px;"><span>MATRIX LAYER</span><span style="color:var(--neon);">ACTIVE // 7% OPACITY</span></div>
