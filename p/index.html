@@ -287,6 +287,11 @@ function renderPage(userData) {
   }
 
   // Audio
+  // Convert Google Drive share links to direct download URLs
+  if (c.audio && c.audio.indexOf('drive.google.com') !== -1) {
+    var driveMatch = c.audio.match(/\/d\/([a-zA-Z0-9_-]+)/);
+    if (driveMatch) c.audio = 'https://drive.google.com/uc?export=download&id=' + driveMatch[1];
+  }
   if (c.audio) {
     html += '<div class="audio-section animate-in">';
     html += '<audio controls preload="none" src="'+esc(c.audio)+'"></audio>';
