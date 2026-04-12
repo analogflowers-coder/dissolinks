@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <script>if(location.hostname==='links.dissoverse.com')location.replace('https://diss0linkz.com'+location.pathname+location.search);</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>DISS0LINKZ // DEEP LINKS</title>
+<title>DISS0LINKZ // DEEP LINK MANAGER</title>
 <link rel="apple-touch-icon" sizes="180x180" href="https://cdn.shopify.com/s/files/1/0897/5686/0735/files/BIG-DISSOVERSE-APP-LOGO.png?v=1775799330">
 <link rel="icon" type="image/png" href="https://cdn.shopify.com/s/files/1/0897/5686/0735/files/BIG-DISSOVERSE-APP-LOGO.png?v=1775799330">
 <meta name="robots" content="noindex, nofollow">
@@ -12,38 +12,109 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" integrity="sha512-CNvpLwFDaYITwIOb9XLz6pAQnS6P5a5D1jtSc30wUW7sVuS1r1lP5DfFHOeJrEqdpOBHRgrW7MGQq3nSWjKg==" crossorigin="anonymous"></script>
 <style>
-:root{--neon:#00ff41;--neon-rgb:0,255,65;--bg:#0a0a0a;--matrix-color:#00ff41;--matrix-fade:rgba(0,255,65,0.4)}
+:root{--neon:#00ff41;--neon-rgb:0,255,65;--bg:#0a0a0a;--matrix-color:#00ff41;--matrix-fade:rgba(0,255,65,0.4);--red-warn:#ff0033;--text-dim:rgba(0,255,65,0.5);--border-dim:rgba(0,255,65,0.12);--border-mid:rgba(0,255,65,0.25)}
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--neon);font-family:'Share Tech Mono','Courier New',monospace;min-height:100vh}
-
-/* CRT Scanlines */
 body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.12) 2px,rgba(0,0,0,0.12) 4px);pointer-events:none;z-index:9999}
 body::after{content:'';position:fixed;inset:0;background:rgba(var(--neon-rgb),0.008);pointer-events:none;z-index:9998;animation:flicker 0.15s infinite}
 @keyframes flicker{0%,100%{opacity:1}50%{opacity:0.97}}
-
 #dv-matrix-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:0.15}
-.gate{position:relative;z-index:10;display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:'VT323',monospace;font-size:14px;letter-spacing:4px;color:rgba(var(--neon-rgb),0.4);text-shadow:0 0 10px rgba(var(--neon-rgb),0.15)}
-.nav{position:relative;z-index:10;padding:12px 20px;border-bottom:1px solid rgba(var(--neon-rgb),0.08);display:flex;justify-content:space-between;align-items:center;background:rgba(0,0,0,0.5);backdrop-filter:blur(8px)}
-.nav a{font-family:'Share Tech Mono',monospace;color:rgba(var(--neon-rgb),0.45);font-size:9px;letter-spacing:2px;text-decoration:none;padding:5px 10px;border:1px solid rgba(var(--neon-rgb),0.15);transition:all 0.3s}
-.nav a:hover{color:var(--neon);border-color:var(--neon)}
-.nav .active{color:var(--neon);border-color:var(--neon)}
+
+/* Gate */
+.gate{position:relative;z-index:10;display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:'VT323',monospace;font-size:14px;letter-spacing:4px;color:rgba(var(--neon-rgb),0.4)}
+
+/* Nav */
+.nav{position:relative;z-index:10;padding:12px 20px;border-bottom:1px solid rgba(var(--neon-rgb),0.08);display:flex;justify-content:space-between;align-items:center;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px)}
 .nav-title{font-family:'VT323',monospace;font-size:16px;letter-spacing:4px;text-shadow:0 0 10px rgba(var(--neon-rgb),0.25)}
 .nav-links{display:flex;gap:6px;align-items:center}
-.logout-btn{background:none;border:1px solid rgba(255,68,68,0.25);color:rgba(255,68,68,0.45);font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;padding:5px 10px;cursor:pointer;transition:all 0.3s}
-.logout-btn:hover{border-color:#ff4444;color:#ff4444}
-.content{position:relative;z-index:10;max-width:600px;margin:0 auto;padding:24px 16px}
-h2{font-family:'VT323',monospace;font-size:16px;letter-spacing:5px;color:rgba(var(--neon-rgb),0.45);margin-bottom:16px;border-bottom:1px solid rgba(var(--neon-rgb),0.06);padding-bottom:8px}
-.info{font-size:10px;letter-spacing:1px;color:rgba(var(--neon-rgb),0.3);line-height:1.8;margin-bottom:20px}
-.coming-soon{text-align:center;padding:60px 20px}
-.coming-soon .title{font-family:'VT323',monospace;font-size:24px;letter-spacing:5px;color:rgba(var(--neon-rgb),0.2);text-shadow:0 0 15px rgba(var(--neon-rgb),0.1);animation:pulse 3s ease-in-out infinite}
-.coming-soon .sub{display:block;margin-top:12px;font-size:9px;letter-spacing:2px;color:rgba(var(--neon-rgb),0.12);max-width:400px;margin-left:auto;margin-right:auto;line-height:1.8}
-@keyframes pulse{0%,100%{opacity:0.2}50%{opacity:0.4}}
+.nav-links a,.nav-links button{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;text-decoration:none;padding:5px 10px;border:1px solid rgba(var(--neon-rgb),0.15);transition:all 0.3s;background:transparent;cursor:pointer}
+.nav-links a{color:rgba(var(--neon-rgb),0.45)}
+.nav-links a:hover{color:var(--neon);border-color:var(--neon)}
+.nav-links a.active{color:var(--neon);border-color:var(--neon)}
+.nav-links .logout{color:rgba(255,68,68,0.45);border-color:rgba(255,68,68,0.2)}
+.nav-links .logout:hover{color:#ff4444;border-color:#ff4444}
+
+/* Content */
+.content{position:relative;z-index:10;max-width:640px;margin:0 auto;padding:24px 16px 100px}
+.section-header{font-family:'VT323',monospace;font-size:16px;letter-spacing:5px;color:rgba(var(--neon-rgb),0.45);margin:20px 0 12px;border-bottom:1px solid rgba(var(--neon-rgb),0.06);padding-bottom:8px}
+
+/* Panels */
+.panel{border:1px solid rgba(var(--neon-rgb),0.08);background:rgba(0,0,0,0.4);padding:16px;margin-bottom:12px;backdrop-filter:blur(4px)}
+.panel:hover{border-color:rgba(var(--neon-rgb),0.2)}
+
+/* Inputs */
+.t-input{width:100%;background:rgba(0,0,0,0.5);border:1px solid rgba(var(--neon-rgb),0.15);color:var(--neon);font-family:'Share Tech Mono',monospace;font-size:13px;padding:10px 12px;letter-spacing:1px;transition:all 0.3s}
+.t-input:focus{outline:none;border-color:var(--neon);box-shadow:0 0 12px rgba(var(--neon-rgb),0.12)}
+.t-input::placeholder{color:rgba(var(--neon-rgb),0.18)}
+.t-select{background:rgba(0,0,0,0.5);border:1px solid rgba(var(--neon-rgb),0.15);color:var(--neon);font-family:'Share Tech Mono',monospace;font-size:12px;padding:8px 10px;cursor:pointer}
+.t-label{font-size:9px;letter-spacing:3px;color:rgba(var(--neon-rgb),0.4);margin-bottom:6px;display:block}
+
+/* Buttons */
+.btn{background:rgba(var(--neon-rgb),0.08);border:1px solid rgba(var(--neon-rgb),0.3);color:var(--neon);font-family:'VT323',monospace;font-size:16px;letter-spacing:3px;padding:12px 20px;cursor:pointer;transition:all 0.3s;width:100%;text-align:center}
+.btn:hover{background:rgba(var(--neon-rgb),0.15);box-shadow:0 0 15px rgba(var(--neon-rgb),0.2)}
+.btn:disabled{opacity:0.4;cursor:not-allowed}
+.btn-red{border-color:rgba(255,68,68,0.3);color:#ff4444;background:rgba(255,68,68,0.05)}
+.btn-red:hover{background:rgba(255,68,68,0.12);box-shadow:0 0 15px rgba(255,68,68,0.15)}
+.btn-sm{font-size:12px;padding:6px 12px;letter-spacing:2px;width:auto}
+
+/* Toggle */
+.toggle-row{display:flex;align-items:center;gap:10px;margin-top:6px;cursor:pointer}
+.toggle-box{width:38px;height:19px;border:1px solid rgba(var(--neon-rgb),0.25);position:relative;transition:all 0.3s}
+.toggle-box.on{border-color:var(--neon);background:rgba(var(--neon-rgb),0.12);box-shadow:0 0 8px rgba(var(--neon-rgb),0.15)}
+.toggle-box::after{content:'';position:absolute;top:2px;left:2px;width:13px;height:13px;background:rgba(var(--neon-rgb),0.35);transition:all 0.3s}
+.toggle-box.on::after{left:21px;background:var(--neon)}
+.toggle-label{font-size:9px;letter-spacing:2px;color:rgba(var(--neon-rgb),0.4)}
+
+/* Options row */
+.opts-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.opts-row>div{flex:1;min-width:120px}
+
+/* Output */
+.output-panel{display:none;border:1px solid var(--neon);background:rgba(var(--neon-rgb),0.03);padding:16px;text-align:center;margin-bottom:12px}
+.output-link{font-family:'VT323',monospace;font-size:22px;letter-spacing:2px;color:var(--neon);text-shadow:0 0 15px rgba(var(--neon-rgb),0.3);word-break:break-all;cursor:pointer;padding:8px;border:1px solid transparent;transition:all 0.2s}
+.output-link:hover{border-color:var(--border-mid);background:rgba(var(--neon-rgb),0.04)}
+.output-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.output-actions .btn{flex:1;min-width:100px;font-size:13px;padding:10px}
+.live-badge{font-family:'VT323',monospace;font-size:13px;letter-spacing:4px;color:var(--neon);text-shadow:0 0 10px rgba(var(--neon-rgb),0.4);margin-top:8px;display:none}
+
+/* Log */
+.log-wrap{border:1px solid rgba(var(--neon-rgb),0.08);background:rgba(0,0,0,0.5);margin-bottom:12px}
+.log-header{padding:8px 12px;border-bottom:1px solid rgba(var(--neon-rgb),0.06);display:flex;align-items:center;gap:8px;font-size:10px;color:var(--text-dim)}
+.log-body{height:160px;overflow-y:auto;padding:8px 12px;font-size:11px;line-height:1.6}
+.log-entry{color:var(--text-dim)}
+
+/* Active links */
+.link-card{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border:1px solid rgba(var(--neon-rgb),0.08);margin-bottom:4px;background:rgba(0,0,0,0.3);transition:all 0.3s;flex-wrap:wrap;gap:6px}
+.link-card:hover{border-color:rgba(var(--neon-rgb),0.25)}
+.link-dot{width:8px;height:8px;border-radius:50%;background:var(--neon);box-shadow:0 0 6px var(--neon);animation:pulse 2s ease-in-out infinite;flex-shrink:0}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+.link-name{font-size:12px;letter-spacing:1px;flex:1;margin:0 8px;word-break:break-all}
+.link-meta{font-size:8px;color:rgba(var(--neon-rgb),0.25);letter-spacing:1px}
+.link-actions{display:flex;gap:4px}
+.empty-state{text-align:center;padding:30px;color:rgba(var(--neon-rgb),0.2);font-family:'VT323',monospace;font-size:14px;letter-spacing:4px}
+
+/* QR */
+.qr-panel{display:none;border:1px solid var(--neon);padding:16px;text-align:center;background:rgba(0,0,0,0.7);box-shadow:0 0 18px rgba(var(--neon-rgb),0.15);margin-top:8px}
+
+/* GitHub PAT */
+.pat-section{margin-bottom:12px}
+.pat-status{font-size:9px;letter-spacing:2px;margin-top:6px}
+.pat-connected{color:var(--neon)}
+.pat-disconnected{color:var(--red-warn)}
+
+/* Slug preview */
+.slug-preview{font-size:12px;color:var(--text-dim);margin-top:4px}
+.slug-preview span{color:var(--neon)}
+
+/* Responsive */
+@media(max-width:500px){.nav-links{gap:4px}.nav-links a,.nav-links button{font-size:7px;padding:4px 6px}.opts-row{flex-direction:column}}
+
 #app{display:none}
 </style>
 </head>
 <body>
-
 <canvas id="dv-matrix-canvas"></canvas>
 
 <div class="gate" id="gate">VERIFYING CLEARANCE...</div>
@@ -55,45 +126,526 @@ h2{font-family:'VT323',monospace;font-size:16px;letter-spacing:5px;color:rgba(va
       <a href="/settings/">SETTINGS</a>
       <a href="/links/" class="active">DEEP LINKS</a>
       <a href="/">GATE</a>
-      <button class="logout-btn" onclick="_fbAuth.signOut().then(function(){location.href='/'})">LOGOUT</button>
+      <button class="logout" onclick="_fbAuth.signOut().then(function(){location.href='/'})">LOGOUT</button>
     </div>
   </div>
+
   <div class="content">
-    <h2>// DEEP LINK MANAGER</h2>
-    <div class="info">Create vanity short links that redirect through the DISSOVERSE bridge system. Links deploy as static HTML files via GitHub Pages.</div>
-    <div class="coming-soon">
-      <div class="title">DEEP LINK ENGINE COMING SOON</div>
-      <span class="sub">This feature is being migrated from the Force-Op tool to a user-friendly interface with Firebase-backed link storage and click tracking.</span>
+    <div class="section-header">// DEEP LINK GENERATOR</div>
+
+    <!-- GitHub PAT (GRANDMASTER only, hidden for regular users) -->
+    <div class="pat-section panel" id="pat-section">
+      <label class="t-label">GITHUB ACCESS TOKEN (REQUIRED FOR DEPLOY)</label>
+      <div style="display:flex;gap:6px">
+        <input type="password" class="t-input" id="gh-pat" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" style="flex:1">
+        <button class="btn btn-sm" onclick="connectPAT()">CONNECT</button>
+      </div>
+      <div class="pat-status" id="pat-status"></div>
+    </div>
+
+    <!-- Link Generator -->
+    <div class="panel">
+      <label class="t-label">TARGET URL</label>
+      <input type="url" class="t-input" id="target-url" placeholder="https://example.com" style="margin-bottom:10px">
+
+      <label class="t-label">VANITY SLUG</label>
+      <input type="text" class="t-input" id="short-name" placeholder="e.g. mainframe" maxlength="30" autocomplete="off" spellcheck="false">
+      <div class="slug-preview">diss0links.com/<span id="slug-preview"></span></div>
+
+      <div class="opts-row" style="margin-top:12px">
+        <div>
+          <label class="t-label">DISPLAY LABEL</label>
+          <input type="text" class="t-input" id="link-label" placeholder="e.g. NEW DROP" maxlength="50">
+        </div>
+        <div>
+          <label class="t-label">EXPIRATION</label>
+          <select class="t-select t-input" id="expiry-days">
+            <option value="7">7 DAYS</option>
+            <option value="14">14 DAYS</option>
+            <option value="30" selected>30 DAYS</option>
+            <option value="90">90 DAYS</option>
+            <option value="0">NEVER</option>
+          </select>
+        </div>
+        <div>
+          <label class="t-label">AGE GATE</label>
+          <div class="toggle-row" onclick="toggleAgeGate()">
+            <div class="toggle-box" id="age-gate-toggle"></div>
+            <span class="toggle-label" id="age-gate-label">OFF</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="btn" onclick="generateLink()" id="generate-btn" style="flex:3">&#9889; GENERATE DISS0LINK</button>
+        <button class="btn btn-red" onclick="clearAll()" style="flex:1;font-size:13px">&#10005; VOID</button>
+      </div>
+    </div>
+
+    <!-- Output Section -->
+    <div class="output-panel" id="output-section">
+      <div style="font-size:9px;letter-spacing:3px;color:var(--text-dim);margin-bottom:8px">YOUR VOID_STRIDE LINK</div>
+      <div class="output-link" id="output-link" onclick="copyLink()" title="Click to copy">
+        diss0links.com/<span id="output-slug"></span>
+      </div>
+      <div id="copy-flash" style="display:none;font-size:10px;letter-spacing:3px;color:var(--neon);margin-top:4px">[COPIED]</div>
+      <div class="live-badge" id="live-badge">&#9632; LIVE</div>
+      <div class="output-actions">
+        <button class="btn" onclick="copyLink()">&#9112; COPY LINK</button>
+        <button class="btn" onclick="previewLink()">&#9673; PREVIEW</button>
+        <button class="btn" onclick="deployLive()" id="deploy-btn">&#9889; DEPLOY LIVE</button>
+        <button class="btn" onclick="downloadHTML()">&#8595; DOWNLOAD</button>
+      </div>
+      <div style="margin-top:8px">
+        <button class="btn" onclick="generateQR()" style="font-size:12px;padding:8px">&#9635; GENERATE QR</button>
+      </div>
+      <div class="qr-panel" id="qr-panel">
+        <div style="font-size:9px;letter-spacing:2px;color:var(--text-dim);margin-bottom:8px">QR // VOID_STRIDE LINK</div>
+        <div id="qr-container" style="display:inline-block;padding:10px;background:#fff"></div>
+        <div style="margin-top:8px"><button class="btn btn-sm" onclick="downloadQR()">&#8595; DOWNLOAD QR</button></div>
+      </div>
+    </div>
+
+    <!-- Live Log -->
+    <div class="log-wrap">
+      <div class="log-header">
+        <span style="color:var(--neon)">&#9679;</span>
+        <span>syslog://diss0linkz/live</span>
+        <span style="margin-left:auto" id="log-count">0 entries</span>
+      </div>
+      <div class="log-body" id="live-log">
+        <div class="log-entry">[SYSTEM] Awaiting input...</div>
+      </div>
+    </div>
+
+    <!-- Active Links Dashboard -->
+    <div class="section-header">// ACTIVE LINKS</div>
+    <div class="log-wrap">
+      <div class="log-header">
+        <span style="color:var(--neon)">&#9679;</span>
+        <span>terminal://diss0linkz/active-links</span>
+        <button class="btn btn-sm" onclick="sweepLinks()" style="margin-left:auto;font-size:9px;padding:3px 8px">&#11041; SWEEP</button>
+        <button class="btn btn-sm" onclick="loadActiveLinks()" style="font-size:9px;padding:3px 8px">&#8635; REFRESH</button>
+      </div>
+      <div id="active-links-panel" style="min-height:60px;padding:12px;background:rgba(0,0,0,0.4)">
+        <div class="empty-state">NO ACTIVE LINKS</div>
+      </div>
     </div>
   </div>
 </div>
 
 <script src="/backgrounds.js"></script>
 
+<!-- CDN Audio -->
 <script>
-// ── CDN AUDIO — DISS0LINKZ BRANDED SOUNDS ──
-var _sfxClick = new Audio('https://cdn.shopify.com/s/files/1/0897/5686/0735/files/Diss0LinkZ.COM_--_CLICK_NOISE.mp3?v=1775956954');
-_sfxClick.preload = 'auto';
+var _sfxClick = 'https://cdn.shopify.com/s/files/1/0897/5686/0735/files/Diss0LinkZ.COM_--_CLICK_NOISE.mp3?v=1775956954';
+var _sfxError = 'https://cdn.shopify.com/s/files/1/0897/5686/0735/files/Diss0LinkZ.COM_--_ERROR_ALARM.mp3?v=1775956954';
 document.addEventListener('click', function(e) {
-  if (e.target.matches('button, a, .logout-btn')) {
-    try { var s = new Audio('https://cdn.shopify.com/s/files/1/0897/5686/0735/files/Diss0LinkZ.COM_--_CLICK_NOISE.mp3?v=1775956954'); s.volume = 0.6; s.play().catch(function(){}); } catch(x) {}
+  if (e.target.matches('button, a, .toggle-row')) {
+    try { var s = new Audio(_sfxClick); s.volume = 0.6; s.play().catch(function(){}); } catch(x) {}
   }
 }, true);
 </script>
 
 <script>
+// ═══════════════════════════════════════════════════════════════
+// DISS0LINKZ DEEP LINK MANAGER — FULL FORCE-OP ENGINE
+// Migrated from index.html to standalone /links/ page
+// DISSOVERSE LLC | 2026
+// ═══════════════════════════════════════════════════════════════
+
 firebase.initializeApp({apiKey:"AIzaSyBJW5JIetcStxkvZoqpk3IwQbUY7BI9-JI",authDomain:"diss0linkz.firebaseapp.com",projectId:"diss0linkz",storageBucket:"diss0linkz.firebasestorage.app",messagingSenderId:"50981881114",appId:"1:50981881114:web:4392a0aa58399a627f18a3"});
 var _fbAuth = firebase.auth();
 var _fbDb = firebase.firestore();
 
+var _currentUser = null;
+var _userData = null;
+var generatedHTML = '';
+var generatedLink = '';
+var logCount = 0;
+var _qrInstance = null;
+
+// ── AUTH GATE ──
 _fbAuth.onAuthStateChanged(function(user) {
   if (!user) { window.location.href = '/'; return; }
+  _currentUser = user;
   _fbDb.collection('users').doc(user.uid).get().then(function(doc) {
     if (!doc.exists || doc.data().status !== 'approved') { window.location.href = '/'; return; }
+    _userData = doc.data();
     document.getElementById('gate').style.display = 'none';
     document.getElementById('app').style.display = 'block';
+    // Restore PAT from session
+    var savedPat = sessionStorage.getItem('gh_pat');
+    if (savedPat) updatePATStatus(true);
+    addLog('SYSTEM', 'Deep Link Manager loaded. Operator: ' + (_userData.username || user.email), 'neon');
+    addLog('SYSTEM', 'All operations execute client-side. Zero data transmitted.', 'dim');
+    loadActiveLinks();
   });
 });
+
+// ── SLUG LIVE PREVIEW ──
+document.getElementById('short-name').addEventListener('input', function() {
+  this.value = this.value.toLowerCase().replace(/[^a-z0-9\-]/g, '');
+  document.getElementById('slug-preview').textContent = this.value;
+});
+
+// ── AGE GATE TOGGLE ──
+function toggleAgeGate() {
+  var box = document.getElementById('age-gate-toggle');
+  var label = document.getElementById('age-gate-label');
+  box.classList.toggle('on');
+  var isOn = box.classList.contains('on');
+  label.textContent = isOn ? 'ON' : 'OFF';
+  label.style.color = isOn ? 'var(--neon)' : '';
+}
+
+// ── GITHUB PAT ──
+function connectPAT() {
+  var pat = document.getElementById('gh-pat').value.trim();
+  if (!pat) { addLog('ERROR', 'No token entered.', 'red'); return; }
+  sessionStorage.setItem('gh_pat', pat);
+  updatePATStatus(true);
+  addLog('SYSTEM', 'GitHub PAT connected. Deploy enabled.', 'neon');
+  loadActiveLinks();
+}
+
+function updatePATStatus(connected) {
+  var el = document.getElementById('pat-status');
+  if (connected) {
+    el.textContent = '> CONNECTED — DEPLOY ENABLED';
+    el.className = 'pat-status pat-connected';
+  } else {
+    el.textContent = '> NO TOKEN — DEPLOY DISABLED (DOWNLOAD ONLY)';
+    el.className = 'pat-status pat-disconnected';
+  }
+}
+
+// ── LOG SYSTEM ──
+function addLog(tag, message, color) {
+  var log = document.getElementById('live-log');
+  var entry = document.createElement('div');
+  entry.className = 'log-entry';
+  var ts = new Date().toTimeString().split(' ')[0];
+  var tagColor = color === 'red' ? 'var(--red-warn)' : color === 'neon' ? 'var(--neon)' : 'var(--text-dim)';
+  entry.innerHTML = '<span style="color:var(--text-dim)">' + ts + '</span> <span style="color:' + tagColor + '">[' + tag + ']</span> ' + message;
+  log.appendChild(entry);
+  log.scrollTop = log.scrollHeight;
+  logCount++;
+  document.getElementById('log-count').textContent = logCount + ' entries';
+}
+
+// ── URL HELPERS ──
+function isInternalUrl(url) {
+  return url.startsWith('https://dissoverse.com') || url.startsWith('http://dissoverse.com') || url.startsWith('dissoverse.com') || url.startsWith('/');
+}
+function extractInternalPath(url) {
+  return url.replace(/^https?:\/\/dissoverse\.com/, '').replace(/^dissoverse\.com/, '') || '/';
+}
+
+// ── BUILD ESCAPE HTML ──
+function buildEscapeHTML(targetUrl, label, mode, ageGate, expiryDays) {
+  var safeUrl = targetUrl.replace(/"/g, '&quot;');
+  var redirectScript, noscriptFallback;
+  var noscriptMsg = '<div style="font-family:monospace;color:#00ff00;background:#000;padding:20px;text-align:center;">JAVASCRIPT REQUIRED. ENABLE JAVASCRIPT AND RELOAD.</div>';
+
+  if (isInternalUrl(targetUrl)) {
+    var bridgeUrl = 'https://dissoverse.com/pages/go?url=' + encodeURIComponent(extractInternalPath(targetUrl));
+    redirectScript = 'window.location.replace("' + bridgeUrl.replace(/"/g, '\\"') + '");';
+  } else {
+    redirectScript = 'window.location.replace("' + safeUrl.replace(/"/g, '\\"') + '");';
+  }
+  noscriptFallback = noscriptMsg;
+
+  var p = [];
+  p.push('<!DOCTYPE html>');
+  p.push('<html><head><meta charset="UTF-8">');
+  p.push('<meta name="viewport" content="width=device-width,initial-scale=1">');
+  p.push('<title>Redirecting...</title>');
+
+  if (ageGate) {
+    p.push('<style>');
+    p.push('*{box-sizing:border-box;margin:0;padding:0;}');
+    p.push('body{background:#0A0A0A;font-family:"Courier New",monospace;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}');
+    p.push('.gate{text-align:center;max-width:320px;width:100%;}');
+    p.push('.brand{font-size:24px;color:#E91885;letter-spacing:4px;font-weight:bold;margin-bottom:20px;}');
+    p.push('.msg{font-size:14px;color:#999;line-height:1.6;margin-bottom:28px;}');
+    p.push('.btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:16px;}');
+    p.push('.btn-yes{background:#E91885;color:#000;border:none;padding:12px 20px;font-family:"Courier New",monospace;font-size:13px;font-weight:bold;cursor:pointer;letter-spacing:1px;}');
+    p.push('.btn-no{background:#333;color:#999;border:none;padding:12px 20px;font-family:"Courier New",monospace;font-size:13px;cursor:pointer;letter-spacing:1px;}');
+    p.push('.btn-yes:hover{background:#ff1a8c;}.btn-no:hover{background:#444;}');
+    p.push('.disclaimer{font-size:10px;color:#555;line-height:1.5;}');
+    p.push('<' + '/style><' + '/head><body>');
+    p.push('<div class="gate"><div class="brand">DISSOVERSE</div>');
+    p.push('<div class="msg">This link contains content intended for adults.</div>');
+    p.push('<div class="btns"><button class="btn-yes" onclick="proceed()">I AM 18 OR OLDER</button>');
+    p.push('<button class="btn-no" onclick="goBack()">TAKE ME BACK</button><' + '/div>');
+    p.push('<div class="disclaimer">By proceeding you confirm you are 18 years of age or older.</div><' + '/div>');
+    p.push('<script>function proceed(){' + redirectScript + '}function goBack(){window.location.replace("https://dissoverse.com");}<' + '/script>');
+    p.push('<noscript>' + noscriptFallback + '<' + '/noscript>');
+    p.push('<' + '/body><' + '/html>');
+  } else {
+    p.push('<' + '/head><body style="background:#000;">');
+    p.push('<!-- BRIDGE ROUTED. See BRIDGE_HARDLOCK.txt -->');
+    p.push('<script>' + redirectScript + '<' + '/script>');
+    p.push('<noscript>' + noscriptFallback + '<' + '/noscript>');
+    p.push('<' + '/body><' + '/html>');
+  }
+  return p.join('\n');
+}
+
+// ── GENERATE LINK ──
+function generateLink() {
+  var urlInput = document.getElementById('target-url');
+  var slugInput = document.getElementById('short-name');
+  var targetUrl = urlInput.value.trim();
+  var shortName = slugInput.value.trim();
+  var label = document.getElementById('link-label').value.trim();
+  var ageGate = document.getElementById('age-gate-toggle').classList.contains('on');
+  var expiryDays = parseInt(document.getElementById('expiry-days').value, 10);
+
+  if (!shortName) {
+    addLog('ERROR', 'Vanity slug required.', 'red');
+    try { new Audio(_sfxError).play().catch(function(){}); } catch(e) {}
+    slugInput.focus();
+    return;
+  }
+  if (!targetUrl) {
+    addLog('ERROR', 'Target URL required.', 'red');
+    try { new Audio(_sfxError).play().catch(function(){}); } catch(e) {}
+    urlInput.focus();
+    return;
+  }
+  if (targetUrl && !targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
+    targetUrl = 'https://' + targetUrl;
+    urlInput.value = targetUrl;
+  }
+  try { new URL(targetUrl); } catch(e) {
+    addLog('ERROR', 'Invalid URL format.', 'red');
+    try { new Audio(_sfxError).play().catch(function(){}); } catch(e2) {}
+    return;
+  }
+
+  addLog('INIT', 'VOID_STRIDE sequence initiated...', 'neon');
+
+  generatedHTML = buildEscapeHTML(targetUrl, label, 'auto', ageGate, expiryDays);
+  generatedLink = 'https://diss0links.com/' + shortName;
+
+  document.getElementById('output-slug').textContent = shortName;
+  document.getElementById('output-section').style.display = 'block';
+  document.getElementById('live-badge').style.display = 'none';
+
+  // Auto-deploy if PAT connected
+  var token = sessionStorage.getItem('gh_pat');
+  if (token) {
+    addLog('DEPLOY', 'PAT detected. Auto-deploying...', 'dim');
+    deployToGitHub(shortName, generatedHTML);
+  } else {
+    addLog('COMPLETE', 'Link generated. Download or connect PAT to deploy.', 'neon');
+  }
+}
+
+// ── GITHUB DEPLOY ──
+async function deployToGitHub(shortName, htmlContent) {
+  var token = sessionStorage.getItem('gh_pat');
+  if (!token) return false;
+  var filename = shortName + '/index.html';
+  var apiUrl = 'https://api.github.com/repos/analogflowers-coder/dissolinks/contents/' + filename;
+  var b64Content = btoa(unescape(encodeURIComponent(htmlContent)));
+  addLog('DEPLOY', 'Pushing ' + filename + ' to GitHub...', 'dim');
+  try {
+    var sha = null;
+    var checkResp = await fetch(apiUrl, { headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json' } });
+    if (checkResp.status === 200) { sha = (await checkResp.json()).sha; addLog('DEPLOY', 'Existing file detected. Overwriting...', 'dim'); }
+    else if (checkResp.status === 401 || checkResp.status === 403) { addLog('ERROR', 'GitHub auth failed (' + checkResp.status + '). Check PAT.', 'red'); return false; }
+    else if (checkResp.status === 429) { addLog('ERROR', 'GitHub API rate limited. Wait 60s.', 'red'); return false; }
+
+    var body = { message: 'link: ' + shortName, content: b64Content };
+    if (sha) body.sha = sha;
+    var putResp = await fetch(apiUrl, { method: 'PUT', headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github+json' }, body: JSON.stringify(body) });
+
+    if (putResp.status === 201 || putResp.status === 200) {
+      var result = await putResp.json();
+      addLog('DEPLOY', 'Commit: ' + result.commit.sha.substring(0,7), 'neon');
+      addLog('LIVE', 'diss0links.com/' + shortName + ' — live in ~90 seconds', 'neon');
+      document.getElementById('live-badge').style.display = 'block';
+      saveLinkRecord(token, shortName);
+      loadActiveLinks();
+      return true;
+    } else { addLog('ERROR', 'Deploy failed (' + putResp.status + ').', 'red'); return false; }
+  } catch(e) { addLog('ERROR', 'Network error: ' + e.message, 'red'); return false; }
+}
+
+async function deployLive() {
+  if (!generatedHTML) return;
+  var shortName = document.getElementById('short-name').value.trim();
+  var btn = document.getElementById('deploy-btn');
+  btn.disabled = true; btn.textContent = '⟳ DEPLOYING...';
+  await deployToGitHub(shortName, generatedHTML);
+  btn.disabled = false; btn.textContent = '⚡ DEPLOY LIVE';
+}
+
+// ── SAVE LINK RECORD ──
+async function saveLinkRecord(token, slug) {
+  var username = (_userData && _userData.username) || (_currentUser && _currentUser.email.split('@')[0]) || 'unknown';
+  var linksPath = 'accounts/' + username + '/links.json';
+  try {
+    var getResp = await fetch('https://api.github.com/repos/analogflowers-coder/dissolinks/contents/' + linksPath, { headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json' } });
+    var existingSha = null;
+    var linksData = { owner: username, links: [] };
+    if (getResp.status === 200) { var gj = await getResp.json(); existingSha = gj.sha; try { linksData = JSON.parse(atob(gj.content.replace(/\n/g,''))); } catch(e) {} }
+    var existing = linksData.links || [];
+    if (!existing.find(function(l) { return (l.slug || l) === slug; })) { existing.push({ slug: slug, created: new Date().toISOString() }); }
+    linksData.links = existing;
+    var putBody = { message: 'vault: add link ' + slug + ' for ' + username, content: btoa(unescape(encodeURIComponent(JSON.stringify(linksData, null, 2)))) };
+    if (existingSha) putBody.sha = existingSha;
+    await fetch('https://api.github.com/repos/analogflowers-coder/dissolinks/contents/' + linksPath, { method: 'PUT', headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github+json' }, body: JSON.stringify(putBody) });
+    addLog('VAULT', 'Link record saved.', 'neon');
+  } catch(e) { addLog('VAULT', 'Could not save record: ' + e.message, 'dim'); }
+}
+
+// ── ACTIVE LINKS DASHBOARD ──
+async function loadActiveLinks() {
+  var token = sessionStorage.getItem('gh_pat');
+  var panel = document.getElementById('active-links-panel');
+  if (!token) { panel.innerHTML = '<div class="empty-state">CONNECT GITHUB PAT TO VIEW LINKS</div>'; return; }
+  var username = (_userData && _userData.username) || (_currentUser && _currentUser.email.split('@')[0]) || 'unknown';
+  panel.innerHTML = '<div class="empty-state">LOADING LINKS FOR ' + username.toUpperCase() + '...</div>';
+  try {
+    var resp = await fetch('https://api.github.com/repos/analogflowers-coder/dissolinks/contents/accounts/' + username + '/links.json', { headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json' } });
+    if (resp.status === 404) { panel.innerHTML = '<div class="empty-state">NO ACTIVE LINKS. GENERATE YOUR FIRST.</div>'; return; }
+    if (resp.status === 401 || resp.status === 403) { panel.innerHTML = '<div class="empty-state" style="color:var(--red-warn)">AUTH FAILED — CHECK PAT</div>'; return; }
+    var data = await resp.json();
+    var linksData = JSON.parse(atob(data.content.replace(/\n/g, '')));
+    var links = linksData.links || [];
+    if (!links.length) { panel.innerHTML = '<div class="empty-state">NO ACTIVE LINKS. GENERATE YOUR FIRST.</div>'; return; }
+    panel.innerHTML = '';
+    links.forEach(function(link) {
+      var slug = link.slug || link;
+      var created = link.created ? new Date(link.created).toLocaleDateString() : '';
+      var card = document.createElement('div');
+      card.className = 'link-card';
+      card.setAttribute('data-slug', slug);
+      card.innerHTML = '<span class="link-dot" id="dot-' + slug + '"></span>' +
+        '<span class="link-name">diss0links.com/' + slug + '</span>' +
+        '<span class="link-meta">' + created + '</span>' +
+        '<div class="link-actions">' +
+        '<button class="btn btn-sm" onclick="copyToClipboard(\'https://diss0links.com/' + slug + '\')">COPY</button>' +
+        '<button class="btn btn-sm btn-red" onclick="deleteLink(\'' + slug + '\')">DELETE</button>' +
+        '</div>';
+      panel.appendChild(card);
+    });
+  } catch(e) { panel.innerHTML = '<div class="empty-state">ERROR: ' + e.message + '</div>'; }
+}
+
+// ── DELETE LINK ──
+async function deleteLink(name) {
+  var token = sessionStorage.getItem('gh_pat');
+  if (!token) return;
+  addLog('DELETE', 'Removing ' + name + '...', 'dim');
+  var fileUrl = 'https://api.github.com/repos/analogflowers-coder/dissolinks/contents/' + name + '/index.html';
+  try {
+    var fileResp = await fetch(fileUrl, { headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json' } });
+    if (!fileResp.ok) { addLog('ERROR', 'Could not locate ' + name + '/index.html.', 'red'); return; }
+    var fileData = await fileResp.json();
+    var delResp = await fetch(fileUrl, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github+json' }, body: JSON.stringify({ message: 'delete: ' + name, sha: fileData.sha }) });
+    if (delResp.ok) { addLog('DELETE', name + ' removed.', 'neon'); loadActiveLinks(); }
+    else { addLog('ERROR', 'Delete failed (' + delResp.status + ').', 'red'); }
+  } catch(e) { addLog('ERROR', 'Delete failed: ' + e.message, 'red'); }
+}
+
+// ── LINK HEALTH SWEEP ──
+async function sweepLinks() {
+  var cards = document.querySelectorAll('.link-card');
+  if (!cards.length) { addLog('SWEEP', 'No links to sweep.', 'dim'); return; }
+  addLog('SWEEP', 'Checking health of ' + cards.length + ' links...', 'neon');
+  cards.forEach(function(card) {
+    var slug = card.getAttribute('data-slug');
+    var dot = document.getElementById('dot-' + slug);
+    if (dot) { dot.style.background = '#ffaa00'; dot.style.boxShadow = '0 0 6px #ffaa00'; }
+    fetch('https://diss0links.com/' + slug + '/', { method: 'HEAD', mode: 'no-cors' })
+      .then(function() { if (dot) { dot.style.background = 'var(--neon)'; dot.style.boxShadow = '0 0 6px var(--neon)'; } addLog('SWEEP', slug + ' — LIVE', 'neon'); })
+      .catch(function() { if (dot) { dot.style.background = 'var(--red-warn)'; dot.style.boxShadow = '0 0 6px var(--red-warn)'; } addLog('SWEEP', slug + ' — DEAD', 'red'); });
+  });
+}
+
+// ── COPY / PREVIEW / DOWNLOAD / CLEAR ──
+function copyLink() {
+  if (!generatedLink) return;
+  navigator.clipboard.writeText(generatedLink).catch(function() {
+    var ta = document.createElement('textarea'); ta.value = generatedLink; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+  });
+  var flash = document.getElementById('copy-flash');
+  flash.style.display = 'block';
+  setTimeout(function() { flash.style.display = 'none'; }, 1500);
+  addLog('COPY', 'Copied: ' + generatedLink, 'neon');
+}
+
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).catch(function() {
+    var ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+  });
+  addLog('COPY', 'Copied: ' + text, 'dim');
+}
+
+function previewLink() {
+  if (!generatedHTML) return;
+  var blob = new Blob([generatedHTML], { type: 'text/html' });
+  window.open(URL.createObjectURL(blob), '_blank');
+}
+
+function downloadHTML() {
+  if (!generatedHTML) return;
+  var shortName = document.getElementById('short-name').value.trim() || 'link';
+  var blob = new Blob([generatedHTML], { type: 'text/html' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = shortName + '.html';
+  a.click();
+  addLog('DOWNLOAD', shortName + '.html downloaded.', 'neon');
+}
+
+function clearAll() {
+  document.getElementById('target-url').value = '';
+  document.getElementById('short-name').value = '';
+  document.getElementById('link-label').value = '';
+  document.getElementById('slug-preview').textContent = '';
+  document.getElementById('output-section').style.display = 'none';
+  document.getElementById('qr-panel').style.display = 'none';
+  generatedHTML = '';
+  generatedLink = '';
+  addLog('SYSTEM', 'All fields reset.', 'dim');
+}
+
+// ── QR CODE ──
+function generateQR() {
+  if (!generatedLink) return;
+  var container = document.getElementById('qr-container');
+  container.innerHTML = '';
+  _qrInstance = new QRCode(container, { text: generatedLink, width: 180, height: 180, colorDark: '#000000', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.H });
+  document.getElementById('qr-panel').style.display = 'block';
+  addLog('QR', 'QR code generated for ' + generatedLink, 'neon');
+}
+
+function downloadQR() {
+  var container = document.getElementById('qr-container');
+  var canvas = container.querySelector('canvas');
+  var img = container.querySelector('img');
+  if (canvas) {
+    var a = document.createElement('a');
+    a.href = canvas.toDataURL('image/png');
+    a.download = 'QR_' + (document.getElementById('short-name').value || 'link') + '.png';
+    a.click();
+  } else if (img) {
+    var c = document.createElement('canvas');
+    c.width = img.width; c.height = img.height;
+    c.getContext('2d').drawImage(img, 0, 0);
+    var a2 = document.createElement('a');
+    a2.href = c.toDataURL('image/png');
+    a2.download = 'QR_' + (document.getElementById('short-name').value || 'link') + '.png';
+    a2.click();
+  }
+  addLog('QR', 'QR image downloaded.', 'neon');
+}
 </script>
 </body>
 </html>
