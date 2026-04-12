@@ -167,9 +167,13 @@ var firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 var db = firebase.firestore();
 
-// Get username from URL
-var pathParts = window.location.pathname.replace(/\/$/,'').split('/');
-var username = pathParts[pathParts.length - 1] || pathParts[pathParts.length - 2];
+// Get username from URL path OR query param (404.html redirects with ?u=username)
+var urlParams = new URLSearchParams(window.location.search);
+var username = urlParams.get('u');
+if (!username) {
+  var pathParts = window.location.pathname.replace(/\/$/,'').split('/');
+  username = pathParts[pathParts.length - 1] || pathParts[pathParts.length - 2];
+}
 
 if (!username || username === 'p') {
   document.getElementById('loading').style.display = 'none';
