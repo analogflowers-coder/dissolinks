@@ -275,7 +275,8 @@ function renderList(containerId, users, status) {
       actions = '<button class="btn-approve" onclick="updateStatus(\''+esc(u.id)+'\',\'approved\')">APPROVE</button>' +
                 '<button class="btn-deny" onclick="updateStatus(\''+esc(u.id)+'\',\'denied\')">DENY</button>';
     } else if (status === 'approved') {
-      actions = '<button class="btn-suspend" onclick="updateStatus(\''+esc(u.id)+'\',\'suspended\')">SUSPEND</button>';
+      var verifyBtn = u.verified ? '<button class="btn-suspend" onclick="toggleVerify(\''+esc(u.id)+'\',false)">UNVERIFY</button>' : '<button class="btn-approve" onclick="toggleVerify(\''+esc(u.id)+'\',true)">VERIFY</button>';
+      actions = verifyBtn + '<button class="btn-suspend" onclick="updateStatus(\''+esc(u.id)+'\',\'suspended\')">SUSPEND</button>';
     } else if (status === 'suspended') {
       actions = '<button class="btn-approve" onclick="updateStatus(\''+esc(u.id)+'\',\'approved\')">REACTIVATE</button>';
     }
@@ -287,6 +288,13 @@ function renderList(containerId, users, status) {
       '<div class="user-actions"><span class="status-badge status-' + status + '">' + status.toUpperCase() + '</span>' + actions + '</div>';
     el.appendChild(row);
   });
+}
+
+function toggleVerify(userId, verified) {
+  db.collection('users').doc(userId).update({
+    verified: verified,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  }).catch(function(e) { alert('Error: ' + e.message); });
 }
 
 function updateStatus(userId, newStatus) {

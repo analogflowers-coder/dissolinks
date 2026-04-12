@@ -202,11 +202,12 @@ body::after{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:r
     <!-- SOCIAL ICONS -->
     <div class="s-section">
       <div class="s-title">// SOCIAL CHANNELS</div>
-      <input class="s-input" id="s-instagram" placeholder="INSTAGRAM URL">
-      <input class="s-input" id="s-twitter" placeholder="X / TWITTER URL">
-      <input class="s-input" id="s-tiktok" placeholder="TIKTOK URL">
-      <input class="s-input" id="s-youtube" placeholder="YOUTUBE URL">
-      <input class="s-input" id="s-spotify" placeholder="SPOTIFY URL">
+      <div class="s-row"><input class="s-input" id="s-instagram" placeholder="INSTAGRAM URL" style="flex:2"><input class="s-input" id="s-instagram-count" placeholder="FOLLOWERS" type="number" min="0" style="flex:1;max-width:100px"></div>
+      <div class="s-row"><input class="s-input" id="s-twitter" placeholder="X / TWITTER URL" style="flex:2"><input class="s-input" id="s-twitter-count" placeholder="FOLLOWERS" type="number" min="0" style="flex:1;max-width:100px"></div>
+      <div class="s-row"><input class="s-input" id="s-tiktok" placeholder="TIKTOK URL" style="flex:2"><input class="s-input" id="s-tiktok-count" placeholder="FOLLOWERS" type="number" min="0" style="flex:1;max-width:100px"></div>
+      <div class="s-row"><input class="s-input" id="s-youtube" placeholder="YOUTUBE URL" style="flex:2"><input class="s-input" id="s-youtube-count" placeholder="SUBS" type="number" min="0" style="flex:1;max-width:100px"></div>
+      <div class="s-row"><input class="s-input" id="s-spotify" placeholder="SPOTIFY URL" style="flex:2"><input class="s-input" id="s-spotify-count" placeholder="LISTENERS" type="number" min="0" style="flex:1;max-width:100px"></div>
+      <div style="font-size:7px;letter-spacing:2px;color:rgba(var(--neon-rgb),0.2);margin-top:4px">FOLLOWER COUNTS ARE SELF-REPORTED</div>
     </div>
 
     <!-- THEME COLOR -->
@@ -363,6 +364,14 @@ function loadSettings(data) {
   if (config.tiktok) document.getElementById('s-tiktok').value = config.tiktok;
   if (config.youtube) document.getElementById('s-youtube').value = config.youtube;
   if (config.spotify) document.getElementById('s-spotify').value = config.spotify;
+  // Follower counts
+  if (config.followerCounts) {
+    if (config.followerCounts.instagram) document.getElementById('s-instagram-count').value = config.followerCounts.instagram;
+    if (config.followerCounts.twitter) document.getElementById('s-twitter-count').value = config.followerCounts.twitter;
+    if (config.followerCounts.tiktok) document.getElementById('s-tiktok-count').value = config.followerCounts.tiktok;
+    if (config.followerCounts.youtube) document.getElementById('s-youtube-count').value = config.followerCounts.youtube;
+    if (config.followerCounts.spotify) document.getElementById('s-spotify-count').value = config.followerCounts.spotify;
+  }
   if (config.audio) document.getElementById('s-audio').value = config.audio;
   if (config.speed) document.getElementById('s-speed').value = config.speed;
   if (config.rgbSpeed) document.getElementById('s-rgb-speed').value = config.rgbSpeed;
@@ -574,6 +583,13 @@ function saveSettings() {
     tiktok: sanitizeUrl(document.getElementById('s-tiktok').value),
     youtube: sanitizeUrl(document.getElementById('s-youtube').value),
     spotify: sanitizeUrl(document.getElementById('s-spotify').value),
+    followerCounts: {
+      instagram: parseInt(document.getElementById('s-instagram-count').value) || 0,
+      twitter: parseInt(document.getElementById('s-twitter-count').value) || 0,
+      tiktok: parseInt(document.getElementById('s-tiktok-count').value) || 0,
+      youtube: parseInt(document.getElementById('s-youtube-count').value) || 0,
+      spotify: parseInt(document.getElementById('s-spotify-count').value) || 0
+    },
     color: customHex && /^#[0-9A-Fa-f]{6}$/.test(customHex) ? customHex : (activeColor ? activeColor.dataset.color : '#00FF41'),
     customColor: customHex,
     background: activeBg ? activeBg.dataset.bg : 'matrix',

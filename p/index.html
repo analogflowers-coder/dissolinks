@@ -192,7 +192,9 @@ function renderPage(userData) {
     html += '<div class="avatar-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>';
   }
   if (c.displayName) {
-    html += '<div class="display-name">'+esc(c.displayName)+'</div>';
+    html += '<div class="display-name">'+esc(c.displayName);
+    if (userData.verified === true) html += '<span style="display:inline-block;width:18px;height:18px;background:var(--accent);border-radius:50%;vertical-align:middle;margin-left:6px;position:relative;top:-1px"><span style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:11px;color:var(--bg);font-weight:bold">&#10003;</span></span>';
+    html += '</div>';
   }
   var handle = c.handle || ('@' + (userData.username || username));
   html += '<div class="handle">'+esc(handle)+'</div>';
@@ -221,6 +223,13 @@ function renderPage(userData) {
       html += '<a class="social-btn" href="'+esc(sanitizeUrl(s.url))+'" target="_blank" rel="noopener"><span>'+s.name+'</span></a>';
     });
     html += '</div>';
+  }
+  // Follower count — only show if at least one platform has a count
+  var fc = c.followerCounts || {};
+  var totalFollowers = (fc.instagram||0) + (fc.twitter||0) + (fc.tiktok||0) + (fc.youtube||0) + (fc.spotify||0);
+  if (totalFollowers > 0) {
+    var formatted = totalFollowers >= 1000000 ? (totalFollowers/1000000).toFixed(1)+'M' : totalFollowers >= 1000 ? (totalFollowers/1000).toFixed(1)+'K' : totalFollowers.toString();
+    html += '<div style="margin-top:14px;font-family:VT323,monospace;font-size:14px;letter-spacing:3px;color:var(--accent);text-shadow:0 0 10px rgba(var(--accent-rgb),0.4)"><span style="font-size:20px;font-weight:900">'+formatted+'</span> FOLLOWERS</div>';
   }
   html += '</div>'; // close .profile
 
