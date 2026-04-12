@@ -62,6 +62,14 @@ Critical mobile rules:
 - Password minlength = 8 everywhere (HTML, JS, placeholder).
 - Firebase only. No localStorage auth fallback. Ever.
 
+## Relay Protocol (STANDING ORDER)
+- Every relay file: `[SENDER]_RELAY_[RECIPIENT]_[DOMAIN]_[SEQ].[ext]`
+- Numbers sequential per sender-recipient pair, never reused
+- Auto-file to `G:\My Drive\AXIOM_RELAY\OUTGOING\TO_[NODE]\`
+- Update `G:\My Drive\AXIOM_RELAY\RELAY_INDEX.md` with every new file
+- CODE broadcasts to ALL nodes autonomously — no GRANDMASTER relay needed
+- Nodes check their folders per protocol on every reply
+
 ## Commands
 - Deploy: git add -A && git commit -m "CODE: [desc]" && git push origin main
 - Theme push: npx shopify theme push --store thedissonance --live --only "file"
