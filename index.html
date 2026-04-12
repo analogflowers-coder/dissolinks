@@ -3873,21 +3873,21 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
   // ── ACCESS GRANTED ──────────────────────────────────────────
   function accessGranted() {
     if (glitchTimeout) clearTimeout(glitchTimeout);
-    // Fade-out dissolve on password ambient loop (500ms ramp)
+    // Fade-out dissolve on password ambient loop (2 second smooth ramp)
     var pwLoop = document.getElementById('dv-password-loop');
     if (pwLoop && !pwLoop.paused) {
       var _pwVol = pwLoop.volume;
       var _pwFade = setInterval(function() {
-        _pwVol = Math.max(0, _pwVol - 0.035);
+        _pwVol = Math.max(0, _pwVol - 0.007);
         pwLoop.volume = _pwVol;
         if (_pwVol <= 0) { clearInterval(_pwFade); pwLoop.pause(); pwLoop.currentTime = 0; }
-      }, 35);
+      }, 40);
     }
-    // Play loading matrix transition sound
-    var loadSfx = document.getElementById('dv-loading-sound');
-    if (loadSfx) { loadSfx.volume = 0.6; loadSfx.currentTime = 0; loadSfx.play().catch(function(){}); }
-    playGrantedSound();
-    startMusic(); // Music plays when UX opens, not on password screen
+    // Play loading matrix transition sound (delayed 800ms so fade is audible first)
+    setTimeout(function() {
+      var loadSfx = document.getElementById('dv-loading-sound');
+      if (loadSfx) { loadSfx.volume = 0.6; loadSfx.currentTime = 0; loadSfx.play().catch(function(){}); }
+    }, 800);
 
     // 1. Activate pink Matrix rain at 3x speed
     window.dvMatrixPink  = true;
