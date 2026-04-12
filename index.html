@@ -1829,7 +1829,7 @@ var _fbDb = firebase.firestore();
   </div>
 
   <!-- TAP TO ENTER GATE — first thing users see, before everything -->
-  <div id="dv-tap-gate" style="text-align:center; padding:30px 0;">
+  <div id="dv-tap-gate" style="display:none; text-align:center; padding:30px 0;">
     <button id="dv-tap-enter-btn" onclick="dvInitiateEntry()" style="
       background:transparent; border:2px solid var(--neon); color:var(--neon);
       font-family:'VT323',monospace; font-size:22px; letter-spacing:6px;
@@ -3845,11 +3845,16 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
             bootDone = true;
             var sep = document.querySelector('.dv-separator');
             if (sep) sep.classList.add('dv-sep-visible');
-            // Show TAP TO ENTER button — DO NOT auto-reveal auth form
-            // User gesture required to unlock Web Audio API
+            // Boot done — reveal auth form (INITIATE already tapped to get here)
             setTimeout(function() {
-              var tapGate = document.getElementById('dv-tap-gate');
-              if (tapGate) tapGate.style.display = 'block';
+              var authForm = document.getElementById('dv-auth-form');
+              if (authForm) {
+                authForm.style.opacity = '1';
+                authForm.style.transform = 'none';
+                authForm.style.pointerEvents = 'auto';
+              }
+              var userInput = document.getElementById('dv-signin-user');
+              if (userInput) userInput.focus();
             }, 150);
           }
         });
@@ -4384,8 +4389,11 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
     });
 
     document.body.classList.add('dv-gate-active');
-    // Boot sequence NO LONGER auto-starts — waits for INITIATE tap
-    // dvInitiateEntry() handles the full sequence start
+    // Show INITIATE button after logo renders (ONE button, ONE time)
+    setTimeout(function() {
+      var tapGate = document.getElementById('dv-tap-gate');
+      if (tapGate) tapGate.style.display = 'block';
+    }, 1200);
 
     // Keyboard handlers for login form
     setTimeout(function() {
