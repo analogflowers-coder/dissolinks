@@ -1828,21 +1828,41 @@ var _fbDb = firebase.firestore();
          draggable="false">
   </div>
 
-  <!-- "THE MATRIX HAS YOU..." typewriter text — shows BEFORE terminal opens -->
-  <div id="dv-matrix-has-you"><span id="dv-matrix-text"></span><span class="dv-cursor"></span></div>
+  <!-- TAP TO ENTER GATE — first thing users see, before everything -->
+  <div id="dv-tap-gate" style="text-align:center; padding:30px 0;">
+    <button id="dv-tap-enter-btn" onclick="dvInitiateEntry()" style="
+      background:transparent; border:2px solid var(--neon); color:var(--neon);
+      font-family:'VT323',monospace; font-size:22px; letter-spacing:6px;
+      padding:16px 40px; cursor:pointer; transition:all 0.3s;
+      text-shadow:0 0 15px rgba(var(--neon-rgb),0.4);
+      box-shadow:0 0 20px rgba(var(--neon-rgb),0.15);
+      animation:tapPulse 2s ease-in-out infinite;
+    ">&#9654; INITIATE</button>
+    <div style="font-size:8px; letter-spacing:3px; color:rgba(var(--neon-rgb),0.25); margin-top:10px;">TAP TO ENTER THE NETWORK</div>
+  </div>
+  <style>
+    @keyframes tapPulse {
+      0%,100% { box-shadow:0 0 20px rgba(var(--neon-rgb),0.15); border-color:var(--neon); }
+      50% { box-shadow:0 0 35px rgba(var(--neon-rgb),0.35),0 0 60px rgba(var(--neon-rgb),0.1); border-color:rgba(var(--neon-rgb),0.7); }
+    }
+  </style>
 
-  <!-- SCAN BAR — separate from terminal so it's visible during text phase -->
-  <div id="dv-scanbar-standalone"></div>
+  <!-- "THE MATRIX HAS YOU..." typewriter text — shows AFTER tap -->
+  <div id="dv-matrix-has-you" style="display:none"><span id="dv-matrix-text"></span><span class="dv-cursor"></span></div>
 
-  <div class="dv-terminal-wrap" id="dv-terminal-box" style="animation-delay: 4s; opacity:0;">
+  <!-- SCAN BAR — hidden until tap -->
+  <div id="dv-scanbar-standalone" style="display:none"></div>
+
+  <div class="dv-terminal-wrap" id="dv-terminal-box" style="display:none; animation-delay: 0s; opacity:0;">
 
   <script>
-  // Typewriter for "the matrix has you..."
-  (function() {
+  // Typewriter for "the matrix has you..." — DEFERRED until INITIATE tap
+  window._dvRunTypewriter = function() {
     var msg = 'the matrix has you...';
     var el = document.getElementById('dv-matrix-text');
     var i = 0;
     if (!el) return;
+    el.textContent = '';
     function type() {
       if (i < msg.length) {
         el.textContent += msg[i];
@@ -1861,7 +1881,7 @@ var _fbDb = firebase.firestore();
         wrap.style.transform = 'translate(-50%,-50%) scale(1.3)';
       }
     }, 3200);
-  })();
+  };
   </script>
     <span class="dv-corner tl">[+]</span>
     <span class="dv-corner tr">[+]</span>
@@ -1879,24 +1899,7 @@ var _fbDb = firebase.firestore();
 
     <div class="dv-separator">&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</div>
 
-    <!-- TAP TO ENTER GATE — user gesture unlocks Web Audio API -->
-    <div id="dv-tap-gate" style="display:none; text-align:center; padding:20px 0;">
-      <button id="dv-tap-enter-btn" onclick="dvInitiateEntry()" style="
-        background:transparent; border:2px solid var(--neon); color:var(--neon);
-        font-family:'VT323',monospace; font-size:22px; letter-spacing:6px;
-        padding:16px 40px; cursor:pointer; transition:all 0.3s;
-        text-shadow:0 0 15px rgba(var(--neon-rgb),0.4);
-        box-shadow:0 0 20px rgba(var(--neon-rgb),0.15);
-        animation:tapPulse 2s ease-in-out infinite;
-      ">&#9654; INITIATE</button>
-      <div style="font-size:8px; letter-spacing:3px; color:rgba(var(--neon-rgb),0.25); margin-top:10px;">TAP TO ENTER THE NETWORK</div>
-    </div>
-    <style>
-      @keyframes tapPulse {
-        0%,100% { box-shadow:0 0 20px rgba(var(--neon-rgb),0.15); border-color:var(--neon); }
-        50% { box-shadow:0 0 35px rgba(var(--neon-rgb),0.35),0 0 60px rgba(var(--neon-rgb),0.1); border-color:rgba(var(--neon-rgb),0.7); }
-      }
-    </style>
+    <!-- TAP gate moved to top of auth gate (before terminal) -->
 
     <!-- ACCOUNT LOGIN FORM — merged auth gate -->
     <div id="dv-auth-form" style="opacity:0; transform:translateY(10px); transition:opacity 0.5s ease, transform 0.5s ease; pointer-events:none;">
@@ -3656,29 +3659,39 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
     if (target) dvClickSound();
   }, true);
 
-  // ── TAP TO ENTER — USER GESTURE UNLOCKS AUDIO ──
+  // ── TAP TO ENTER — USER GESTURE UNLOCKS AUDIO + STARTS FULL SEQUENCE ──
   var _pwLoopStarted = false;
   window.dvInitiateEntry = function() {
     // This click IS the user gesture that unlocks Web Audio API
-    // 1. Start password ambient loop
+    // 1. Start password ambient loop IMMEDIATELY on tap
     var pwLoop = document.getElementById('dv-password-loop');
     if (pwLoop && !_pwLoopStarted) {
       pwLoop.volume = 0.35;
       pwLoop.play().then(function() { _pwLoopStarted = true; }).catch(function(){});
     }
-    // 2. Hide TAP TO ENTER button
+    // 2. Hide INITIATE button
     var tapGate = document.getElementById('dv-tap-gate');
     if (tapGate) tapGate.style.display = 'none';
-    // 3. Reveal auth form
-    var authForm = document.getElementById('dv-auth-form');
-    if (authForm) {
-      authForm.style.opacity = '1';
-      authForm.style.transform = 'none';
-      authForm.style.pointerEvents = 'auto';
+    // 3. Show typewriter "the matrix has you..." and start it
+    var matrixHasYou = document.getElementById('dv-matrix-has-you');
+    if (matrixHasYou) matrixHasYou.style.display = '';
+    if (window._dvRunTypewriter) window._dvRunTypewriter();
+    // 4. Show scanbar
+    var scanbar = document.getElementById('dv-scanbar-standalone');
+    if (scanbar) scanbar.style.display = '';
+    // 5. Show terminal box after typewriter phase (3.2s type + 0.8s fade)
+    var termBox = document.getElementById('dv-terminal-box');
+    if (termBox) {
+      setTimeout(function() {
+        termBox.style.display = '';
+        termBox.style.opacity = '1';
+      }, 4000);
     }
-    // 4. Focus email input
-    var userInput = document.getElementById('dv-signin-user');
-    if (userInput) userInput.focus();
+    // 6. Run boot sequence after terminal opens (4s + 1.8s open anim)
+    setTimeout(function() {
+      runBootSequence();
+      scheduleGlitch();
+    }, 5800);
   };
 
   // ── BOOT SEQUENCE ───────────────────────────────────────────────
@@ -4372,11 +4385,8 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
     });
 
     document.body.classList.add('dv-gate-active');
-    // Wait for typewriter (3.2s) + fade (0.8s) + terminal open (1.8s) then boot text
-    setTimeout(function() {
-      runBootSequence();
-      scheduleGlitch();
-    }, 6000);
+    // Boot sequence NO LONGER auto-starts — waits for INITIATE tap
+    // dvInitiateEntry() handles the full sequence start
 
     // Keyboard handlers for login form
     setTimeout(function() {
