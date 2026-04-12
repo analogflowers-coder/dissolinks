@@ -403,7 +403,20 @@ function loadSettings(data) {
   if (config.speed) window.dvMatrixSpeed = config.speed;
 }
 
-function escAttr(s) { return s.replace(/"/g, '&quot;').replace(/</g, '&lt;'); }
+function escAttr(s) { return s.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+// URL protocol whitelist — blocks javascript:, data:, vbscript: XSS
+function sanitizeUrl(url) {
+  if (!url) return '';
+  url = url.trim();
+  if (!url) return '';
+  // Allow # (empty link placeholder)
+  if (url === '#') return '#';
+  // Auto-prepend https if no protocol
+  if (!url.match(/^[a-zA-Z]+:\/\//)) url = 'https://' + url;
+  // Only allow http:// and https://
+  if (!url.match(/^https?:\/\//i)) return '';
+  return url;
+}
 
 // ── ADD LINK ROW ──
 function addLinkRow() {
@@ -547,22 +560,25 @@ function saveSettings() {
   var activeBg = document.querySelector('.s-bg-btn.active');
   var customHex = document.getElementById('s-custom-color').value.trim();
 
+  // Sanitize all link URLs in tiles
+  links.forEach(function(l) { l.url = sanitizeUrl(l.url); });
+
   var config = {
-    avatar: document.getElementById('s-avatar').value,
+    avatar: sanitizeUrl(document.getElementById('s-avatar').value),
     displayName: document.getElementById('s-name').value,
     handle: '@' + (userData.username || ''),
     bio: document.getElementById('s-bio').value,
     links: links,
-    instagram: document.getElementById('s-instagram').value,
-    twitter: document.getElementById('s-twitter').value,
-    tiktok: document.getElementById('s-tiktok').value,
-    youtube: document.getElementById('s-youtube').value,
-    spotify: document.getElementById('s-spotify').value,
+    instagram: sanitizeUrl(document.getElementById('s-instagram').value),
+    twitter: sanitizeUrl(document.getElementById('s-twitter').value),
+    tiktok: sanitizeUrl(document.getElementById('s-tiktok').value),
+    youtube: sanitizeUrl(document.getElementById('s-youtube').value),
+    spotify: sanitizeUrl(document.getElementById('s-spotify').value),
     color: customHex && /^#[0-9A-Fa-f]{6}$/.test(customHex) ? customHex : (activeColor ? activeColor.dataset.color : '#00FF41'),
     customColor: customHex,
     background: activeBg ? activeBg.dataset.bg : 'matrix',
     speed: parseFloat(document.getElementById('s-speed').value),
-    audio: document.getElementById('s-audio').value,
+    audio: sanitizeUrl(document.getElementById('s-audio').value),
     autoplay: document.getElementById('s-autoplay-toggle').classList.contains('on'),
     rgbEnabled: document.getElementById('s-rgb-toggle').classList.contains('on'),
     rgbSpeed: parseFloat(document.getElementById('s-rgb-speed').value)

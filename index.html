@@ -1922,7 +1922,7 @@ var _fbDb = firebase.firestore();
         <div class="vault-field">
           <label class="vault-label" for="dv-signin-pass">&#62; CLEARANCE CODE</label>
           <input type="password" id="dv-signin-pass" class="vault-input" placeholder="CLEARANCE CODE // MIN 8 CHARS"
-            autocomplete="current-password" spellcheck="false" minlength="12">
+            autocomplete="current-password" spellcheck="false" minlength="8">
         </div>
         <button class="vault-btn-primary" id="dv-signin-btn" onclick="dvAccountSignIn()">&#9654; AUTHENTICATE</button>
         <div style="text-align:center;margin-top:10px">
@@ -1942,13 +1942,13 @@ var _fbDb = firebase.firestore();
         </div>
         <div class="vault-field">
           <label class="vault-label" for="dv-create-pass">&#62; ESTABLISH CLEARANCE CODE</label>
-          <input type="password" id="dv-create-pass" class="vault-input" placeholder="ESTABLISH CODE // MIN 12 CHARS"
-            autocomplete="new-password" spellcheck="false" minlength="12">
+          <input type="password" id="dv-create-pass" class="vault-input" placeholder="ESTABLISH CODE // MIN 8 CHARS"
+            autocomplete="new-password" spellcheck="false" minlength="8">
         </div>
         <div class="vault-field">
           <label class="vault-label" for="dv-create-pass2">&#62; CONFIRM CLEARANCE CODE</label>
           <input type="password" id="dv-create-pass2" class="vault-input" placeholder="REPEAT CLEARANCE CODE"
-            autocomplete="new-password" spellcheck="false" minlength="12">
+            autocomplete="new-password" spellcheck="false" minlength="8">
         </div>
         <button class="vault-btn-primary" id="dv-create-btn" onclick="dvAccountCreate()">&#9654; SUBMIT FOR CLEARANCE</button>
       </div>
@@ -2064,7 +2064,7 @@ var _fbDb = firebase.firestore();
         <div style="font-size:9px; color:var(--text-dim); margin-top:4px; letter-spacing:1px; line-height:1.6;">Required for DEPLOY LIVE + Active Links Dashboard. Stored in session only.</div>
       </div>
       <button class="btn-neon" style="width:100%; margin-bottom:8px;" onclick="ncpExportLinks()">▶ EXPORT LINKS AS JSON</button>
-      <button class="btn-neon" style="width:100%; margin-bottom:8px;" onclick="ncpCopySession()">▶ COPY SESSION TOKEN</button>
+      <!-- ncpCopySession REMOVED — P1-005 security fix (attack surface) -->
       <div id="ncp-export-feedback" style="font-size:10px; color:var(--neon); text-align:center; letter-spacing:2px; min-height:16px;"></div>
     </div>
     <!-- Tab: PANIC -->
@@ -2832,21 +2832,7 @@ function ncpExportLinks() {
   if (fb) { fb.textContent = '✓ EXPORT DISPATCHED'; setTimeout(function() { fb.textContent = ''; }, 2500); }
 }
 
-function ncpCopySession() {
-  var cookies = document.cookie.split(';');
-  var val = 'NO_ACTIVE_SESSION';
-  for (var i = 0; i < cookies.length; i++) {
-    if (cookies[i].trim().indexOf('diss0linkz_auth=') === 0) {
-      val = cookies[i].trim().split('=')[1]; break;
-    }
-  }
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(val).then(function() {
-      var fb = document.getElementById('ncp-export-feedback');
-      if (fb) { fb.textContent = '✓ SESSION TOKEN COPIED'; setTimeout(function() { fb.textContent = ''; }, 2000); }
-    });
-  }
-}
+// ncpCopySession REMOVED — P1-005: pure attack surface, no legitimate use
 
 
 // ── DRAWER TOGGLE ─────────────────────────────────────────────────────────────
@@ -4115,36 +4101,8 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
       if (canvas) canvas.style.display = 'none';
     }, 500);
 
-    // Play death sound
-    try {
-      if (!_dvClickCtx) _dvClickCtx = new (window.AudioContext || window.webkitAudioContext)();
-      var ctx = _dvClickCtx;
-      var now = ctx.currentTime;
-      // Deep rumble
-      var rumble = ctx.createOscillator();
-      rumble.type = 'sawtooth';
-      rumble.frequency.setValueAtTime(80, now);
-      rumble.frequency.exponentialRampToValueAtTime(20, now + 1);
-      var rumbleGain = ctx.createGain();
-      rumbleGain.gain.setValueAtTime(0.15, now);
-      rumbleGain.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
-      rumble.connect(rumbleGain);
-      rumbleGain.connect(ctx.destination);
-      rumble.start(now);
-      rumble.stop(now + 1.5);
-      // Static hiss
-      var hissBuf = ctx.createBuffer(1, ctx.sampleRate * 0.8, ctx.sampleRate);
-      var hissData = hissBuf.getChannelData(0);
-      for (var h = 0; h < hissBuf.length; h++) hissData[h] = (Math.random()*2-1) * (1 - h/hissBuf.length);
-      var hiss = ctx.createBufferSource();
-      hiss.buffer = hissBuf;
-      var hissGain = ctx.createGain();
-      hissGain.gain.setValueAtTime(0.1, now);
-      hissGain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
-      hiss.connect(hissGain);
-      hissGain.connect(ctx.destination);
-      hiss.start(now + 0.1);
-    } catch(e) {}
+    // Play death sound (custom CDN error alarm)
+    try { var ds = new Audio(_dvSfxErrorSrc); ds.volume = 0.8; ds.play().catch(function(){}); } catch(e) {}
   }
 
   function showScreenCrack() {
