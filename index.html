@@ -3886,7 +3886,22 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
     // Play loading matrix transition sound (delayed 800ms so fade is audible first)
     setTimeout(function() {
       var loadSfx = document.getElementById('dv-loading-sound');
-      if (loadSfx) { loadSfx.volume = 0.6; loadSfx.currentTime = 0; loadSfx.play().catch(function(){}); }
+      if (loadSfx) {
+        loadSfx.volume = 0.6; loadSfx.currentTime = 0;
+        loadSfx.play().catch(function(){});
+        // Fade out 3 seconds before the track ends
+        loadSfx.addEventListener('timeupdate', function _fadeCheck() {
+          if (loadSfx.duration && loadSfx.currentTime >= loadSfx.duration - 3) {
+            loadSfx.removeEventListener('timeupdate', _fadeCheck);
+            var _lVol = loadSfx.volume;
+            var _lFade = setInterval(function() {
+              _lVol = Math.max(0, _lVol - 0.01);
+              loadSfx.volume = _lVol;
+              if (_lVol <= 0) { clearInterval(_lFade); loadSfx.pause(); }
+            }, 30);
+          }
+        });
+      }
     }, 800);
 
     // 1. Activate pink Matrix rain at 3x speed
