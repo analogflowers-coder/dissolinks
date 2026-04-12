@@ -3657,9 +3657,13 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
       pwLoop.volume = 0.35;
       pwLoop.play().then(function() { _pwLoopStarted = true; }).catch(function(){});
     }
-    // 2. Hide INITIATE button
+    // 2. Hide INITIATE button + unlock scroll for mobile
     var tapGate = document.getElementById('dv-tap-gate');
     if (tapGate) tapGate.style.display = 'none';
+    document.body.style.overflow = 'auto';
+    document.body.style.position = 'relative';
+    document.body.style.height = 'auto';
+    document.documentElement.style.overflow = 'auto';
     // 3. Show typewriter "the matrix has you..." and start it
     var matrixHasYou = document.getElementById('dv-matrix-has-you');
     if (matrixHasYou) matrixHasYou.style.display = '';
