@@ -1792,7 +1792,7 @@ var _fbDb = firebase.firestore();
 
 <!-- LOADING TRANSITION SOUND (plays during auth → app transition) -->
 <audio id="dv-loading-sound" preload="auto" crossorigin="anonymous">
-  <source src="https://cdn.shopify.com/s/files/1/0897/5686/0735/files/Diss0LinkZ.COM_--_LOADING_MATRIX_SOUND.mp3?v=1775956955" type="audio/mpeg">
+  <source src="https://cdn.shopify.com/s/files/1/0897/5686/0735/files/Diss0LinkZ.COM_--_LOADING_MATRIX_SOUND_FIXED_WITH_DELAY_OUT.mp3?v=1775994530" type="audio/mpeg">
 </audio>
 
 <!-- OLD MUSIC TOGGLE REMOVED — now inside terminal as dv-music-btn-terminal -->
@@ -5764,13 +5764,13 @@ var dvAudio = (function() {
 
   /* ── 4. BOOT — custom CDN loading sound ─────────────────── */
   function _playBoot() {
-    try { var s = new Audio('https://cdn.shopify.com/s/files/1/0897/5686/0735/files/Diss0LinkZ.COM_--_LOADING_MATRIX_SOUND.mp3?v=1775956955'); s.volume = 0.5; s.play().catch(function(){}); } catch(e) {}
+    try { var s = new Audio('https://cdn.shopify.com/s/files/1/0897/5686/0735/files/Diss0LinkZ.COM_--_LOADING_MATRIX_SOUND_FIXED_WITH_DELAY_OUT.mp3?v=1775994530'); s.volume = 0.5; s.play().catch(function(){}); } catch(e) {}
   }
   function boot() { _playBoot(); }
 
   /* ── 5b. TERMINAL OPEN — custom CDN loading sound ───────── */
   function terminalOpen() {
-    try { var s = new Audio('https://cdn.shopify.com/s/files/1/0897/5686/0735/files/Diss0LinkZ.COM_--_LOADING_MATRIX_SOUND.mp3?v=1775956955'); s.volume = 0.4; s.play().catch(function(){}); } catch(e) {}
+    try { var s = new Audio('https://cdn.shopify.com/s/files/1/0897/5686/0735/files/Diss0LinkZ.COM_--_LOADING_MATRIX_SOUND_FIXED_WITH_DELAY_OUT.mp3?v=1775994530'); s.volume = 0.4; s.play().catch(function(){}); } catch(e) {}
   }
 
   /* ── 5c. GLITCH SOUND — custom CDN error alarm (low vol) ── */
