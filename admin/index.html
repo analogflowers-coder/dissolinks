@@ -84,6 +84,15 @@ body::after{content:'';position:fixed;inset:0;background:rgba(var(--neon-rgb),0.
   <div id="admin-error"></div>
 </div>
 
+<!-- SECONDARY CLEARANCE GATE — SHA-256 verified -->
+<div id="clearance-gate" class="admin-gate" style="display:none">
+  <div class="label" style="color:var(--neon);text-shadow:0 0 12px rgba(var(--neon-rgb),0.4)">>> SECONDARY CLEARANCE REQUIRED</div>
+  <div style="font-size:9px;letter-spacing:2px;color:rgba(var(--neon-rgb),0.3);margin-bottom:12px;max-width:320px;text-align:center;line-height:1.6">FIREBASE AUTH VERIFIED. ENTER ADMIN CLEARANCE CODE TO ACCESS COMMAND CENTER.</div>
+  <input type="password" id="clearance-code" placeholder="ADMIN CLEARANCE CODE" style="background:rgba(0,0,0,0.5);border:1px solid rgba(var(--neon-rgb),0.2);color:var(--neon);font-family:'Share Tech Mono','Courier New',monospace;font-size:13px;padding:10px 14px;width:300px;letter-spacing:1px;transition:all 0.3s">
+  <button onclick="verifyClearance()" style="background:rgba(var(--neon-rgb),0.08);border:1px solid rgba(var(--neon-rgb),0.3);color:var(--neon);font-family:'VT323',monospace;font-size:16px;letter-spacing:4px;padding:10px 28px;cursor:pointer;transition:all 0.3s">&#9654; VERIFY</button>
+  <div id="clearance-error" style="font-size:9px;color:#ff4444;letter-spacing:1px;min-height:16px;text-shadow:0 0 8px rgba(255,68,68,0.2)"></div>
+</div>
+
 <!-- ADMIN PANEL -->
 <div id="admin-panel">
   <div class="admin-header">
@@ -145,32 +154,86 @@ var db = firebase.firestore();
 
 var ADMIN_EMAILS = ['dissoverse@gmail.com', 'analogflowers@gmail.com'];
 
+// ── SECONDARY CLEARANCE CODE (SHA-256 HASH) ──
+// !! PLACEHOLDER — GRANDMASTER: replace this hash with SHA-256 of your chosen clearance code
+// To generate: open browser console, run:
+//   crypto.subtle.digest('SHA-256', new TextEncoder().encode('YOUR_CODE')).then(h => console.log(Array.from(new Uint8Array(h)).map(b=>b.toString(16).padStart(2,'0')).join('')))
+// Then paste the output below.
+var ADMIN_CLEARANCE_HASH = 'PLACEHOLDER_HASH_REPLACE_ME';
+var _clearanceVerified = false;
+
+async function sha256(message) {
+  var data = new TextEncoder().encode(message);
+  var hash = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hash)).map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+}
+
+function playErrorSound() {
+  try { var s = new Audio('https://cdn.shopify.com/s/files/1/0897/5686/0735/files/Diss0LinkZ.COM_--_ERROR_ALARM.mp3?v=1775956954'); s.volume = 0.7; s.play().catch(function(){}); } catch(x) {}
+}
+
 function adminLogin() {
   var email = document.getElementById('admin-email').value;
   var pass = document.getElementById('admin-pass').value;
   var err = document.getElementById('admin-error');
   if (!email || !pass) { err.textContent = '> ALL FIELDS REQUIRED'; return; }
-  if (!ADMIN_EMAILS.includes(email.toLowerCase())) { err.textContent = '> UNAUTHORIZED OPERATIVE'; try{var s=new Audio('https://cdn.shopify.com/s/files/1/0897/5686/0735/files/Diss0LinkZ.COM_--_ERROR_ALARM.mp3?v=1775956954');s.volume=0.7;s.play().catch(function(){});}catch(x){} return; }
+  if (!ADMIN_EMAILS.includes(email.toLowerCase())) { err.textContent = '> UNAUTHORIZED OPERATIVE'; playErrorSound(); return; }
   auth.signInWithEmailAndPassword(email, pass)
-    .then(function() { loadAdminPanel(); })
-    .catch(function(e) { err.textContent = '> AUTH FAILED: ' + e.message; try{var s=new Audio('https://cdn.shopify.com/s/files/1/0897/5686/0735/files/Diss0LinkZ.COM_--_ERROR_ALARM.mp3?v=1775956954');s.volume=0.7;s.play().catch(function(){});}catch(x){} });
+    .then(function() { showClearanceGate(); })
+    .catch(function(e) { err.textContent = '> AUTH FAILED: ' + e.message; playErrorSound(); });
 }
 
+function showClearanceGate() {
+  // Firebase auth passed + email whitelisted — now require secondary clearance
+  document.getElementById('admin-gate').style.display = 'none';
+  document.getElementById('clearance-gate').style.display = 'flex';
+  var codeInput = document.getElementById('clearance-code');
+  if (codeInput) codeInput.focus();
+}
+
+async function verifyClearance() {
+  var code = document.getElementById('clearance-code').value;
+  var err = document.getElementById('clearance-error');
+  if (!code) { err.textContent = '> CLEARANCE CODE REQUIRED'; return; }
+  var hash = await sha256(code);
+  if (hash === ADMIN_CLEARANCE_HASH || ADMIN_CLEARANCE_HASH === 'PLACEHOLDER_HASH_REPLACE_ME') {
+    // Hash matches OR placeholder not yet set (allow through for initial setup)
+    _clearanceVerified = true;
+    document.getElementById('clearance-gate').style.display = 'none';
+    loadAdminPanel();
+  } else {
+    err.textContent = '> CLEARANCE DENIED. ACCESS REVOKED.';
+    playErrorSound();
+    setTimeout(function() { auth.signOut(); window.location.href = '/'; }, 2000);
+  }
+}
+
+// Enter key on clearance input
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && document.getElementById('clearance-gate').style.display === 'flex') {
+    verifyClearance();
+  }
+});
+
 function adminLogout() {
+  _clearanceVerified = false;
   auth.signOut().then(function() {
     document.getElementById('admin-panel').style.display = 'none';
+    document.getElementById('clearance-gate').style.display = 'none';
     document.getElementById('admin-gate').style.display = 'flex';
   });
 }
 
 auth.onAuthStateChanged(function(user) {
   if (user && ADMIN_EMAILS.includes(user.email.toLowerCase())) {
-    loadAdminPanel();
+    // Auto-login still requires clearance code
+    showClearanceGate();
   }
 });
 
 function loadAdminPanel() {
   document.getElementById('admin-gate').style.display = 'none';
+  document.getElementById('clearance-gate').style.display = 'none';
   document.getElementById('admin-panel').style.display = 'block';
   loadUsers();
 }

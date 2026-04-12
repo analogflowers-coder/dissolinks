@@ -1779,10 +1779,9 @@ var _fbDb = firebase.firestore();
 <!-- MATRIX RAIN CANVAS -->
 <canvas id="dv-matrix-canvas"></canvas>
 
-<!-- BACKGROUND MUSIC (plays after login in app mode) -->
-<audio id="dv-bg-music" loop preload="auto" crossorigin="anonymous">
-  <source src="https://cdn.shopify.com/s/files/1/0897/5686/0735/files/TRAP_BEAT_256KPS.mp3?v=1775267721" type="audio/mpeg">
-</audio>
+<!-- BACKGROUND MUSIC REMOVED — trap beat cut per GRANDMASTER directive -->
+<!-- Audio autoplay handled by TAP TO ENTER gate + password loop -->
+<audio id="dv-bg-music" loop preload="none" crossorigin="anonymous" style="display:none"></audio>
 
 <!-- PASSWORD PAGE AMBIENT LOOP (plays on auth gate, stops on login) -->
 <audio id="dv-password-loop" loop preload="auto" crossorigin="anonymous">
@@ -1879,6 +1878,25 @@ var _fbDb = firebase.firestore();
     <div id="dv-boot-output"></div>
 
     <div class="dv-separator">&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</div>
+
+    <!-- TAP TO ENTER GATE — user gesture unlocks Web Audio API -->
+    <div id="dv-tap-gate" style="display:none; text-align:center; padding:20px 0;">
+      <button id="dv-tap-enter-btn" onclick="dvInitiateEntry()" style="
+        background:transparent; border:2px solid var(--neon); color:var(--neon);
+        font-family:'VT323',monospace; font-size:22px; letter-spacing:6px;
+        padding:16px 40px; cursor:pointer; transition:all 0.3s;
+        text-shadow:0 0 15px rgba(var(--neon-rgb),0.4);
+        box-shadow:0 0 20px rgba(var(--neon-rgb),0.15);
+        animation:tapPulse 2s ease-in-out infinite;
+      ">&#9654; INITIATE</button>
+      <div style="font-size:8px; letter-spacing:3px; color:rgba(var(--neon-rgb),0.25); margin-top:10px;">TAP TO ENTER THE NETWORK</div>
+    </div>
+    <style>
+      @keyframes tapPulse {
+        0%,100% { box-shadow:0 0 20px rgba(var(--neon-rgb),0.15); border-color:var(--neon); }
+        50% { box-shadow:0 0 35px rgba(var(--neon-rgb),0.35),0 0 60px rgba(var(--neon-rgb),0.1); border-color:rgba(var(--neon-rgb),0.7); }
+      }
+    </style>
 
     <!-- ACCOUNT LOGIN FORM — merged auth gate -->
     <div id="dv-auth-form" style="opacity:0; transform:translateY(10px); transition:opacity 0.5s ease, transform 0.5s ease; pointer-events:none;">
@@ -3638,21 +3656,30 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
     if (target) dvClickSound();
   }, true);
 
-  // ── PASSWORD PAGE AMBIENT LOOP ──
-  // Starts on first user interaction while auth gate is visible
+  // ── TAP TO ENTER — USER GESTURE UNLOCKS AUDIO ──
   var _pwLoopStarted = false;
-  function dvStartPasswordLoop() {
-    if (_pwLoopStarted) return;
-    var gate = document.getElementById('diss0linkz-auth-gate');
-    if (!gate || gate.style.display === 'none') return;
+  window.dvInitiateEntry = function() {
+    // This click IS the user gesture that unlocks Web Audio API
+    // 1. Start password ambient loop
     var pwLoop = document.getElementById('dv-password-loop');
-    if (pwLoop) {
+    if (pwLoop && !_pwLoopStarted) {
       pwLoop.volume = 0.35;
       pwLoop.play().then(function() { _pwLoopStarted = true; }).catch(function(){});
     }
-  }
-  document.addEventListener('click', function() { dvStartPasswordLoop(); }, { once: false });
-  document.addEventListener('keydown', function() { dvStartPasswordLoop(); }, { once: false });
+    // 2. Hide TAP TO ENTER button
+    var tapGate = document.getElementById('dv-tap-gate');
+    if (tapGate) tapGate.style.display = 'none';
+    // 3. Reveal auth form
+    var authForm = document.getElementById('dv-auth-form');
+    if (authForm) {
+      authForm.style.opacity = '1';
+      authForm.style.transform = 'none';
+      authForm.style.pointerEvents = 'auto';
+    }
+    // 4. Focus email input
+    var userInput = document.getElementById('dv-signin-user');
+    if (userInput) userInput.focus();
+  };
 
   // ── BOOT SEQUENCE ───────────────────────────────────────────────
   var BOOT_LINES = [
@@ -3805,16 +3832,11 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
             bootDone = true;
             var sep = document.querySelector('.dv-separator');
             if (sep) sep.classList.add('dv-sep-visible');
-            // Reveal the account login form
+            // Show TAP TO ENTER button — DO NOT auto-reveal auth form
+            // User gesture required to unlock Web Audio API
             setTimeout(function() {
-              var authForm = document.getElementById('dv-auth-form');
-              if (authForm) {
-                authForm.style.opacity = '1';
-                authForm.style.transform = 'none';
-                authForm.style.pointerEvents = 'auto';
-              }
-              var userInput = document.getElementById('dv-signin-user');
-              if (userInput) userInput.focus();
+              var tapGate = document.getElementById('dv-tap-gate');
+              if (tapGate) tapGate.style.display = 'block';
             }, 150);
           }
         });
@@ -3857,9 +3879,16 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
   // ── ACCESS GRANTED ──────────────────────────────────────────
   function accessGranted() {
     if (glitchTimeout) clearTimeout(glitchTimeout);
-    // Stop password ambient loop
+    // Fade-out dissolve on password ambient loop (500ms ramp)
     var pwLoop = document.getElementById('dv-password-loop');
-    if (pwLoop) { pwLoop.pause(); pwLoop.currentTime = 0; }
+    if (pwLoop && !pwLoop.paused) {
+      var _pwVol = pwLoop.volume;
+      var _pwFade = setInterval(function() {
+        _pwVol = Math.max(0, _pwVol - 0.035);
+        pwLoop.volume = _pwVol;
+        if (_pwVol <= 0) { clearInterval(_pwFade); pwLoop.pause(); pwLoop.currentTime = 0; }
+      }, 35);
+    }
     // Play loading matrix transition sound
     var loadSfx = document.getElementById('dv-loading-sound');
     if (loadSfx) { loadSfx.volume = 0.6; loadSfx.currentTime = 0; loadSfx.play().catch(function(){}); }
