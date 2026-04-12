@@ -8,66 +8,93 @@
 <link rel="apple-touch-icon" sizes="180x180" href="https://cdn.shopify.com/s/files/1/0897/5686/0735/files/BIG-DISSOVERSE-APP-LOGO.png?v=1775799330">
 <link rel="icon" type="image/png" href="https://cdn.shopify.com/s/files/1/0897/5686/0735/files/BIG-DISSOVERSE-APP-LOGO.png?v=1775799330">
 <meta name="robots" content="noindex, nofollow">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <style>
-:root { --neon: #00ff41; --neon-rgb: 0,255,65; --bg: #0a0a0a; }
-* { margin:0; padding:0; box-sizing:border-box; }
-body { background:var(--bg); color:var(--neon); font-family:'Courier New',monospace; min-height:100vh; }
-.admin-gate { display:flex; align-items:center; justify-content:center; min-height:100vh; flex-direction:column; gap:16px; }
-.admin-gate input { background:transparent; border:1px solid rgba(var(--neon-rgb),0.3); color:var(--neon); font-family:'Courier New',monospace; font-size:13px; padding:10px 14px; width:300px; letter-spacing:1px; }
-.admin-gate input:focus { outline:none; border-color:var(--neon); box-shadow:0 0 10px rgba(var(--neon-rgb),0.2); }
-.admin-gate button { background:rgba(var(--neon-rgb),0.1); border:1px solid rgba(var(--neon-rgb),0.4); color:var(--neon); font-family:'Courier New',monospace; font-size:11px; letter-spacing:3px; padding:10px 24px; cursor:pointer; }
-.admin-gate button:hover { background:rgba(var(--neon-rgb),0.2); border-color:var(--neon); }
-.admin-header { padding:16px 24px; border-bottom:1px solid rgba(var(--neon-rgb),0.15); display:flex; justify-content:space-between; align-items:center; }
-.admin-header h1 { font-size:14px; letter-spacing:4px; }
-.admin-header button { background:none; border:1px solid rgba(var(--neon-rgb),0.3); color:var(--neon); font-family:'Courier New',monospace; font-size:9px; letter-spacing:2px; padding:6px 14px; cursor:pointer; }
-.admin-content { padding:24px; }
-.admin-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:24px; }
-.stat-card { border:1px solid rgba(var(--neon-rgb),0.15); padding:16px; text-align:center; }
-.stat-card .num { font-size:28px; letter-spacing:2px; margin-bottom:4px; }
-.stat-card .label { font-size:7px; letter-spacing:3px; color:rgba(var(--neon-rgb),0.45); }
-.section-title { font-size:9px; letter-spacing:4px; color:rgba(var(--neon-rgb),0.5); margin:20px 0 12px; border-bottom:1px solid rgba(var(--neon-rgb),0.08); padding-bottom:6px; }
-.user-row { display:flex; align-items:center; justify-content:space-between; padding:10px 14px; border:1px solid rgba(var(--neon-rgb),0.1); margin-bottom:4px; font-size:11px; }
-.user-row:hover { border-color:rgba(var(--neon-rgb),0.3); background:rgba(var(--neon-rgb),0.02); }
-.user-info { display:flex; flex-direction:column; gap:2px; }
-.user-info .username { font-size:13px; letter-spacing:2px; }
-.user-info .email { font-size:9px; color:rgba(var(--neon-rgb),0.4); letter-spacing:1px; }
-.user-info .date { font-size:8px; color:rgba(var(--neon-rgb),0.25); }
-.user-actions { display:flex; gap:6px; }
-.user-actions button { font-family:'Courier New',monospace; font-size:8px; letter-spacing:2px; padding:5px 10px; cursor:pointer; border:1px solid; background:transparent; }
-.btn-approve { color:#00ff41; border-color:#00ff41; }
-.btn-approve:hover { background:rgba(0,255,65,0.15); }
-.btn-deny { color:#ff4444; border-color:#ff4444; }
-.btn-deny:hover { background:rgba(255,68,68,0.15); }
-.btn-suspend { color:#ffaa00; border-color:#ffaa00; }
-.btn-suspend:hover { background:rgba(255,170,0,0.15); }
-.status-badge { font-size:8px; letter-spacing:2px; padding:3px 8px; display:inline-block; }
-.status-pending { color:#ffaa00; border:1px solid #ffaa00; }
-.status-approved { color:#00ff41; border:1px solid #00ff41; }
-.status-suspended { color:#ff4444; border:1px solid #ff4444; }
-#admin-panel { display:none; }
-.empty-state { text-align:center; padding:40px; color:rgba(var(--neon-rgb),0.25); font-size:10px; letter-spacing:3px; }
-@media(max-width:768px) { .user-row { flex-direction:column; gap:8px; align-items:flex-start; } .admin-stats { grid-template-columns:1fr 1fr; } }
+:root{--neon:#00ff41;--neon-rgb:0,255,65;--bg:#0a0a0a;--matrix-color:#00ff41;--matrix-fade:rgba(0,255,65,0.4)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--neon);font-family:'Share Tech Mono','Courier New',monospace;min-height:100vh}
+
+/* CRT Scanlines */
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.12) 2px,rgba(0,0,0,0.12) 4px);pointer-events:none;z-index:9999}
+body::after{content:'';position:fixed;inset:0;background:rgba(var(--neon-rgb),0.008);pointer-events:none;z-index:9998;animation:flicker 0.15s infinite}
+@keyframes flicker{0%,100%{opacity:1}50%{opacity:0.97}}
+
+/* Background canvas */
+#dv-matrix-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:0.12}
+
+.admin-gate{position:relative;z-index:10;display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:16px}
+.admin-gate .label{font-family:'VT323',monospace;font-size:14px;letter-spacing:5px;color:rgba(var(--neon-rgb),0.4);margin-bottom:16px;text-shadow:0 0 10px rgba(var(--neon-rgb),0.15)}
+.admin-gate input{background:rgba(0,0,0,0.5);border:1px solid rgba(var(--neon-rgb),0.2);color:var(--neon);font-family:'Share Tech Mono','Courier New',monospace;font-size:13px;padding:10px 14px;width:300px;letter-spacing:1px;transition:all 0.3s}
+.admin-gate input:focus{outline:none;border-color:var(--neon);box-shadow:0 0 12px rgba(var(--neon-rgb),0.15)}
+.admin-gate input::placeholder{color:rgba(var(--neon-rgb),0.2)}
+.admin-gate button{background:rgba(var(--neon-rgb),0.08);border:1px solid rgba(var(--neon-rgb),0.3);color:var(--neon);font-family:'VT323',monospace;font-size:16px;letter-spacing:4px;padding:10px 28px;cursor:pointer;transition:all 0.3s}
+.admin-gate button:hover{background:rgba(var(--neon-rgb),0.15);border-color:var(--neon);box-shadow:0 0 15px rgba(var(--neon-rgb),0.2)}
+.admin-header{position:relative;z-index:10;padding:16px 24px;border-bottom:1px solid rgba(var(--neon-rgb),0.1);display:flex;justify-content:space-between;align-items:center;background:rgba(0,0,0,0.5);backdrop-filter:blur(8px)}
+.admin-header h1{font-family:'VT323',monospace;font-size:18px;letter-spacing:5px;text-shadow:0 0 12px rgba(var(--neon-rgb),0.25)}
+.admin-header .nav-links{display:flex;gap:6px;align-items:center}
+.admin-header .nav-links a{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;text-decoration:none;color:rgba(var(--neon-rgb),0.45);padding:5px 10px;border:1px solid rgba(var(--neon-rgb),0.15);transition:all 0.3s}
+.admin-header .nav-links a:hover{color:var(--neon);border-color:var(--neon)}
+.admin-header .nav-links a.active{color:var(--neon);border-color:var(--neon)}
+.admin-header button{background:none;border:1px solid rgba(255,68,68,0.25);color:rgba(255,68,68,0.45);font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;padding:5px 12px;cursor:pointer;transition:all 0.3s}
+.admin-header button:hover{border-color:#ff4444;color:#ff4444}
+.admin-content{position:relative;z-index:10;padding:24px}
+.admin-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:24px}
+.stat-card{border:1px solid rgba(var(--neon-rgb),0.1);padding:18px;text-align:center;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);transition:border-color 0.3s}
+.stat-card:hover{border-color:rgba(var(--neon-rgb),0.25)}
+.stat-card .num{font-family:'VT323',monospace;font-size:36px;letter-spacing:2px;margin-bottom:4px;text-shadow:0 0 12px rgba(var(--neon-rgb),0.2)}
+.stat-card .label{font-size:7px;letter-spacing:3px;color:rgba(var(--neon-rgb),0.4)}
+.section-title{font-family:'VT323',monospace;font-size:14px;letter-spacing:5px;color:rgba(var(--neon-rgb),0.45);margin:24px 0 12px;border-bottom:1px solid rgba(var(--neon-rgb),0.06);padding-bottom:8px}
+.user-row{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border:1px solid rgba(var(--neon-rgb),0.08);margin-bottom:4px;font-size:11px;background:rgba(0,0,0,0.3);transition:all 0.3s}
+.user-row:hover{border-color:rgba(var(--neon-rgb),0.25);background:rgba(var(--neon-rgb),0.02)}
+.user-info{display:flex;flex-direction:column;gap:3px}
+.user-info .username{font-family:'VT323',monospace;font-size:16px;letter-spacing:3px}
+.user-info .email{font-size:9px;color:rgba(var(--neon-rgb),0.35);letter-spacing:1px}
+.user-info .date{font-size:8px;color:rgba(var(--neon-rgb),0.2)}
+.user-actions{display:flex;gap:6px;align-items:center}
+.user-actions button{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:2px;padding:5px 10px;cursor:pointer;border:1px solid;background:transparent;transition:all 0.3s}
+.btn-approve{color:#00ff41;border-color:rgba(0,255,65,0.4)}
+.btn-approve:hover{background:rgba(0,255,65,0.12);box-shadow:0 0 8px rgba(0,255,65,0.15)}
+.btn-deny{color:#ff4444;border-color:rgba(255,68,68,0.4)}
+.btn-deny:hover{background:rgba(255,68,68,0.12);box-shadow:0 0 8px rgba(255,68,68,0.15)}
+.btn-suspend{color:#ffaa00;border-color:rgba(255,170,0,0.4)}
+.btn-suspend:hover{background:rgba(255,170,0,0.12);box-shadow:0 0 8px rgba(255,170,0,0.15)}
+.status-badge{font-family:'VT323',monospace;font-size:11px;letter-spacing:2px;padding:3px 8px;display:inline-block}
+.status-pending{color:#ffaa00;border:1px solid rgba(255,170,0,0.4)}
+.status-approved{color:#00ff41;border:1px solid rgba(0,255,65,0.4)}
+.status-suspended{color:#ff4444;border:1px solid rgba(255,68,68,0.4)}
+#admin-panel{display:none}
+.empty-state{text-align:center;padding:40px;color:rgba(var(--neon-rgb),0.2);font-family:'VT323',monospace;font-size:14px;letter-spacing:4px}
+#admin-error{font-size:9px;color:#ff4444;letter-spacing:1px;min-height:16px;text-shadow:0 0 8px rgba(255,68,68,0.2)}
+@media(max-width:768px){.user-row{flex-direction:column;gap:8px;align-items:flex-start}.admin-stats{grid-template-columns:1fr 1fr}.admin-header{flex-direction:column;gap:8px}}
 </style>
 </head>
 <body>
 
+<canvas id="dv-matrix-canvas"></canvas>
+
 <!-- ADMIN LOGIN GATE -->
 <div id="admin-gate" class="admin-gate">
-  <div style="font-size:10px; letter-spacing:4px; color:rgba(var(--neon-rgb),0.4); margin-bottom:16px;">>> COMMAND CENTER // AUTHORIZED PERSONNEL ONLY</div>
+  <div class="label">>> COMMAND CENTER // AUTHORIZED PERSONNEL ONLY</div>
   <input type="email" id="admin-email" placeholder="OPERATOR EMAIL">
   <input type="password" id="admin-pass" placeholder="CLEARANCE CODE">
   <button onclick="adminLogin()">&#9654; AUTHENTICATE</button>
-  <div id="admin-error" style="font-size:9px; color:#ff4444; letter-spacing:1px; min-height:16px;"></div>
+  <div id="admin-error"></div>
 </div>
 
 <!-- ADMIN PANEL -->
 <div id="admin-panel">
   <div class="admin-header">
     <h1>>> DISS0LINKZ COMMAND CENTER</h1>
-    <button onclick="adminLogout()">DISCONNECT</button>
+    <div class="nav-links">
+      <a href="/settings/">SETTINGS</a>
+      <a href="/links/">DEEP LINKS</a>
+      <a href="/admin/" class="active">COMMAND</a>
+      <a href="/">GATE</a>
+      <button onclick="adminLogout()">DISCONNECT</button>
+    </div>
   </div>
   <div class="admin-content">
     <div class="admin-stats">
@@ -88,6 +115,8 @@ body { background:var(--bg); color:var(--neon); font-family:'Courier New',monosp
   </div>
 </div>
 
+<script src="/backgrounds.js"></script>
+
 <script>
 var firebaseConfig = {
   apiKey: "AIzaSyBJW5JIetcStxkvZoqpk3IwQbUY7BI9-JI",
@@ -101,7 +130,6 @@ firebase.initializeApp(firebaseConfig);
 var auth = firebase.auth();
 var db = firebase.firestore();
 
-// Admin email whitelist — ONLY these emails can access the admin panel
 var ADMIN_EMAILS = ['dissoverse@gmail.com', 'analogflowers@gmail.com'];
 
 function adminLogin() {
@@ -122,7 +150,6 @@ function adminLogout() {
   });
 }
 
-// Check if already logged in
 auth.onAuthStateChanged(function(user) {
   if (user && ADMIN_EMAILS.includes(user.email.toLowerCase())) {
     loadAdminPanel();
@@ -157,6 +184,8 @@ function loadUsers() {
   });
 }
 
+function esc(s) { var d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
 function renderList(containerId, users, status) {
   var el = document.getElementById(containerId);
   if (!users.length) { el.innerHTML = '<div class="empty-state">NONE</div>'; return; }
@@ -164,19 +193,19 @@ function renderList(containerId, users, status) {
   users.forEach(function(u) {
     var row = document.createElement('div');
     row.className = 'user-row';
-    var created = u.created ? new Date(u.created.seconds * 1000).toLocaleString() : '—';
+    var created = u.created ? new Date(u.created.seconds * 1000).toLocaleString() : '--';
     var actions = '';
     if (status === 'pending') {
-      actions = '<button class="btn-approve" onclick="updateStatus(\'' + u.id + '\',\'approved\')">APPROVE</button>' +
-                '<button class="btn-deny" onclick="updateStatus(\'' + u.id + '\',\'denied\')">DENY</button>';
+      actions = '<button class="btn-approve" onclick="updateStatus(\''+esc(u.id)+'\',\'approved\')">APPROVE</button>' +
+                '<button class="btn-deny" onclick="updateStatus(\''+esc(u.id)+'\',\'denied\')">DENY</button>';
     } else if (status === 'approved') {
-      actions = '<button class="btn-suspend" onclick="updateStatus(\'' + u.id + '\',\'suspended\')">SUSPEND</button>';
+      actions = '<button class="btn-suspend" onclick="updateStatus(\''+esc(u.id)+'\',\'suspended\')">SUSPEND</button>';
     } else if (status === 'suspended') {
-      actions = '<button class="btn-approve" onclick="updateStatus(\'' + u.id + '\',\'approved\')">REACTIVATE</button>';
+      actions = '<button class="btn-approve" onclick="updateStatus(\''+esc(u.id)+'\',\'approved\')">REACTIVATE</button>';
     }
     row.innerHTML = '<div class="user-info">' +
-      '<span class="username">' + (u.username || u.email || 'UNKNOWN') + '</span>' +
-      '<span class="email">' + (u.email || '') + '</span>' +
+      '<span class="username">' + esc(u.username || u.email || 'UNKNOWN') + '</span>' +
+      '<span class="email">' + esc(u.email || '') + '</span>' +
       '<span class="date">REGISTERED: ' + created + '</span>' +
       '</div>' +
       '<div class="user-actions"><span class="status-badge status-' + status + '">' + status.toUpperCase() + '</span>' + actions + '</div>';
@@ -189,8 +218,6 @@ function updateStatus(userId, newStatus) {
     status: newStatus,
     updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
     updatedBy: auth.currentUser.email
-  }).then(function() {
-    console.log('Status updated: ' + userId + ' -> ' + newStatus);
   }).catch(function(e) {
     alert('Error: ' + e.message);
   });

@@ -8,39 +8,53 @@
 <link rel="apple-touch-icon" sizes="180x180" href="https://cdn.shopify.com/s/files/1/0897/5686/0735/files/BIG-DISSOVERSE-APP-LOGO.png?v=1775799330">
 <link rel="icon" type="image/png" href="https://cdn.shopify.com/s/files/1/0897/5686/0735/files/BIG-DISSOVERSE-APP-LOGO.png?v=1775799330">
 <meta name="robots" content="noindex, nofollow">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <style>
-:root{--neon:#00ff41;--neon-rgb:0,255,65;--bg:#0a0a0a}
+:root{--neon:#00ff41;--neon-rgb:0,255,65;--bg:#0a0a0a;--matrix-color:#00ff41;--matrix-fade:rgba(0,255,65,0.4)}
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);color:var(--neon);font-family:'Courier New',monospace;min-height:100vh}
-.gate{display:flex;align-items:center;justify-content:center;min-height:100vh;font-size:11px;letter-spacing:3px;color:rgba(var(--neon-rgb),0.4)}
-.nav{padding:12px 20px;border-bottom:1px solid rgba(var(--neon-rgb),0.1);display:flex;justify-content:space-between;align-items:center}
-.nav a{color:rgba(var(--neon-rgb),0.5);font-size:9px;letter-spacing:2px;text-decoration:none;padding:4px 10px;border:1px solid rgba(var(--neon-rgb),0.15);transition:all 0.3s}
+body{background:var(--bg);color:var(--neon);font-family:'Share Tech Mono','Courier New',monospace;min-height:100vh}
+
+/* CRT Scanlines */
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.12) 2px,rgba(0,0,0,0.12) 4px);pointer-events:none;z-index:9999}
+body::after{content:'';position:fixed;inset:0;background:rgba(var(--neon-rgb),0.008);pointer-events:none;z-index:9998;animation:flicker 0.15s infinite}
+@keyframes flicker{0%,100%{opacity:1}50%{opacity:0.97}}
+
+#dv-matrix-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:0.15}
+.gate{position:relative;z-index:10;display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:'VT323',monospace;font-size:14px;letter-spacing:4px;color:rgba(var(--neon-rgb),0.4);text-shadow:0 0 10px rgba(var(--neon-rgb),0.15)}
+.nav{position:relative;z-index:10;padding:12px 20px;border-bottom:1px solid rgba(var(--neon-rgb),0.08);display:flex;justify-content:space-between;align-items:center;background:rgba(0,0,0,0.5);backdrop-filter:blur(8px)}
+.nav a{font-family:'Share Tech Mono',monospace;color:rgba(var(--neon-rgb),0.45);font-size:9px;letter-spacing:2px;text-decoration:none;padding:5px 10px;border:1px solid rgba(var(--neon-rgb),0.15);transition:all 0.3s}
 .nav a:hover{color:var(--neon);border-color:var(--neon)}
 .nav .active{color:var(--neon);border-color:var(--neon)}
-.nav-title{font-size:11px;letter-spacing:4px}
-.content{max-width:600px;margin:0 auto;padding:24px 16px}
-h2{font-size:11px;letter-spacing:4px;color:rgba(var(--neon-rgb),0.5);margin-bottom:16px;border-bottom:1px solid rgba(var(--neon-rgb),0.08);padding-bottom:8px}
-.info{font-size:10px;letter-spacing:1px;color:rgba(var(--neon-rgb),0.35);line-height:1.8;margin-bottom:20px}
-.coming-soon{text-align:center;padding:60px 20px;font-size:12px;letter-spacing:4px;color:rgba(var(--neon-rgb),0.25)}
-.coming-soon span{display:block;margin-top:8px;font-size:9px;letter-spacing:2px;color:rgba(var(--neon-rgb),0.15)}
-.logout-btn{background:none;border:1px solid rgba(255,68,68,0.3);color:rgba(255,68,68,0.5);font-family:'Courier New',monospace;font-size:8px;letter-spacing:2px;padding:4px 10px;cursor:pointer}
+.nav-title{font-family:'VT323',monospace;font-size:16px;letter-spacing:4px;text-shadow:0 0 10px rgba(var(--neon-rgb),0.25)}
+.nav-links{display:flex;gap:6px;align-items:center}
+.logout-btn{background:none;border:1px solid rgba(255,68,68,0.25);color:rgba(255,68,68,0.45);font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;padding:5px 10px;cursor:pointer;transition:all 0.3s}
 .logout-btn:hover{border-color:#ff4444;color:#ff4444}
+.content{position:relative;z-index:10;max-width:600px;margin:0 auto;padding:24px 16px}
+h2{font-family:'VT323',monospace;font-size:16px;letter-spacing:5px;color:rgba(var(--neon-rgb),0.45);margin-bottom:16px;border-bottom:1px solid rgba(var(--neon-rgb),0.06);padding-bottom:8px}
+.info{font-size:10px;letter-spacing:1px;color:rgba(var(--neon-rgb),0.3);line-height:1.8;margin-bottom:20px}
+.coming-soon{text-align:center;padding:60px 20px}
+.coming-soon .title{font-family:'VT323',monospace;font-size:24px;letter-spacing:5px;color:rgba(var(--neon-rgb),0.2);text-shadow:0 0 15px rgba(var(--neon-rgb),0.1);animation:pulse 3s ease-in-out infinite}
+.coming-soon .sub{display:block;margin-top:12px;font-size:9px;letter-spacing:2px;color:rgba(var(--neon-rgb),0.12);max-width:400px;margin-left:auto;margin-right:auto;line-height:1.8}
+@keyframes pulse{0%,100%{opacity:0.2}50%{opacity:0.4}}
 #app{display:none}
 </style>
 </head>
 <body>
 
-<div class="gate" id="gate">CHECKING CLEARANCE...</div>
+<canvas id="dv-matrix-canvas"></canvas>
+
+<div class="gate" id="gate">VERIFYING CLEARANCE...</div>
 
 <div id="app">
   <div class="nav">
     <span class="nav-title">>> DISS0LINKZ</span>
-    <div>
+    <div class="nav-links">
       <a href="/settings/">SETTINGS</a>
       <a href="/links/" class="active">DEEP LINKS</a>
+      <a href="/admin/">COMMAND</a>
       <a href="/">GATE</a>
       <button class="logout-btn" onclick="_fbAuth.signOut().then(function(){location.href='/'})">LOGOUT</button>
     </div>
@@ -49,11 +63,13 @@ h2{font-size:11px;letter-spacing:4px;color:rgba(var(--neon-rgb),0.5);margin-bott
     <h2>// DEEP LINK MANAGER</h2>
     <div class="info">Create vanity short links that redirect through the DISSOVERSE bridge system. Links deploy as static HTML files via GitHub Pages.</div>
     <div class="coming-soon">
-      DEEP LINK ENGINE COMING SOON
-      <span>This feature is being migrated from the Force-Op tool to a user-friendly interface with Firebase-backed link storage and click tracking.</span>
+      <div class="title">DEEP LINK ENGINE COMING SOON</div>
+      <span class="sub">This feature is being migrated from the Force-Op tool to a user-friendly interface with Firebase-backed link storage and click tracking.</span>
     </div>
   </div>
 </div>
+
+<script src="/backgrounds.js"></script>
 
 <script>
 firebase.initializeApp({apiKey:"AIzaSyBJW5JIetcStxkvZoqpk3IwQbUY7BI9-JI",authDomain:"diss0linkz.firebaseapp.com",projectId:"diss0linkz",storageBucket:"diss0linkz.firebasestorage.app",messagingSenderId:"50981881114",appId:"1:50981881114:web:4392a0aa58399a627f18a3"});

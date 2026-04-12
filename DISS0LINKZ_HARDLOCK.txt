@@ -1,0 +1,200 @@
+================================================================
+DISS0LINKZ — HARDLOCK GOVERNANCE DOCUMENT
+================================================================
+DATE:     2026-04-11
+FROM:     GRANDMASTER + CODE (COD)
+TO:       ALL FUTURE CODE SESSIONS, AXIOM, NEURAL, ORACLE
+SITE:     diss0links.com
+REPO:     github.com/analogflowers-coder/dissolinks (branch: main)
+HOSTING:  GitHub Pages (auto-deploy on push to main)
+OLD URL:  links.dissoverse.com (redirects via JS to diss0links.com)
+================================================================
+
+                  READ THIS BEFORE TOUCHING ANYTHING.
+
+================================================================
+SECTION 1: ARCHITECTURE OVERVIEW
+================================================================
+
+DISS0LINKZ is a link-in-bio SaaS product. Five sections:
+
+  A. AUTH GATE (index.html)
+     - Firebase Auth (Email/Password)
+     - No localStorage fallback. Firebase ONLY.
+     - Boot sequence + terminal animation
+     - Login / Signup / Password Reset
+     - Whitelist auto-approval for GRANDMASTER email
+     - Terminal death screen after 7 failed logins
+
+  B. SETTINGS PORTAL (/settings/)
+     - Full landing page customization tool
+     - Profile, links, social channels, colors, backgrounds
+     - 5 canvas background animations with live preview
+     - CRT scanlines + click sounds
+     - Saves to Firestore user doc config object
+
+  C. DEEP LINK ENGINE (/links/)
+     - Placeholder for Force-Op link generator migration
+     - Will replace old localStorage-based system
+     - Firebase-backed link storage + click tracking
+
+  D. PUBLIC LANDING PAGES (/p/[username]/)
+     - Dynamic Firestore reads (Option A)
+     - Renders user config as a public landing page
+     - Background animations, social icons, link tiles
+     - 404.html routes /p/username/ via query param
+
+  E. ADMIN PANEL (/admin/)
+     - GRANDMASTER-only access (email whitelist)
+     - Approve/Deny/Suspend users
+     - Stats dashboard
+     - Real-time Firestore listener
+
+================================================================
+SECTION 2: FILE STRUCTURE
+================================================================
+
+  dissolinks/
+    index.html               Auth gate (~6700 lines)
+    backgrounds.js           5 canvas animations (matrix, signal,
+                             hex, static, grid)
+    404.html                 Styled 404 + /p/ route handler
+    CNAME                    diss0links.com
+    DISS0LINKZ_HARDLOCK.txt  THIS FILE
+
+    settings/index.html      Creator settings portal
+    links/index.html         Deep link manager (placeholder)
+    admin/index.html         GRANDMASTER command center
+    p/index.html             Public landing page renderer
+
+    BRIDGE PAGES (FROZEN — see BRIDGE_HARDLOCK.txt):
+      all/index.html
+      shop/index.html
+      main/index.html
+      mainsite/index.html
+      itsrockymontana/index.html
+      ivydelicate/index.html
+      shopstore/index.html
+
+    GOVERNANCE (DO NOT DELETE):
+      DISSOLINK_MASTER_RULES.txt
+      BRIDGE_HARDLOCK.txt
+      FOREVER_LINKS.txt
+      _MUST_READ_BEFORE_PROCEEDING.txt
+
+================================================================
+SECTION 3: FIREBASE CONFIGURATION
+================================================================
+
+  Project:           diss0linkz
+  Console:           console.firebase.google.com/u/0/project/diss0linkz
+  Auth Provider:     Email/Password (enabled)
+  Database:          Firestore (nam5, US)
+  API Key:           AIzaSyBJW5JIetcStxkvZoqpk3IwQbUY7BI9-JI
+  Auth Domain:       diss0linkz.firebaseapp.com
+  Project ID:        diss0linkz
+  Storage Bucket:    diss0linkz.firebasestorage.app
+  Messaging ID:      50981881114
+  App ID:            1:50981881114:web:4392a0aa58399a627f18a3
+
+  ADMIN EMAILS:      dissoverse@gmail.com, analogflowers@gmail.com
+
+  Firestore User Doc Structure:
+    users/{uid}: {
+      uid, username, email, status,
+      subscriptionTier, created, approvedBy, approvedAt,
+      config: {
+        avatar, displayName, handle, bio, links[],
+        instagram, twitter, tiktok, youtube, spotify,
+        color, customColor, background, speed,
+        audio, autoplay, rgbEnabled, rgbSpeed
+      }
+    }
+
+================================================================
+SECTION 4: PROTECTED FEATURES — DO NOT MODIFY
+================================================================
+
+1. FIREBASE AUTH FLOW
+   The old localStorage password "444" system is DEAD.
+   Do NOT re-add localStorage auth. Firebase only.
+   If Firebase is down, show "SYSTEM OFFLINE."
+
+2. BOOT SEQUENCE (index.html)
+   Terminal typing animation, logo reveal, glitch exit.
+   Do NOT remove or shorten. Sets the brand tone.
+
+3. BACKGROUND ANIMATIONS (backgrounds.js)
+   5 animations: matrix, signal, hex, static, grid.
+   All read colors from CSS custom properties.
+   Do NOT break the dvSetBackground() global API.
+
+4. BRIDGE PAGES (all/, shop/, main/, etc.)
+   FROZEN SYSTEM. See BRIDGE_HARDLOCK.txt.
+   These use the bridge page architecture.
+   Do NOT convert to direct redirects.
+
+5. 404.html ROUTING LOGIC
+   The 404.html catches /p/username/ requests on GitHub Pages
+   and redirects to /p/?u=username for the renderer.
+   Do NOT remove this routing. It's how public pages work.
+
+6. ADMIN EMAIL WHITELIST
+   Admin access is controlled by email whitelist in admin/index.html.
+   Only dissoverse@gmail.com and analogflowers@gmail.com.
+   Do NOT add other emails without GRANDMASTER approval.
+
+7. CRT SCANLINES + CLICK SOUNDS
+   All pages use CRT scanline overlay (body::before).
+   Settings page has Web Audio API click sounds.
+   These are brand identity. Do NOT remove.
+
+8. DOMAIN REDIRECT
+   Every page has: if(location.hostname==='links.dissoverse.com')
+   This redirects the old domain. Keep it.
+
+================================================================
+SECTION 5: HOW TO PUSH CHANGES
+================================================================
+
+  cd /c/Users/analo/OneDrive/Desktop/dissolinks
+  git pull origin main
+  # make changes
+  git add -A
+  git commit -m "description"
+  git push origin main
+
+  CDN propagation: 60-90 seconds after push.
+
+================================================================
+SECTION 6: WHAT IS NOT BUILT YET (FUTURE PHASES)
+================================================================
+
+  Phase 2: Shopify subscription billing
+  Phase 2: Link click analytics
+  Phase 2: Email notifications beyond signup
+  Phase 3: Shopify webhook sync (needs Blaze plan)
+  Phase 4: Custom domain support
+  Phase 4: File upload for avatars (Firebase Storage)
+  Phase 4: Drag-to-reorder links
+
+  DO NOT BUILD THESE WITHOUT GRANDMASTER DIRECTIVE.
+
+================================================================
+SECTION 7: CUSTOM AUDIO ASSETS (PENDING)
+================================================================
+
+  GRANDMASTER has custom audio files to replace:
+  - Button click sound (currently Web Audio API beep)
+  - Error message alarm sound
+  - Login-to-UX loading transition sound
+  - Password page looping background track
+
+  These will be provided separately. The current placeholder
+  sounds (Web Audio API generated) should be replaced with
+  the custom assets when provided.
+
+================================================================
+END OF HARDLOCK DOCUMENT
+DISS0LINKZ | DISSOVERSE LLC | "a light in the dark, come get lit."
+================================================================
