@@ -72,6 +72,17 @@ h2{font-family:'VT323',monospace;font-size:16px;letter-spacing:5px;color:rgba(va
 <script src="/backgrounds.js"></script>
 
 <script>
+// ── CDN AUDIO — DISS0LINKZ BRANDED SOUNDS ──
+var _sfxClick = new Audio('https://cdn.shopify.com/s/files/1/0897/5686/0735/files/Diss0LinkZ.COM_--_CLICK_NOISE.mp3?v=1775956954');
+_sfxClick.preload = 'auto';
+document.addEventListener('click', function(e) {
+  if (e.target.matches('button, a, .logout-btn')) {
+    try { var s = _sfxClick.cloneNode(); s.volume = 0.6; s.play().catch(function(){}); } catch(x) {}
+  }
+}, true);
+</script>
+
+<script>
 firebase.initializeApp({apiKey:"AIzaSyBJW5JIetcStxkvZoqpk3IwQbUY7BI9-JI",authDomain:"diss0linkz.firebaseapp.com",projectId:"diss0linkz",storageBucket:"diss0linkz.firebasestorage.app",messagingSenderId:"50981881114",appId:"1:50981881114:web:4392a0aa58399a627f18a3"});
 var _fbAuth = firebase.auth();
 var _fbDb = firebase.firestore();

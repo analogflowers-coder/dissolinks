@@ -296,20 +296,17 @@ var db = firebase.firestore();
 var currentUser = null;
 var userData = null;
 
-// ── CLICK SOUND ──
+// ── CDN AUDIO — DISS0LINKZ BRANDED SOUNDS ──
+var _sfxClick = new Audio('https://cdn.shopify.com/s/files/1/0897/5686/0735/files/Diss0LinkZ.COM_--_CLICK_NOISE.mp3?v=1775956954');
+_sfxClick.preload = 'auto';
+var _sfxError = new Audio('https://cdn.shopify.com/s/files/1/0897/5686/0735/files/Diss0LinkZ.COM_--_ERROR_ALARM.mp3?v=1775956954');
+_sfxError.preload = 'auto';
+
 function playClick() {
-  try {
-    var ctx = new (window.AudioContext || window.webkitAudioContext)();
-    var osc = ctx.createOscillator();
-    var gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.frequency.value = 1400;
-    gain.gain.value = 0.04;
-    osc.start();
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.04);
-    osc.stop(ctx.currentTime + 0.04);
-  } catch(e) {}
+  try { var s = _sfxClick.cloneNode(); s.volume = 0.6; s.play().catch(function(){}); } catch(e) {}
+}
+function playError() {
+  try { var s = _sfxError.cloneNode(); s.volume = 0.7; s.play().catch(function(){}); } catch(e) {}
 }
 
 // Add click sound to all interactive elements
@@ -521,6 +518,7 @@ function saveSettings() {
   }).then(function() {
     showToast('> CONFIGURATION SAVED', false);
   }).catch(function(e) {
+    playError();
     showToast('> SAVE FAILED: ' + e.message, true);
   });
 }

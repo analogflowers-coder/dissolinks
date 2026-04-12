@@ -118,6 +118,19 @@ body::after{content:'';position:fixed;inset:0;background:rgba(var(--neon-rgb),0.
 <script src="/backgrounds.js"></script>
 
 <script>
+// ── CDN AUDIO — DISS0LINKZ BRANDED SOUNDS ──
+var _sfxClick = new Audio('https://cdn.shopify.com/s/files/1/0897/5686/0735/files/Diss0LinkZ.COM_--_CLICK_NOISE.mp3?v=1775956954');
+_sfxClick.preload = 'auto';
+var _sfxError = new Audio('https://cdn.shopify.com/s/files/1/0897/5686/0735/files/Diss0LinkZ.COM_--_ERROR_ALARM.mp3?v=1775956954');
+_sfxError.preload = 'auto';
+document.addEventListener('click', function(e) {
+  if (e.target.matches('button, a, .btn-approve, .btn-deny, .btn-suspend')) {
+    try { var s = _sfxClick.cloneNode(); s.volume = 0.6; s.play().catch(function(){}); } catch(x) {}
+  }
+}, true);
+</script>
+
+<script>
 var firebaseConfig = {
   apiKey: "AIzaSyBJW5JIetcStxkvZoqpk3IwQbUY7BI9-JI",
   authDomain: "diss0linkz.firebaseapp.com",
@@ -137,10 +150,10 @@ function adminLogin() {
   var pass = document.getElementById('admin-pass').value;
   var err = document.getElementById('admin-error');
   if (!email || !pass) { err.textContent = '> ALL FIELDS REQUIRED'; return; }
-  if (!ADMIN_EMAILS.includes(email.toLowerCase())) { err.textContent = '> UNAUTHORIZED OPERATIVE'; return; }
+  if (!ADMIN_EMAILS.includes(email.toLowerCase())) { err.textContent = '> UNAUTHORIZED OPERATIVE'; try{var s=_sfxError.cloneNode();s.volume=0.7;s.play().catch(function(){});}catch(x){} return; }
   auth.signInWithEmailAndPassword(email, pass)
     .then(function() { loadAdminPanel(); })
-    .catch(function(e) { err.textContent = '> AUTH FAILED: ' + e.message; });
+    .catch(function(e) { err.textContent = '> AUTH FAILED: ' + e.message; try{var s=_sfxError.cloneNode();s.volume=0.7;s.play().catch(function(){});}catch(x){} });
 }
 
 function adminLogout() {

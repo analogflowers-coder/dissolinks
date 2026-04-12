@@ -1779,9 +1779,19 @@ var _fbDb = firebase.firestore();
 <!-- MATRIX RAIN CANVAS -->
 <canvas id="dv-matrix-canvas"></canvas>
 
-<!-- BACKGROUND MUSIC -->
+<!-- BACKGROUND MUSIC (plays after login in app mode) -->
 <audio id="dv-bg-music" loop preload="auto" crossorigin="anonymous">
   <source src="https://cdn.shopify.com/s/files/1/0897/5686/0735/files/TRAP_BEAT_256KPS.mp3?v=1775267721" type="audio/mpeg">
+</audio>
+
+<!-- PASSWORD PAGE AMBIENT LOOP (plays on auth gate, stops on login) -->
+<audio id="dv-password-loop" loop preload="auto" crossorigin="anonymous">
+  <source src="https://cdn.shopify.com/s/files/1/0897/5686/0735/files/Diss0LinkZ.COM_--_PASSWORD_LOOPING_SOUND.mp3?v=1775957008" type="audio/mpeg">
+</audio>
+
+<!-- LOADING TRANSITION SOUND (plays during auth → app transition) -->
+<audio id="dv-loading-sound" preload="auto" crossorigin="anonymous">
+  <source src="https://cdn.shopify.com/s/files/1/0897/5686/0735/files/Diss0LinkZ.COM_--_LOADING_MATRIX_SOUND.mp3?v=1775956955" type="audio/mpeg">
 </audio>
 
 <!-- OLD MUSIC TOGGLE REMOVED — now inside terminal as dv-music-btn-terminal -->
@@ -3610,60 +3620,23 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
   var musicMuted = false;
   var glitchTimeout = null;
 
-  // ── CYBERPUNK UI CLICK SOUND (synthesized, no external files) ──
-  var _dvClickCtx = null;
+  // ── CUSTOM CDN AUDIO — DISS0LINKZ BRANDED SOUNDS ──
+  var _dvSfxClickSrc = 'https://cdn.shopify.com/s/files/1/0897/5686/0735/files/Diss0LinkZ.COM_--_CLICK_NOISE.mp3?v=1775956954';
+  var _dvSfxErrorSrc = 'https://cdn.shopify.com/s/files/1/0897/5686/0735/files/Diss0LinkZ.COM_--_ERROR_ALARM.mp3?v=1775956954';
+  // Preload click sound
+  var _dvSfxClickPreload = new Audio(_dvSfxClickSrc);
+  _dvSfxClickPreload.preload = 'auto';
+  _dvSfxClickPreload.volume = 0.6;
+  // Preload error alarm
+  var _dvSfxErrorPreload = new Audio(_dvSfxErrorSrc);
+  _dvSfxErrorPreload.preload = 'auto';
+  _dvSfxErrorPreload.volume = 0.7;
+
   function dvClickSound() {
     try {
-      if (!_dvClickCtx) _dvClickCtx = new (window.AudioContext || window.webkitAudioContext)();
-      var ctx = _dvClickCtx;
-      var now = ctx.currentTime;
-
-      // Layer 1: Short noise burst (digital glitch texture)
-      var bufLen = ctx.sampleRate * 0.04;
-      var noiseBuf = ctx.createBuffer(1, bufLen, ctx.sampleRate);
-      var noiseData = noiseBuf.getChannelData(0);
-      for (var i = 0; i < bufLen; i++) {
-        noiseData[i] = (Math.random() * 2 - 1) * (1 - i / bufLen);
-      }
-      var noise = ctx.createBufferSource();
-      noise.buffer = noiseBuf;
-      var noiseFilter = ctx.createBiquadFilter();
-      noiseFilter.type = 'bandpass';
-      noiseFilter.frequency.value = 4000;
-      noiseFilter.Q.value = 2;
-      var noiseGain = ctx.createGain();
-      noiseGain.gain.setValueAtTime(0.15, now);
-      noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
-      noise.connect(noiseFilter);
-      noiseFilter.connect(noiseGain);
-      noiseGain.connect(ctx.destination);
-      noise.start(now);
-
-      // Layer 2: Quick sine blip (arcade bleep)
-      var osc = ctx.createOscillator();
-      osc.type = 'square';
-      osc.frequency.setValueAtTime(1800, now);
-      osc.frequency.exponentialRampToValueAtTime(400, now + 0.06);
-      var oscGain = ctx.createGain();
-      oscGain.gain.setValueAtTime(0.08, now);
-      oscGain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
-      osc.connect(oscGain);
-      oscGain.connect(ctx.destination);
-      osc.start(now);
-      osc.stop(now + 0.07);
-
-      // Layer 3: Sub hit (weight)
-      var sub = ctx.createOscillator();
-      sub.type = 'sine';
-      sub.frequency.setValueAtTime(120, now);
-      sub.frequency.exponentialRampToValueAtTime(60, now + 0.05);
-      var subGain = ctx.createGain();
-      subGain.gain.setValueAtTime(0.12, now);
-      subGain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
-      sub.connect(subGain);
-      subGain.connect(ctx.destination);
-      sub.start(now);
-      sub.stop(now + 0.06);
+      var s = _dvSfxClickPreload.cloneNode();
+      s.volume = 0.6;
+      s.play().catch(function(){});
     } catch(e) {}
   }
 
@@ -3672,6 +3645,22 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
     var target = e.target.closest('button, a, .vault-tab, .vault-btn-primary, .s-swatch, .s-color, .dv-mood__color-btn, .dv-mood__bg-btn, .dv-mood__toggle-btn, input[type="submit"]');
     if (target) dvClickSound();
   }, true);
+
+  // ── PASSWORD PAGE AMBIENT LOOP ──
+  // Starts on first user interaction while auth gate is visible
+  var _pwLoopStarted = false;
+  function dvStartPasswordLoop() {
+    if (_pwLoopStarted) return;
+    var gate = document.getElementById('diss0linkz-auth-gate');
+    if (!gate || gate.style.display === 'none') return;
+    var pwLoop = document.getElementById('dv-password-loop');
+    if (pwLoop) {
+      pwLoop.volume = 0.35;
+      pwLoop.play().then(function() { _pwLoopStarted = true; }).catch(function(){});
+    }
+  }
+  document.addEventListener('click', function() { dvStartPasswordLoop(); }, { once: false });
+  document.addEventListener('keydown', function() { dvStartPasswordLoop(); }, { once: false });
 
   // ── BOOT SEQUENCE ───────────────────────────────────────────────
   var BOOT_LINES = [
@@ -3769,16 +3758,9 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
 
   function playDeniedSound() {
     try {
-      var ctx = getAudioCtx();
-      var osc = ctx.createOscillator();
-      var gain = ctx.createGain();
-      osc.type = 'sawtooth';
-      osc.connect(gain); gain.connect(ctx.destination);
-      osc.frequency.setValueAtTime(180, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(40, ctx.currentTime + 0.35);
-      gain.gain.setValueAtTime(0.22, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.35);
-      osc.start(); osc.stop(ctx.currentTime + 0.35);
+      var s = _dvSfxErrorPreload.cloneNode();
+      s.volume = 0.7;
+      s.play().catch(function(){});
     } catch(e) {}
   }
 
@@ -3883,6 +3865,12 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
   // ── ACCESS GRANTED ──────────────────────────────────────────
   function accessGranted() {
     if (glitchTimeout) clearTimeout(glitchTimeout);
+    // Stop password ambient loop
+    var pwLoop = document.getElementById('dv-password-loop');
+    if (pwLoop) { pwLoop.pause(); pwLoop.currentTime = 0; }
+    // Play loading matrix transition sound
+    var loadSfx = document.getElementById('dv-loading-sound');
+    if (loadSfx) { loadSfx.volume = 0.6; loadSfx.currentTime = 0; loadSfx.play().catch(function(){}); }
     playGrantedSound();
     startMusic(); // Music plays when UX opens, not on password screen
 
@@ -4191,6 +4179,10 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
     if (!el) return;
     el.textContent = msg;
     el.className = 'vault-status' + (type ? ' vault-' + type : '');
+    // Play error alarm on any error status
+    if (type === 'err') {
+      try { var s = _dvSfxErrorPreload.cloneNode(); s.volume = 0.5; s.play().catch(function(){}); } catch(e) {}
+    }
   }
 
   function dvUpdateUI(username) {
