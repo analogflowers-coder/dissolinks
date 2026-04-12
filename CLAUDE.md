@@ -1,5 +1,21 @@
 # DISS0LINKZ
 
+## FIRST ACTION ON EVERY SESSION
+Before writing ANY code, execute this startup sequence:
+1. Read this entire CLAUDE.md
+2. Read tasks/lessons.md for standing rules and past mistakes
+3. Read DISS0LINKZ_HARDLOCK.txt for protected features
+4. Read OPEN_TASKS.md from the clone package at C:\Users\analo\OneDrive\Desktop\CODE_CLONE_PACKAGE\references\OPEN_TASKS.md
+5. Check AXIOM relay: G:\My Drive\AXIOM_RELAY\OUTGOING\TO_CODE\ for new directives
+6. Check RELAY_INDEX.md: G:\My Drive\AXIOM_RELAY\RELAY_INDEX.md for context
+7. Query MemPalace for session context:
+   - palace_dissoverse: search "DISS0LINKZ" for latest product state
+   - palace_operations: search "CODE session" for recent session history
+8. Report to GRANDMASTER: "Startup sequence complete. [X] directives pending. Ready."
+
+DO NOT skip this sequence. DO NOT start coding before completing it.
+Every past session that skipped context loading produced regressions.
+
 ## What This Is
 DISS0LINKZ is a cyberpunk link-in-bio SaaS platform. Static site
 on GitHub Pages. Firebase Auth + Firestore for data. No backend
