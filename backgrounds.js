@@ -131,6 +131,7 @@
   // BACKGROUND 4: STATIC NOISE (VHS/TV snow)
   // ════════════════════════════════════════════
   var noiseData = null;
+  var _channelFlicker = 0;
   function drawStaticNoise() {
     var rgb = getRGB();
     if (!noiseData || noiseData.width !== W || noiseData.height !== H) {
@@ -138,23 +139,37 @@
     }
     var d = noiseData.data;
     var spd = window.dvMatrixSpeed || 1;
-    var intensity = Math.min(spd * 0.15, 0.4);
+    var intensity = Math.min(spd * 0.4 + 0.3, 1.0);
+    // Channel flicker — random horizontal bands brighten/dim
+    var flickerBand = Math.random() > 0.85;
+    var flickerY = flickerBand ? Math.floor(Math.random() * H) : -1;
+    var flickerH = flickerBand ? 20 + Math.floor(Math.random() * 80) : 0;
     for (var i = 0; i < d.length; i += 4) {
+      var pixelY = Math.floor((i / 4) / W);
       var v = Math.random() * 255;
-      d[i] = v * (rgb[0] / 255) * intensity;
-      d[i + 1] = v * (rgb[1] / 255) * intensity;
-      d[i + 2] = v * (rgb[2] / 255) * intensity;
-      d[i + 3] = Math.random() * 60;
+      // Boost pixels in flicker band
+      var bandBoost = (flickerBand && pixelY >= flickerY && pixelY < flickerY + flickerH) ? 2.5 : 1;
+      d[i] = Math.min(255, v * (rgb[0] / 255) * intensity * bandBoost);
+      d[i + 1] = Math.min(255, v * (rgb[1] / 255) * intensity * bandBoost);
+      d[i + 2] = Math.min(255, v * (rgb[2] / 255) * intensity * bandBoost);
+      d[i + 3] = 40 + Math.random() * 160;
     }
     ctx.putImageData(noiseData, 0, 0);
-    // Occasional glitch tear
-    if (Math.random() > 0.97) {
+    // Frequent glitch tears
+    if (Math.random() > 0.9) {
       var tearY = Math.random() * H;
-      var tearH = 2 + Math.random() * 8;
-      var shift = (Math.random() - 0.5) * 30;
-      var slice = ctx.getImageData(0, tearY, W, tearH);
+      var tearH = 2 + Math.random() * 15;
+      var shift = (Math.random() - 0.5) * 60;
+      var slice = ctx.getImageData(0, Math.max(0,tearY), W, tearH);
       ctx.putImageData(slice, shift, tearY);
     }
+    // VHS horizontal roll bar
+    _channelFlicker += 3 + Math.random() * 5;
+    if (_channelFlicker > H) _channelFlicker = 0;
+    ctx.fillStyle = 'rgba(' + rgb.join(',') + ',0.12)';
+    ctx.fillRect(0, _channelFlicker, W, 3);
+    ctx.fillStyle = 'rgba(255,255,255,0.04)';
+    ctx.fillRect(0, _channelFlicker + 3, W, 30);
   }
 
   // ════════════════════════════════════════════
