@@ -28,8 +28,11 @@
   resize();
 
   // ── COLOR HELPERS ──
-  function getColor() { return window.dvMatrixColor || getComputedStyle(document.documentElement).getPropertyValue('--matrix-color').trim() || '#00ff41'; }
-  function getFade() { return window.dvMatrixFade || getComputedStyle(document.documentElement).getPropertyValue('--matrix-fade').trim() || 'rgba(0,255,65,0.4)'; }
+  function getColor() { return getComputedStyle(document.documentElement).getPropertyValue('--matrix-color').trim() || window.dvMatrixColor || '#00ff41'; }
+  function getFade() {
+    var rgb = getRGB();
+    return 'rgba(' + rgb.join(',') + ',0.4)';
+  }
   function getRGB() {
     var raw = getComputedStyle(document.documentElement).getPropertyValue('--neon-rgb').trim() || '0,255,65';
     return raw.split(',').map(function(v) { return parseInt(v.trim()); });
