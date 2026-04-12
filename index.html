@@ -1894,7 +1894,7 @@ var _fbDb = firebase.firestore();
           <img src="https://cdn.shopify.com/s/files/1/0897/5686/0735/files/GREEN_Account_Login-Icon..png?v=1775772105" alt="OPERATIVE" style="width:36px; height:36px; opacity:0.8; filter:var(--dv-icon-filter, none);" draggable="false">
         </div>
         <div class="vault-field">
-          <label class="vault-label" for="dv-signin-user">&#62; OPERATIVE ID</label>
+          <label class="vault-label" for="dv-signin-user">&#62; EMAIL</label>
           <input type="email" id="dv-signin-user" class="vault-input" placeholder="EMAIL ADDRESS"
             autocomplete="email" autocorrect="off" autocapitalize="off" spellcheck="false" maxlength="60">
         </div>
@@ -1915,17 +1915,9 @@ var _fbDb = firebase.firestore();
           <img src="https://cdn.shopify.com/s/files/1/0897/5686/0735/files/GREEN_Account_Login-Icon..png?v=1775772105" alt="OPERATIVE" style="width:36px; height:36px; opacity:0.8; filter:var(--dv-icon-filter, none);" draggable="false">
         </div>
         <div class="vault-field">
-          <label class="vault-label" for="dv-create-user">&#62; OPERATIVE ID</label>
-          <input type="text" id="dv-create-user" class="vault-input" placeholder="ENTER OPERATIVE ID (username)"
-            autocomplete="username" autocorrect="off" autocapitalize="off" spellcheck="false" maxlength="30">
-        </div>
-        <div class="vault-field">
-          <label class="vault-label" for="dv-create-email">&#62; EMAIL ADDRESS</label>
-          <input type="email" id="dv-create-email" class="vault-input" placeholder="YOUR EMAIL ADDRESS"
-            autocomplete="email" spellcheck="false">
-          <div style="font-size:9px; color:rgba(0,255,65,0.35); margin-top:4px; letter-spacing:1.5px;">
-            LETTERS, NUMBERS, HYPHENS, UNDERSCORES ONLY
-          </div>
+          <label class="vault-label" for="dv-create-email">&#62; EMAIL</label>
+          <input type="email" id="dv-create-email" class="vault-input" placeholder="EMAIL ADDRESS"
+            autocomplete="email" spellcheck="false" maxlength="60">
         </div>
         <div class="vault-field">
           <label class="vault-label" for="dv-create-pass">&#62; ESTABLISH CLEARANCE CODE</label>
@@ -4222,7 +4214,7 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
         }
       })
       .catch(function(e) {
-        var msg = e.code === 'auth/user-not-found' ? '> OPERATIVE NOT FOUND. REQUEST CLEARANCE FIRST.'
+        var msg = e.code === 'auth/user-not-found' ? '> EMAIL NOT FOUND. REQUEST CLEARANCE FIRST.'
                 : e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential' ? '> AUTH ERROR: MYRAVYRA ACCESS DENIED >> CREDENTIALS = FALSE. CONTACT ADMIN NODE SUPPORT STATION.'
                 : e.code === 'auth/invalid-email' ? '> INVALID EMAIL FORMAT.'
                 : '> AUTH ERROR: MYRAVYRA ACCESS DENIED >> CREDENTIALS = FALSE. CONTACT ADMIN NODE SUPPORT STATION.';
@@ -4246,42 +4238,34 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
       });
   };
 
-  // ── CREATE ACCOUNT ──────────────────────────────────────────────
+  // ── CREATE ACCOUNT (email-only, cypherpunk anonymous) ───────────
   window.dvAccountCreate = async function() {
-    var userInput  = document.getElementById('dv-create-user');
+    var emailField = document.getElementById('dv-create-email');
     var passInput  = document.getElementById('dv-create-pass');
     var pass2Input = document.getElementById('dv-create-pass2');
     var btn        = document.getElementById('dv-create-btn');
-    if (!userInput || !passInput || !pass2Input) return;
-    var username = userInput.value.trim().toLowerCase().replace(/[^a-z0-9_\-]/g, '');
+    if (!emailField || !passInput || !pass2Input) return;
+    var email    = emailField.value.trim();
     var password = passInput.value;
     var pass2    = pass2Input.value;
-    if (!username || username.length < 3) { dvSetAuthStatus('> OPERATIVE ID REQUIRED (3+ CHARACTERS).', 'err'); return; }
+    if (!email) { dvSetAuthStatus('> EMAIL REQUIRED.', 'err'); return; }
     if (!password) { dvSetAuthStatus('> CLEARANCE CODE REQUIRED.', 'err'); return; }
     if (password.length < 8) { dvSetAuthStatus('> CLEARANCE CODE INSUFFICIENT. MINIMUM 8 CHARACTERS.', 'err'); return; }
     if (password !== pass2) { dvSetAuthStatus('> CLEARANCE CODE MISMATCH. TRANSMISSION ABORTED.', 'err'); return; }
-    // Check if username input has @ — treat as email
-    var email = username.includes('@') ? username : username + '@diss0linkz.user';
-    // If there's no email field, use username as identifier
-    var emailField = document.getElementById('dv-create-email');
-    if (emailField && emailField.value.trim()) email = emailField.value.trim();
+    // Auto-derive username from email prefix (anonymous by default)
+    var username = email.split('@')[0].toLowerCase().replace(/[^a-z0-9_\-]/g, '').substring(0, 20);
+    if (!username) username = 'operative_' + Date.now().toString(36);
     btn.disabled = true;
     dvSetAuthStatus('> ESTABLISHING SECURE CHANNEL...', 'wait');
 
     // BETA WHITELIST — auto-approve these emails, deny everyone else
-    // LOCKED WHITELIST — GRANDMASTER ONLY until full beta test passes
     var BETA_WHITELIST = [
       'analogflowers@gmail.com'
     ];
     var emailLower = email.toLowerCase();
     var isWhitelisted = BETA_WHITELIST.some(function(w) { return w.toLowerCase() === emailLower; });
 
-    // Check username uniqueness in Firestore
-    _fbDb.collection('users').where('username','==',username).limit(1).get()
-      .then(function(snap) {
-        if (!snap.empty) { throw {code:'username-taken',message:'OPERATIVE ID ALREADY REGISTERED.'}; }
-        return _fbAuth.createUserWithEmailAndPassword(email, password);
-      })
+    _fbAuth.createUserWithEmailAndPassword(email, password)
       .then(function(cred) {
         var userStatus = isWhitelisted ? 'approved' : 'pending';
         return _fbDb.collection('users').doc(cred.user.uid).set({
@@ -4294,7 +4278,7 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
           approvedBy: isWhitelisted ? 'WHITELIST_AUTO' : null,
           approvedAt: isWhitelisted ? firebase.firestore.FieldValue.serverTimestamp() : null,
           config: {
-            displayName: '', bio: '', avatar: '',
+            displayName: '', bio: '', avatar: '', handle: '',
             links: [], socialLinks: {instagram:'',x:'',tiktok:'',youtube:'',spotify:''},
             color: '#00FF41', speed: 5, background: 'matrix', audioUrl: ''
           }
@@ -4302,11 +4286,11 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
       })
       .then(function(result) {
         if (result.status === 'approved') {
-          dvSetAuthStatus('> CLEARANCE GRANTED. WELCOME TO THE NETWORK, OPERATIVE.', 'ok');
+          dvSetSession(username);
+          dvSetAuthStatus('> CLEARANCE GRANTED. WELCOME TO THE NETWORK.', 'ok');
           setTimeout(function() { accessGranted(); }, 600);
         } else {
           dvSetAuthStatus('> ACCESS DENIED.\\n> THIS IS A CLOSED BETA.\\n> ONLY APPROVED OPERATIVES MAY ENTER.', 'err');
-          // Delete non-whitelisted account after showing message
           setTimeout(function() {
             _fbAuth.currentUser.delete().catch(function(){});
             _fbDb.collection('users').doc(result.uid).delete().catch(function(){});
@@ -4317,8 +4301,7 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
         btn.disabled = false;
       })
       .catch(function(e) {
-        var msg = e.code === 'username-taken' ? '> ' + e.message
-                : e.code === 'auth/email-already-in-use' ? '> EMAIL ALREADY REGISTERED. USE SIGN IN.'
+        var msg = e.code === 'auth/email-already-in-use' ? '> EMAIL ALREADY REGISTERED. USE SIGN IN.'
                 : e.code === 'auth/weak-password' ? '> CLEARANCE CODE TOO WEAK. USE 8+ CHARACTERS.'
                 : e.code === 'auth/invalid-email' ? '> INVALID EMAIL FORMAT.'
                 : '> ERROR: ' + e.message;
@@ -4372,7 +4355,7 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
       var ids = [
         { id: 'dv-signin-user', handler: focusNext('dv-signin-pass') },
         { id: 'dv-signin-pass', handler: function(e) { if (e.key === 'Enter') window.dvAccountSignIn(); } },
-        { id: 'dv-create-user', handler: focusNext('dv-create-pass') },
+        { id: 'dv-create-email', handler: focusNext('dv-create-pass') },
         { id: 'dv-create-pass', handler: focusNext('dv-create-pass2') },
         { id: 'dv-create-pass2', handler: function(e) { if (e.key === 'Enter') window.dvAccountCreate(); } }
       ];
