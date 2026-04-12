@@ -199,7 +199,17 @@ body::after{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:r
       <button class="add-link-btn" onclick="addLinkRow()">+ ADD LINK</button>
     </div>
 
-    <!-- SOCIAL ICONS -->
+    <!-- SOCIAL CHANNELS — ADULT PLATFORMS -->
+    <div class="s-section">
+      <div class="s-title">// ADULT PLATFORMS</div>
+      <input class="s-input" id="s-onlyfans" placeholder="ONLYFANS URL">
+      <input class="s-input" id="s-fansly" placeholder="FANSLY URL">
+      <input class="s-input" id="s-sextpanther" placeholder="SEXTPANTHER URL">
+      <input class="s-input" id="s-pornhub" placeholder="PORNHUB URL">
+      <input class="s-input" id="s-manyvids" placeholder="MANYVIDS URL">
+    </div>
+
+    <!-- SOCIAL CHANNELS — MAINSTREAM -->
     <div class="s-section">
       <div class="s-title">// SOCIAL CHANNELS</div>
       <div class="s-row"><input class="s-input" id="s-instagram" placeholder="INSTAGRAM URL" style="flex:2"><input class="s-input" id="s-instagram-count" placeholder="FOLLOWERS" type="number" min="0" style="flex:1;max-width:100px"></div>
@@ -364,6 +374,12 @@ function loadSettings(data) {
   if (config.tiktok) document.getElementById('s-tiktok').value = config.tiktok;
   if (config.youtube) document.getElementById('s-youtube').value = config.youtube;
   if (config.spotify) document.getElementById('s-spotify').value = config.spotify;
+  // Adult platforms
+  if (config.onlyfans) document.getElementById('s-onlyfans').value = config.onlyfans;
+  if (config.fansly) document.getElementById('s-fansly').value = config.fansly;
+  if (config.sextpanther) document.getElementById('s-sextpanther').value = config.sextpanther;
+  if (config.pornhub) document.getElementById('s-pornhub').value = config.pornhub;
+  if (config.manyvids) document.getElementById('s-manyvids').value = config.manyvids;
   // Follower counts
   if (config.followerCounts) {
     if (config.followerCounts.instagram) document.getElementById('s-instagram-count').value = config.followerCounts.instagram;
@@ -578,6 +594,11 @@ function saveSettings() {
     handle: '@' + (userData.username || ''),
     bio: document.getElementById('s-bio').value,
     links: links,
+    onlyfans: sanitizeUrl(document.getElementById('s-onlyfans').value),
+    fansly: sanitizeUrl(document.getElementById('s-fansly').value),
+    sextpanther: sanitizeUrl(document.getElementById('s-sextpanther').value),
+    pornhub: sanitizeUrl(document.getElementById('s-pornhub').value),
+    manyvids: sanitizeUrl(document.getElementById('s-manyvids').value),
     instagram: sanitizeUrl(document.getElementById('s-instagram').value),
     twitter: sanitizeUrl(document.getElementById('s-twitter').value),
     tiktok: sanitizeUrl(document.getElementById('s-tiktok').value),
