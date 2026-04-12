@@ -459,10 +459,16 @@ document.getElementById('s-custom-color').addEventListener('input', function() {
 // ── BACKGROUND PICKER — LIVE PREVIEW ──
 function switchBackground(type) {
   if (type === 'none') {
+    // Stop the animation engine completely + hide canvas
     var c = document.getElementById('dv-matrix-canvas');
-    if (c) { var cx = c.getContext('2d'); cx.clearRect(0,0,c.width,c.height); }
-  } else if (window.dvSetBackground) {
-    window.dvSetBackground(type);
+    if (c) { c.style.display = 'none'; var cx = c.getContext('2d'); cx.clearRect(0,0,c.width,c.height); }
+    // Kill any running timers/frames in backgrounds.js
+    if (window.dvSetBackground) window.dvSetBackground('none');
+  } else {
+    // Show canvas + start selected background
+    var c = document.getElementById('dv-matrix-canvas');
+    if (c) c.style.display = '';
+    if (window.dvSetBackground) window.dvSetBackground(type);
   }
 }
 

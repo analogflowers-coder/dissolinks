@@ -232,15 +232,18 @@
 
   function startBackground(type) {
     currentBg = type || 'matrix';
-    if (_timer) clearInterval(_timer);
-    if (_frame) cancelAnimationFrame(_frame);
+    if (_timer) { clearInterval(_timer); _timer = null; }
+    if (_frame) { cancelAnimationFrame(_frame); _frame = null; }
     ctx.clearRect(0, 0, W, H);
+
+    // OFF — stop everything, blank canvas
+    if (type === 'none' || type === 'off') return;
+
     if (type === 'signal') { scanY = 0; scanDir = 1; }
     if (type === 'hex') initHexStreams();
     if (type === 'grid') gridPulse = 0;
 
     if (type === 'static') {
-      // Static noise needs requestAnimationFrame for smooth rendering
       function staticLoop() {
         drawStaticNoise();
         _frame = requestAnimationFrame(staticLoop);
