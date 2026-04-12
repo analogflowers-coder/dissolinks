@@ -1806,12 +1806,7 @@ var _fbDb = firebase.firestore();
   var isMobile = (window.innerWidth < 768 || navigator.maxTouchPoints > 0);
   if (isMobile) {
     document.addEventListener('DOMContentLoaded', function() {
-      var btn = document.getElementById('dv-ambient-btn');
-      if (btn && !btn._ghostScriptMobileLabelSet) {
-        btn._ghostScriptMobileLabelSet = true;
-        // Ensure hum is off and label reflects OFF state — hum defaults off so no stopHum needed
-        btn.textContent = '\u2B21 AMBIENT // OFF';
-      }
+      // dv-ambient-btn removed (DEAD-07) — no-op
     });
   }
 })();</script>
@@ -3657,13 +3652,25 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
       pwLoop.volume = 0.35;
       pwLoop.play().then(function() { _pwLoopStarted = true; }).catch(function(){});
     }
-    // 2. Hide INITIATE button + unlock scroll for mobile
+    // 2. Hide INITIATE button + PERMANENT scroll unlock
     var tapGate = document.getElementById('dv-tap-gate');
     if (tapGate) tapGate.style.display = 'none';
+    // Remove the class that locks scroll — permanent, not just overridden
+    document.body.classList.remove('dv-gate-active');
     document.body.style.overflow = 'auto';
     document.body.style.position = 'relative';
     document.body.style.height = 'auto';
     document.documentElement.style.overflow = 'auto';
+    // MutationObserver: if dv-gate-active ever gets re-added, remove it immediately
+    var _scrollGuard = new MutationObserver(function(mutations) {
+      mutations.forEach(function(m) {
+        if (m.type === 'attributes' && m.attributeName === 'class' && document.body.classList.contains('dv-gate-active')) {
+          document.body.classList.remove('dv-gate-active');
+          document.body.style.overflow = 'auto';
+        }
+      });
+    });
+    _scrollGuard.observe(document.body, { attributes: true, attributeFilter: ['class'] });
     // 3. Show typewriter "the matrix has you..." and start it
     var matrixHasYou = document.getElementById('dv-matrix-has-you');
     if (matrixHasYou) matrixHasYou.style.display = '';
@@ -3875,24 +3882,29 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
         if (_pwVol <= 0) { clearInterval(_pwFade); pwLoop.pause(); pwLoop.currentTime = 0; }
       }, 40);
     }
-    // Play loading matrix transition sound (delayed 800ms so fade is audible first)
+    // Play loading matrix transition sound (delayed 800ms so password fade is audible first)
     setTimeout(function() {
       var loadSfx = document.getElementById('dv-loading-sound');
       if (loadSfx) {
         loadSfx.volume = 0.6; loadSfx.currentTime = 0;
         loadSfx.play().catch(function(){});
-        // Fade out 3 seconds before the track ends
-        loadSfx.addEventListener('timeupdate', function _fadeCheck() {
-          if (loadSfx.duration && loadSfx.currentTime >= loadSfx.duration - 3) {
-            loadSfx.removeEventListener('timeupdate', _fadeCheck);
+        // Reliable fade: poll every 100ms instead of unreliable timeupdate events
+        var _lFading = false;
+        var _lPoll = setInterval(function() {
+          if (!loadSfx.duration || _lFading) return;
+          if (loadSfx.currentTime >= loadSfx.duration - 3) {
+            _lFading = true;
+            clearInterval(_lPoll);
             var _lVol = loadSfx.volume;
             var _lFade = setInterval(function() {
-              _lVol = Math.max(0, _lVol - 0.01);
+              _lVol = Math.max(0, _lVol - 0.008);
               loadSfx.volume = _lVol;
               if (_lVol <= 0) { clearInterval(_lFade); loadSfx.pause(); }
             }, 30);
           }
-        });
+        }, 100);
+        // Safety net: if track ends without fade (very short track), clean stop
+        loadSfx.addEventListener('ended', function() { clearInterval(_lPoll); }, { once: true });
       }
     }, 800);
 
@@ -5805,9 +5817,7 @@ var dvAudio = (function() {
     } else {
       startHum();
     }
-    /* Update ambient button label */
-    var btn = document.getElementById('dv-ambient-btn');
-    if (btn) btn.textContent = _humActive ? '\u2B21 AMBIENT // ON' : '\u2B21 AMBIENT // OFF';
+    /* dv-ambient-btn removed (DEAD-07) — no label update needed */
     return _humActive;
   }
 
