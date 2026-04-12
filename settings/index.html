@@ -303,10 +303,10 @@ var _sfxError = new Audio('https://cdn.shopify.com/s/files/1/0897/5686/0735/file
 _sfxError.preload = 'auto';
 
 function playClick() {
-  try { var s = _sfxClick.cloneNode(); s.volume = 0.6; s.play().catch(function(){}); } catch(e) {}
+  try { var s = new Audio('https://cdn.shopify.com/s/files/1/0897/5686/0735/files/Diss0LinkZ.COM_--_CLICK_NOISE.mp3?v=1775956954'); s.volume = 0.6; s.play().catch(function(){}); } catch(e) {}
 }
 function playError() {
-  try { var s = _sfxError.cloneNode(); s.volume = 0.7; s.play().catch(function(){}); } catch(e) {}
+  try { var s = new Audio('https://cdn.shopify.com/s/files/1/0897/5686/0735/files/Diss0LinkZ.COM_--_ERROR_ALARM.mp3?v=1775956954'); s.volume = 0.7; s.play().catch(function(){}); } catch(e) {}
 }
 
 // Add click sound to all interactive elements

@@ -3634,7 +3634,7 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
 
   function dvClickSound() {
     try {
-      var s = _dvSfxClickPreload.cloneNode();
+      var s = new Audio(_dvSfxClickSrc);
       s.volume = 0.6;
       s.play().catch(function(){});
     } catch(e) {}
@@ -3758,7 +3758,7 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
 
   function playDeniedSound() {
     try {
-      var s = _dvSfxErrorPreload.cloneNode();
+      var s = new Audio(_dvSfxErrorSrc);
       s.volume = 0.7;
       s.play().catch(function(){});
     } catch(e) {}
@@ -4181,7 +4181,7 @@ document.getElementById('age-gate-toggle').addEventListener('change', function()
     el.className = 'vault-status' + (type ? ' vault-' + type : '');
     // Play error alarm on any error status
     if (type === 'err') {
-      try { var s = _dvSfxErrorPreload.cloneNode(); s.volume = 0.5; s.play().catch(function(){}); } catch(e) {}
+      try { var s = new Audio(_dvSfxErrorSrc); s.volume = 0.5; s.play().catch(function(){}); } catch(e) {}
     }
   }
 

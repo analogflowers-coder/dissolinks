@@ -77,7 +77,7 @@ var _sfxClick = new Audio('https://cdn.shopify.com/s/files/1/0897/5686/0735/file
 _sfxClick.preload = 'auto';
 document.addEventListener('click', function(e) {
   if (e.target.matches('button, a, .logout-btn')) {
-    try { var s = _sfxClick.cloneNode(); s.volume = 0.6; s.play().catch(function(){}); } catch(x) {}
+    try { var s = new Audio('https://cdn.shopify.com/s/files/1/0897/5686/0735/files/Diss0LinkZ.COM_--_CLICK_NOISE.mp3?v=1775956954'); s.volume = 0.6; s.play().catch(function(){}); } catch(x) {}
   }
 }, true);
 </script>
